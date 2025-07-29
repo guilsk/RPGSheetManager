@@ -17,7 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\RPGSheetManager.Application\RPGSheetManager.Application.csproj" />
+    <ProjectReference Include="..\RPGSheetManager.Infra\RPGSheetManager.Infra.csproj" />
   </ItemGroup>
 
 </Project>

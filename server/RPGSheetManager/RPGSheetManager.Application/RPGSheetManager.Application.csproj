@@ -7,12 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Campaigns\" />
-    <Folder Include="Systems\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MongoDB.Bson" Version="3.4.2" />
+    <ProjectReference Include="..\RPGSheetManager.Domain\RPGSheetManager.Domain.csproj" />
   </ItemGroup>
 
 </Project>
