@@ -1,4 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MongoDB.Driver;
+using RPGSheetManager.Application.Services.Characters;
+using RPGSheetManager.Domain.Characters;
+using RPGSheetManager.Infra.Features.Characters;
+using RPGSheetManager.Infra.Settings;
 
 namespace RPGSheetManager.API {
     public class Program {
@@ -6,14 +11,11 @@ namespace RPGSheetManager.API {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}/";
                     options.Audience = builder.Configuration["Auth0:Audience"];
                 });
-
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new() { Title = "RPGSheetManager.API", Version = "v1" });
@@ -47,6 +49,18 @@ namespace RPGSheetManager.API {
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            builder.Services.Configure<MongoDbSettings>(
+                builder.Configuration.GetSection("MongoDb"));
+
+            builder.Services.AddSingleton<IMongoClient>(sp =>
+                new MongoClient(builder.Configuration.GetSection("MongoDb:ConnectionString").Value));
+
+            builder.Services.AddScoped(sp => 
+                sp.GetRequiredService<IMongoClient>()
+                .GetDatabase(builder.Configuration.GetSection("MongoDb:DatabaseName").Value));
+            builder.Services.AddScoped<ICharacterRepository, CharacterRepository>();
+            builder.Services.AddScoped<CharacterService>();
 
             var app = builder.Build();
 

@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPGSheetManager.Domain", "R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPGSheetManager.API", "RPGSheetManager.API\RPGSheetManager.API.csproj", "{0D9B7817-8988-4540-AC80-EE167B650E75}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPGSheetManager.Infra", "RPGSheetManager.Infra\RPGSheetManager.Infra.csproj", "{F760B258-0987-4641-9A1E-D1EBB71A1781}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPGSheetManager.Application", "RPGSheetManager.Application\RPGSheetManager.Application.csproj", "{06A5BA9C-BE86-4145-8DC2-12746264E011}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +33,14 @@ Global
 		{0D9B7817-8988-4540-AC80-EE167B650E75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D9B7817-8988-4540-AC80-EE167B650E75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D9B7817-8988-4540-AC80-EE167B650E75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F760B258-0987-4641-9A1E-D1EBB71A1781}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F760B258-0987-4641-9A1E-D1EBB71A1781}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F760B258-0987-4641-9A1E-D1EBB71A1781}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F760B258-0987-4641-9A1E-D1EBB71A1781}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06A5BA9C-BE86-4145-8DC2-12746264E011}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06A5BA9C-BE86-4145-8DC2-12746264E011}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06A5BA9C-BE86-4145-8DC2-12746264E011}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06A5BA9C-BE86-4145-8DC2-12746264E011}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,6 +48,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{27311AAD-F7ED-4775-9AF4-D4075C97D104} = {6A39B8CC-193F-4D60-990F-66D6707F922F}
 		{0D9B7817-8988-4540-AC80-EE167B650E75} = {1E22A641-EF7E-4F85-A7B4-0EF3B9FA729E}
+		{F760B258-0987-4641-9A1E-D1EBB71A1781} = {E91BB18D-696F-4B81-9B66-EF534E2AC3E8}
+		{06A5BA9C-BE86-4145-8DC2-12746264E011} = {AA2446EB-E62C-429D-81CE-62750D3D775E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DC4692DE-AC93-4AC5-A7FD-266E795BEE40}
