@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Campaigns\" />
-    <Folder Include="Systems\" />
   </ItemGroup>
 
   <ItemGroup>

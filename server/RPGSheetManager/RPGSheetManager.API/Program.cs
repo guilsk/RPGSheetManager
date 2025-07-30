@@ -1,8 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MongoDB.Driver;
 using RPGSheetManager.Application.Services.Characters;
+using RPGSheetManager.Application.Services.Systems;
+using RPGSheetManager.Application.Services.Users;
 using RPGSheetManager.Domain.Characters;
+using RPGSheetManager.Domain.Systems;
+using RPGSheetManager.Domain.Users;
 using RPGSheetManager.Infra.Features.Characters;
+using RPGSheetManager.Infra.Features.Systems;
+using RPGSheetManager.Infra.Features.Users;
 using RPGSheetManager.Infra.Settings;
 
 namespace RPGSheetManager.API {
@@ -59,9 +65,13 @@ namespace RPGSheetManager.API {
             builder.Services.AddScoped(sp => 
                 sp.GetRequiredService<IMongoClient>()
                 .GetDatabase(builder.Configuration.GetSection("MongoDb:DatabaseName").Value));
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<ICharacterRepository, CharacterRepository>();
             builder.Services.AddScoped<CharacterService>();
-
+            builder.Services.AddScoped<ISystemRepository, SystemRepository>();
+            builder.Services.AddScoped<SystemService>();
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
