@@ -11,6 +11,7 @@ namespace RPGSheetManager.Domain.Systems {
         public required string Description { get; set; }
         [BsonRepresentation(BsonType.String)]
         public Guid OwnerId { get; set; }
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public List<CharacterData> Template { get; set; } = new List<CharacterData>();
     }
