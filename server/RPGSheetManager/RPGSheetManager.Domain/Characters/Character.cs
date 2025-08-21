@@ -19,11 +19,19 @@ namespace RPGSheetManager.Domain.Characters {
     public class CharacterData {
         public required string Name { get; set; }
         public string? Value { get; set; }
+        public RollConfig? Rollable { get; set; }
+        public string? Expression { get; set; }
         public bool Editable { get; set; }
+        public bool Edited { get; set; }
         public bool SessionEditable { get; set; }
         public bool Visible { get; set; }
         public string? Category { get; set; }
         public required string Component { get; set; }
         public int? Order { get; set; }
+    }
+
+    public class RollConfig {
+        public bool Enabled { get; set; }
+        public string? Formula { get; set; }
     }
 }
