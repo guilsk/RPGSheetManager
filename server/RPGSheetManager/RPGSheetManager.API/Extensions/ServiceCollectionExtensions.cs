@@ -12,6 +12,7 @@ namespace RPGSheetManager.API.Extensions
                 {
                     options.Authority = $"https://{configuration["Auth0:Domain"]}/";
                     options.Audience = configuration["Auth0:Audience"];
+                    options.MapInboundClaims = false;
                 });
             return services;
         }

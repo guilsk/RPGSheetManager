@@ -1,0 +1,15 @@
+<div class="container">
+	<h1>Bem-vindo ao RPG Manager</h1>
+
+	<ng-container *ngIf="auth.isAuthenticated$ | async; else loginBlock">
+		<p>✅ Logado como:</p>
+		<pre>{{ auth.user$ | async | json }}</pre>
+		<button (click)="auth.logout()">
+			Logout
+		</button>
+	</ng-container>
+
+	<ng-template #loginBlock>
+		<button (click)="auth.loginWithRedirect()" type="button">Login com Auth0</button>
+	</ng-template>
+</div>

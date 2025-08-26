@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RPGSheetManager.Domain.Characters;
 using RPGSheetManager.Application.Services.Characters;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RPGSheetManager.API.Controllers.Characters {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CharacterController : ControllerBase {
