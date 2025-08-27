@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@auth0/auth0-angular';
-import { UserService } from './auth/user.service';
-import { firstValueFrom } from 'rxjs';
-import { User } from './models/user.model';
+import { UserService } from './entities/user/user.service';
+import { User } from './entities/user/user.model';
+import { LayoutComponent } from './shared/ui/layout/layout.component';
 
 @Component({
 	selector: 'app-root',
 	standalone: true,
-	imports: [CommonModule],
+	imports: [CommonModule, LayoutComponent],
 	templateUrl: './app.component.html',
-	styleUrls: ['./app.component.scss']
+	styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
 	constructor(
@@ -19,10 +19,6 @@ export class AppComponent implements OnInit {
 	) { }
 
 	public async ngOnInit(): Promise<void> {
-		const token = await firstValueFrom(this.auth.getAccessTokenSilently({
-			authorizationParams: { audience: 'https://rpg-sheetmanager/' }
-		}));
-
 		this.auth.user$.subscribe(profile => {
 			if (profile) {
 				const user: User = {
