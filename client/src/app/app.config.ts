@@ -22,7 +22,7 @@ export const appConfig: ApplicationConfig = {
 			httpInterceptor: {
 				allowedList: [
 					{
-						uri: 'https://localhost:44397/api/*',
+						uri: 'https://localhost:7111/api/*',
 						tokenOptions: {
 							authorizationParams: { audience: 'https://rpg-sheetmanager/' }
 						}
