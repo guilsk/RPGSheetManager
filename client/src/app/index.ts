@@ -1,18 +1,14 @@
 // Shared API
-export * from './shared/api/auth.interceptor';
+export * from './auth/auth.interceptor';
 
 // Entities
-export * from './entities/user/user.model';
-export * from './entities/user/user.service';
-export * from './entities/character/character.model';
-export * from './entities/system/system.model';
-export * from './entities/campaign/campaign.model';
-
+export * from './features/services/user.service';
+export * from './shared/models/rpg-sheet-manager.model';
 // Shared
-export * from './shared/guards/auth.guard';
-export * from './shared/ui/layout/layout.component';
+export * from './auth/auth.guard';
+export * from './features/pages/layout/layout.component';
 
 // Pages
-export * from './pages/characters/characters.component';
-export * from './pages/systems/systems.component';
-export * from './pages/campaigns/campaigns.component';
+export * from './features/pages/characters/characters.component';
+export * from './features/pages/systems/systems.component';
+export * from './features/pages/campaigns/campaigns.component';

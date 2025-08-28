@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@auth0/auth0-angular';
-import { UserService } from './entities/user/user.service';
-import { User } from './entities/user/user.model';
-import { LayoutComponent } from './shared/ui/layout/layout.component';
+import { UserService } from './features/services/user.service';
+import { LayoutComponent } from './features/pages/layout/layout.component';
+import { IUser } from './shared/models/rpg-sheet-manager.model';
 
 @Component({
 	selector: 'app-root',
@@ -21,9 +21,10 @@ export class AppComponent implements OnInit {
 	public async ngOnInit(): Promise<void> {
 		this.auth.user$.subscribe(profile => {
 			if (profile) {
-				const user: User = {
+				const user: IUser = {
 					authId: profile.sub,
-					displayName: profile.name
+					displayName: profile.name,
+					createdAt: profile.updated_at ? new Date(profile.updated_at) : new Date()
 				};
 				this.userService.post(user).subscribe();
 			}
