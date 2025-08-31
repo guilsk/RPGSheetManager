@@ -1,44 +1,56 @@
+// Enums
+export enum ComponentType {
+	TEXT = 'text',
+	NUMERIC = 'numeric',
+	TEXTAREA = 'textarea',
+	SELECT = 'select',
+	CHECKBOX = 'checkbox',
+	RADIO = 'radio'
+}
+
 // Personagens
-export interface ICharacter {
+export interface Character {
 	id?: string;
 	systemId?: string;
 	userId?: string;
 	createdAt?: Date;
 	name?: string;
-	data?: ICharacterData[];
+	data?: CharacterData[];
 }
 
-export interface ICharacterData {
+export interface CharacterData {
 	name?: string;
 	value?: string;
-	rollable?: IRollConfig;
+	rollable?: RollConfig;
 	expression?: string;
 	editable?: boolean;
-	edited?: boolean;
+	edited?: boolean; // Alinhado com o backend
 	sessionEditable?: boolean;
 	visible?: boolean;
 	category?: string;
-	component?: string;
+	component?: ComponentType;
 	order?: number;
+	options?: string[]; // Para select e radio
 }
 
-export interface IRollConfig {
+export interface RollConfig {
 	enabled?: boolean;
 	formula?: string;
 }
 
 // Sistemas
-export interface IRpgSystem {
+export interface RpgSystem {
     id?: string;
     name?: string;
     description?: string;
     ownerId?: string;
     createdAt?: Date;
-    template?: ICharacterData[];
+    template?: CharacterData[];
+	categoryOrder?: string[];
 }
 
 // Campanhas
-export interface ICampaign {
+export interface Campaign {
     id?: string;
     title?: string;
     systemId?: string;
@@ -46,24 +58,24 @@ export interface ICampaign {
     playerIds?: string[];
     createdAt?: Date;
     activeSession?: boolean;
-    characters?: ICampaignCharacter[];
-    chatMessages?: IChatMessage[];
-    diceHistory?: IDiceRoll[];
+    characters?: CampaignCharacter[];
+    chatMessages?: ChatMessage[];
+    diceHistory?: DiceRoll[];
 }
 
-export interface ICampaignCharacter {
+export interface CampaignCharacter {
     charId?: string;
     playerId?: string;
-    dynamicData?: IDynamicField[];
+    dynamicData?: DynamicField[];
 }
 
-export interface IChatMessage {
+export interface ChatMessage {
 	senderId?: string;
 	timestamp?: Date;
 	message?: string;
 }
 
-export interface IDiceRoll {
+export interface DiceRoll {
 	rollerId?: string;
 	expression?: string;
 	result?: number;
@@ -71,13 +83,13 @@ export interface IDiceRoll {
 	timestamp?: Date;
 }
 
-export interface IDynamicField {
+export interface DynamicField {
 	name?: string;
 	value?: string;
 }
 
 // Usuários
-export interface IUser {
+export interface User {
     authId?: string;
     displayName?: string;
     createdAt?: Date;

@@ -8,9 +8,26 @@ export const routes: Routes = [
 		pathMatch: 'full'
 	},
 	{
+		path: 'callback',
+		loadComponent: () => import('./features/pages/auth-callback/auth-callback.component')
+			.then(m => m.AuthCallbackComponent)
+	},
+	{
 		path: 'characters',
 		loadComponent: () => import('./features/pages/characters/characters.component')
 			.then(m => m.CharactersComponent),
+		canActivate: [authGuard]
+	},
+	{
+		path: 'characters/new',
+		loadComponent: () => import('./features/pages/characters/character-edit/character-edit.component')
+			.then(m => m.CharacterEditComponent),
+		canActivate: [authGuard]
+	},
+	{
+		path: 'characters/edit/:id',
+		loadComponent: () => import('./features/pages/characters/character-edit/character-edit.component')
+			.then(m => m.CharacterEditComponent),
 		canActivate: [authGuard]
 	},
 	{

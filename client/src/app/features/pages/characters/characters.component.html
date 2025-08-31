@@ -6,61 +6,34 @@
 
 	<div class="page-content">
 		<div class="actions">
-			<button class="btn btn-primary">Criar Novo Personagem</button>
+			<button class="btn btn-primary" routerLink="/characters/new">Criar Novo Personagem</button>
 		</div>
 
 		<div class="characters-grid">
-			<div class="character-card">
+			<div class="character-card" *ngFor="let character of characters">
 				<div class="character-header">
-					<h3>Aragorn, Guardião</h3>
-					<span class="level">Nível 12</span>
+					<h3>{{ character.name }}</h3>
+					<span class="level">{{ getCharacterLevel(character) }}</span>
 				</div>
-				<p class="system">Sistema: D&D 5e</p>
-				<p class="campaign">Campanha: A Ascensão dos Dragões</p>
+				<p class="system">Sistema: {{ getSystemName(character.systemId) }}</p>
 				<div class="character-stats">
-					<div class="stat">
-						<span class="label">Força:</span>
-						<span class="value">18</span>
-					</div>
-					<div class="stat">
-						<span class="label">Destreza:</span>
-						<span class="value">14</span>
-					</div>
-					<div class="stat">
-						<span class="label">Constituição:</span>
-						<span class="value">16</span>
+					<div class="stat" *ngFor="let stat of getMainStats(character); let i = index" [hidden]="i >= 3">
+						<span class="label">{{ stat.name }}:</span>
+						<span class="value">{{ stat.value }}</span>
 					</div>
 				</div>
 				<div class="card-actions">
-					<button class="btn btn-secondary">Editar</button>
-					<button class="btn btn-primary">Ver Ficha</button>
+					<button class="btn btn-secondary" [routerLink]="['/characters/edit', character.id]">Editar</button>
+					<button class="btn btn-primary" (click)="deleteCharacter(character)">Deletar</button>
 				</div>
 			</div>
 
-			<div class="character-card">
-				<div class="character-header">
-					<h3>Dr. Henry Jones</h3>
-					<span class="level">Investigador</span>
-				</div>
-				<p class="system">Sistema: Call of Cthulhu</p>
-				<p class="campaign">Campanha: Mistérios de Arkham</p>
-				<div class="character-stats">
-					<div class="stat">
-						<span class="label">Força:</span>
-						<span class="value">60</span>
-					</div>
-					<div class="stat">
-						<span class="label">Destreza:</span>
-						<span class="value">70</span>
-					</div>
-					<div class="stat">
-						<span class="label">Inteligência:</span>
-						<span class="value">85</span>
-					</div>
-				</div>
-				<div class="card-actions">
-					<button class="btn btn-secondary">Editar</button>
-					<button class="btn btn-primary">Ver Ficha</button>
+			<!-- Card para criar novo personagem -->
+			<div class="character-card new-character-card" routerLink="/characters/new">
+				<div class="new-character-content">
+					<div class="new-character-icon">+</div>
+					<h3>Criar Novo Personagem</h3>
+					<p>Adicione um novo personagem ao seu grupo</p>
 				</div>
 			</div>
 		</div>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { IUser } from '../../shared/models/rpg-sheet-manager.model';
+import { User } from '../../shared/models/rpg-sheet-manager.model';
 
 @Injectable({
     providedIn: 'root'
@@ -10,7 +10,7 @@ export class UserService {
 
     constructor(private http: HttpClient) {}
 
-    public post(userInfo: IUser): any {
-        return this.http.post<IUser>(this.apiUrl, userInfo);
+    public post(userInfo: User): any {
+        return this.http.post<User>(this.apiUrl, userInfo);
     }
 }

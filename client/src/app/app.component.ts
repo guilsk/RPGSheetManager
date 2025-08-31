@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '@auth0/auth0-angular';
 import { UserService } from './features/services/user.service';
 import { LayoutComponent } from './features/pages/layout/layout.component';
-import { IUser } from './shared/models/rpg-sheet-manager.model';
+import { User } from './shared/models/rpg-sheet-manager.model';
+import { catchError, switchMap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
 	selector: 'app-root',
@@ -19,15 +21,30 @@ export class AppComponent implements OnInit {
 	) { }
 
 	public async ngOnInit(): Promise<void> {
-		this.auth.user$.subscribe(profile => {
-			if (profile) {
-				const user: IUser = {
-					authId: profile.sub,
-					displayName: profile.name,
-					createdAt: profile.updated_at ? new Date(profile.updated_at) : new Date()
-				};
-				this.userService.post(user).subscribe();
+		// Tratar erros de autenticação
+		this.auth.error$.subscribe(error => {
+			if (error) {
+				console.error('Erro de autenticação Auth0:', error);
 			}
 		});
+
+		// Processar usuário autenticado
+		this.auth.user$.pipe(
+			switchMap(profile => {
+				if (profile) {
+					const user: User = {
+						authId: profile.sub,
+						displayName: profile.name,
+						createdAt: profile.updated_at ? new Date(profile.updated_at) : new Date()
+					};
+					return this.userService.post(user);
+				}
+				return of(null);
+			}),
+			catchError(error => {
+				console.error('Erro ao processar usuário:', error);
+				return of(null);
+			})
+		).subscribe();
 	}
 }

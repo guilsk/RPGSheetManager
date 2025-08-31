@@ -14,7 +14,7 @@ export const appConfig: ApplicationConfig = {
 			domain: 'dev-j4yhsqhd3jiqhal4.us.auth0.com',
 			clientId: 'VYpgkGhW4JmH4980SiGBvWS891jqk55t',
 			authorizationParams: {
-				redirect_uri: window.location.origin,
+				redirect_uri: `${window.location.origin}/callback`,
 				audience: 'https://rpg-sheetmanager/'
 			},
 			useRefreshTokens: true,

@@ -115,6 +115,50 @@
 	}
 }
 
+.new-character-card {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 200px;
+	border: 2px dashed #d1d5db;
+	background: #f9fafb;
+	cursor: pointer;
+	transition: all 0.3s ease;
+
+	&:hover {
+		border-color: #3b82f6;
+		background: #eff6ff;
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+	}
+
+	.new-character-content {
+		text-align: center;
+		
+		.new-character-icon {
+			font-size: 3rem;
+			color: #9ca3af;
+			margin-bottom: 1rem;
+			transition: color 0.3s ease;
+		}
+
+		h3 {
+			color: #374151;
+			margin-bottom: 0.5rem;
+			font-size: 1.25rem;
+		}
+
+		p {
+			color: #6b7280;
+			font-size: 0.875rem;
+		}
+	}
+
+	&:hover .new-character-content .new-character-icon {
+		color: #3b82f6;
+	}
+}
+
 .btn {
 	padding: 0.5rem 1rem;
 	border: none;
