@@ -13,7 +13,7 @@ namespace RPGSheetManager.Infra.Features.Characters {
             return await _collection.Find(_ => true).ToListAsync();
         }
 
-        public async Task<Character?> GetByIdAsync(Guid id) {
+        public async Task<Character?> GetByIdAsync(string id) {
             return await _collection.Find(c => c.Id == id).FirstOrDefaultAsync();
         }
 
@@ -21,11 +21,11 @@ namespace RPGSheetManager.Infra.Features.Characters {
             await _collection.InsertOneAsync(character);
         }
 
-        public async Task UpdateAsync(Guid id, Character updated) {
+        public async Task UpdateAsync(string id, Character updated) {
             await _collection.ReplaceOneAsync(c => c.Id == id, updated);
         }
 
-        public async Task DeleteAsync(Guid id) {
+        public async Task DeleteAsync(string id) {
             await _collection.DeleteOneAsync(c => c.Id == id);
         }
     }

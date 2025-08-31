@@ -18,8 +18,8 @@ namespace RPGSheetManager.API.Controllers.Systems {
             return Ok(characters);
         }
 
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetById(Guid id) {
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id) {
             var character = await _service.GetByIdAsync(id);
             if (character == null) return NotFound();
             return Ok(character);
@@ -27,21 +27,21 @@ namespace RPGSheetManager.API.Controllers.Systems {
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] RPGSystem system) {
-            system.Id = Guid.NewGuid();
+            system.Id = Guid.NewGuid().ToString();
             system.CreatedAt = DateTime.UtcNow;
             await _service.AddAsync(system);
             return CreatedAtAction(nameof(GetById), new { id = system.Id }, system);
         }
 
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] RPGSystem system) {
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, [FromBody] RPGSystem system) {
             system.Id = id;
             await _service.UpdateAsync(id, system);
             return NoContent();
         }
 
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid id) {
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id) {
             await _service.DeleteAsync(id);
             return NoContent();
         }

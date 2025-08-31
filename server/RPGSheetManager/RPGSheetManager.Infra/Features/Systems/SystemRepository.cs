@@ -13,7 +13,7 @@ namespace RPGSheetManager.Infra.Features.Systems {
             return await _collection.Find(_ => true).ToListAsync();
         }
 
-        public async Task<RPGSystem?> GetByIdAsync(Guid id) {
+        public async Task<RPGSystem?> GetByIdAsync(string id) {
             return await _collection.Find(c => c.Id == id).FirstOrDefaultAsync();
         }
 
@@ -21,11 +21,11 @@ namespace RPGSheetManager.Infra.Features.Systems {
             await _collection.InsertOneAsync(systems);
         }
 
-        public async Task UpdateAsync(Guid id, RPGSystem updated) {
+        public async Task UpdateAsync(string id, RPGSystem updated) {
             await _collection.ReplaceOneAsync(c => c.Id == id, updated);
         }
 
-        public async Task DeleteAsync(Guid id) {
+        public async Task DeleteAsync(string id) {
             await _collection.DeleteOneAsync(c => c.Id == id);
         }
     }

@@ -8,9 +8,9 @@ namespace RPGSheetManager.Application.Services.Systems {
         }
 
         public Task<List<RPGSystem>> GetAllAsync() => _repository.GetAllAsync();
-        public Task<RPGSystem?> GetByIdAsync(Guid id) => _repository.GetByIdAsync(id);
+        public Task<RPGSystem?> GetByIdAsync(string id) => _repository.GetByIdAsync(id);
         public Task AddAsync(RPGSystem system) => _repository.AddAsync(system);
-        public Task UpdateAsync(Guid id, RPGSystem system) => _repository.UpdateAsync(id, system);
-        public Task DeleteAsync(Guid id)=> _repository.DeleteAsync(id);
+        public Task UpdateAsync(string id, RPGSystem system) => _repository.UpdateAsync(id, system);
+        public Task DeleteAsync(string id)=> _repository.DeleteAsync(id);
     }
 }
