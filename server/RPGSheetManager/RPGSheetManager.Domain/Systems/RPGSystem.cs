@@ -4,6 +4,7 @@ using RPGSheetManager.Domain.Characters;
 
 namespace RPGSheetManager.Domain.Systems {
     public class RPGSystem {
+        [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public required string Id { get; set; }
         [BsonElement("name")]
