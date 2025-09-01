@@ -47,7 +47,7 @@ export class CharacterService {
     createCharacter(character: Character): Observable<Character> {
         // Preparar dados para envio (remover campos opcionais vazios)
         const characterToCreate = this.prepareCharacterForApi(character);
-        
+
         return this.http.post<Character>(this.apiUrl, characterToCreate).pipe(
             tap(createdCharacter => {
                 // Atualizar lista local
@@ -67,7 +67,7 @@ export class CharacterService {
         }
 
         const characterToUpdate = this.prepareCharacterForApi(character);
-        
+
         return this.http.put<Character>(`${this.apiUrl}/${character.id}`, characterToUpdate).pipe(
             tap(() => {
                 // Atualizar lista local
@@ -131,11 +131,11 @@ export class CharacterService {
     // Método para calcular valores baseados em expressões
     calculateExpressions(data: CharacterData[]): CharacterData[] {
         const processedData = [...data];
-        
+
         processedData.forEach(field => {
             if (field.expression && !field.edited) {
                 let expression = field.expression;
-                
+
                 // Substituir referências a outros campos
                 processedData.forEach(otherField => {
                     if (otherField.name && otherField.value) {
@@ -152,7 +152,7 @@ export class CharacterService {
                 }
             }
         });
-        
+
         return processedData;
     }
 
@@ -160,11 +160,11 @@ export class CharacterService {
         // Remove espaços e valida se a expressão contém apenas números e operadores seguros
         const sanitized = expression.replace(/\s/g, '');
         const safePattern = /^[\d+\-*/().]+$/;
-        
+
         if (!safePattern.test(sanitized)) {
             throw new Error('Expressão contém caracteres inválidos');
         }
-        
+
         // Para expressões simples como soma, subtração, multiplicação e divisão
         // Em produção, considere usar uma biblioteca como math.js ou similar
         try {

@@ -11,5 +11,5 @@ import { AuthService } from '@auth0/auth0-angular';
 	styleUrl: './layout.component.scss'
 })
 export class LayoutComponent {
-	constructor(public auth: AuthService) {}
+	constructor(public auth: AuthService) { }
 }

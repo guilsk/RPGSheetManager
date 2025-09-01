@@ -41,7 +41,7 @@ export class AuthCallbackComponent implements OnInit {
 	constructor(
 		private auth: AuthService,
 		private router: Router
-	) {}
+	) { }
 
 	ngOnInit() {
 		// O Auth0 Angular SDK automaticamente processa o callback

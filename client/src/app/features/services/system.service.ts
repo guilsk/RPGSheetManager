@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 export class SystemService {
     private apiUrl = 'https://localhost:7111/api/system';
 
-     constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient) { }
 
     public getSystems(): Observable<RpgSystem[]> {
         return this.http.get<RpgSystem[]>(this.apiUrl);
