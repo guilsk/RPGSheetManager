@@ -23,12 +23,22 @@ export class DiceService {
 	 */
 	rollDice(formula: string, fieldValues: { [key: string]: string } = {}): DiceRollResult {
 		let processedFormula = formula.trim();
+		
+		console.log('🎲 Fórmula original:', formula);
+		console.log('🎲 Valores disponíveis:', fieldValues);
 
 		// Substituir variáveis por valores dos campos
 		Object.keys(fieldValues).forEach(key => {
-			const regex = new RegExp(`{${key}}`, 'g');
+			const regex = new RegExp(`\\{${key}\\}`, 'g');
+			const oldFormula = processedFormula;
 			processedFormula = processedFormula.replace(regex, fieldValues[key] || '0');
+			
+			if (oldFormula !== processedFormula) {
+				console.log(`🎲 Substituído {${key}} por "${fieldValues[key]}" na fórmula`);
+			}
 		});
+
+		console.log('🎲 Fórmula processada:', processedFormula);
 
 		// Analisar a fórmula
 		const result = this.parseAndRoll(processedFormula);
@@ -43,22 +53,38 @@ export class DiceService {
 	}
 
 	private parseAndRoll(formula: string): { total: number, rolls: number[], modifier: number, breakdown: string } {
+		console.log('🎲 Analisando fórmula:', formula);
+		
 		const parts: string[] = [];
 		const rolls: number[] = [];
 		let total = 0;
 		let modifier = 0;
 
-		// Dividir a fórmula em partes (dados e modificadores)
-		const dicePattern = /(\d+d\d+)|([+-]\d+)/g;
+		// Limpar espaços da fórmula
+		const cleanFormula = formula.replace(/\s/g, '');
+		
+		// Padrão melhorado que captura dados e modificadores (incluindo negativos)
+		// Captura: números seguidos de 'd' e números, ou operadores seguidos de números
+		const dicePattern = /(\d+d\d+)|([+-]?\d+)/g;
 		let match;
 
-		while ((match = dicePattern.exec(formula)) !== null) {
+		// Se a fórmula começa com um número (sem sinal), adiciona '+' implícito
+		let processedFormula = cleanFormula;
+		if (/^\d/.test(processedFormula) && !processedFormula.includes('d')) {
+			processedFormula = '+' + processedFormula;
+		}
+
+		while ((match = dicePattern.exec(processedFormula)) !== null) {
 			parts.push(match[0]);
 		}
 
+		console.log('🎲 Partes encontradas:', parts);
+
 		let breakdown = '';
 
-		for (const part of parts) {
+		for (let i = 0; i < parts.length; i++) {
+			const part = parts[i];
+			
 			if (part.includes('d')) {
 				// É um dado (ex: "2d6")
 				const [count, sides] = part.split('d').map(Number);
@@ -72,15 +98,25 @@ export class DiceService {
 				breakdown += `${part}(${diceRolls.join(',')})`;
 
 			} else {
-				// É um modificador (ex: "+3", "-1")
-				const mod = parseInt(part);
+				// É um modificador (ex: "+3", "-1", "3")
+				let mod = parseInt(part);
+				
+				// Se não tem sinal e não é o primeiro elemento, assumir positivo
+				if (!part.startsWith('+') && !part.startsWith('-') && i > 0) {
+					mod = Math.abs(mod);
+				}
+				
 				modifier += mod;
 				total += mod;
 
-				if (breakdown) breakdown += ' ';
-				breakdown += part;
+				if (breakdown) {
+					breakdown += mod >= 0 ? ' + ' : ' ';
+				}
+				breakdown += mod >= 0 && breakdown ? mod.toString() : part;
 			}
 		}
+
+		console.log('🎲 Total calculado:', total, 'Breakdown:', breakdown);
 
 		return {
 			total,
@@ -110,8 +146,12 @@ export class DiceService {
 	 * @returns true se a fórmula é válida
 	 */
 	validateFormula(formula: string): boolean {
-		const pattern = /^(\d+d\d+)([+-]\d+)*$/;
-		return pattern.test(formula.replace(/\s/g, '').replace(/{[^}]+}/g, '1'));
+		// Remove espaços e substitui variáveis por números para validação
+		const cleanFormula = formula.replace(/\s/g, '').replace(/\{[^}]+\}/g, '1');
+		
+		// Padrão que aceita dados e modificadores (com ou sem sinais)
+		const pattern = /^(\d+d\d+)([+-]?\d+)*$/;
+		return pattern.test(cleanFormula);
 	}
 
 	/**

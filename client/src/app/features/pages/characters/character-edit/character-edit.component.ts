@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -26,6 +26,7 @@ export class CharacterEditComponent implements OnInit {
 	private router = inject(Router);
 	private characterService = inject(CharacterService);
 	private systemService = inject(SystemService);
+	private cdr = inject(ChangeDetectorRef);
 
 	characterForm!: FormGroup;
 	character: Character = {};
@@ -271,8 +272,22 @@ export class CharacterEditComponent implements OnInit {
 	}
 
 	private processExpressions() {
-		this.characterData = this.characterService.calculateExpressions(this.characterData);
-		this.organizeDataByCategory();
+		console.log('Processando expressões...');
+		const updatedData = this.characterService.calculateExpressions(this.characterData);
+		
+		// Verificar se houve mudanças
+		const hasChanges = updatedData.some((field, index) => 
+			field.value !== this.characterData[index]?.value
+		);
+		
+		if (hasChanges) {
+			console.log('Detectadas mudanças nos valores, atualizando interface...');
+			this.characterData = updatedData;
+			this.organizeDataByCategory();
+			this.cdr.detectChanges(); // Forçar detecção de mudanças
+		} else {
+			console.log('Nenhuma mudança detectada nos valores');
+		}
 	}
 
 	onSubmit() {

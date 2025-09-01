@@ -130,46 +130,112 @@ export class CharacterService {
 
     // Método para calcular valores baseados em expressões
     calculateExpressions(data: CharacterData[]): CharacterData[] {
-        const processedData = [...data];
+        // Criar uma cópia profunda para evitar mutação direta
+        const processedData = data.map(field => ({...field}));
+        
+        console.log('Iniciando cálculo de expressões para', processedData.length, 'campos');
 
-        processedData.forEach(field => {
-            if (field.expression && !field.edited) {
-                let expression = field.expression;
+        // Primeira passagem: calcular expressões que não dependem de outras expressões
+        let hasChanges = true;
+        let iterations = 0;
+        const maxIterations = 5; // Prevenir loop infinito
 
-                // Substituir referências a outros campos
-                processedData.forEach(otherField => {
-                    if (otherField.name && otherField.value) {
-                        const regex = new RegExp(`{${otherField.name}}`, 'g');
-                        expression = expression.replace(regex, otherField.value);
+        while (hasChanges && iterations < maxIterations) {
+            hasChanges = false;
+            iterations++;
+            console.log(`Iteração ${iterations} de cálculo de expressões`);
+
+            processedData.forEach(field => {
+                if (field.expression && !field.edited) {
+                    let expression = field.expression;
+                    const originalValue = field.value;
+                    
+                    console.log(`Processando campo "${field.name}" com expressão: "${expression}"`);
+
+                    // Substituir referências a outros campos
+                    processedData.forEach(otherField => {
+                        if (otherField.name && otherField.value !== undefined && otherField.value !== '') {
+                            const regex = new RegExp(`{${otherField.name}}`, 'g');
+                            const oldExpression = expression;
+                            expression = expression.replace(regex, otherField.value);
+                            
+                            if (oldExpression !== expression) {
+                                console.log(`Substituído {${otherField.name}} por "${otherField.value}" na expressão`);
+                            }
+                        }
+                    });
+
+                    console.log(`Expressão final para "${field.name}":`, expression);
+
+                    // Só calcular se todas as variáveis foram substituídas
+                    if (!expression.includes('{')) {
+                        try {
+                            const result = this.evaluateSimpleExpression(expression);
+                            const newValue = result.toString();
+                            
+                            if (newValue !== originalValue) {
+                                field.value = newValue;
+                                hasChanges = true;
+                                console.log(`Resultado calculado para "${field.name}":`, result);
+                            }
+                        } catch (e) {
+                            console.warn('Erro ao processar expressão:', expression, e);
+                        }
+                    } else {
+                        console.log(`Expressão "${field.name}" ainda contém variáveis não resolvidas:`, expression);
                     }
-                });
-
-                // Implementação segura para avaliar expressões matemáticas simples
-                try {
-                    field.value = this.evaluateSimpleExpression(expression).toString();
-                } catch (e) {
-                    console.warn('Erro ao processar expressão:', expression, e);
                 }
-            }
-        });
+            });
+        }
+
+        if (iterations >= maxIterations) {
+            console.warn('Máximo de iterações atingido para cálculo de expressões');
+        }
 
         return processedData;
     }
 
     private evaluateSimpleExpression(expression: string): number {
-        // Remove espaços e valida se a expressão contém apenas números e operadores seguros
-        const sanitized = expression.replace(/\s/g, '');
-        const safePattern = /^[\d+\-*/().]+$/;
-
-        if (!safePattern.test(sanitized)) {
-            throw new Error('Expressão contém caracteres inválidos');
+        // Limpa a expressão mas preserva sua estrutura
+        const sanitized = expression.trim();
+        
+        console.log('Avaliando expressão:', sanitized);
+        
+        // Remove a validação restritiva que estava bloqueando as expressões válidas
+        // Apenas verifica se não contém caracteres claramente perigosos
+        const dangerousPattern = /[;&|`${}]/;
+        
+        if (dangerousPattern.test(sanitized)) {
+            throw new Error('Expressão contém caracteres perigosos');
         }
 
-        // Para expressões simples como soma, subtração, multiplicação e divisão
-        // Em produção, considere usar uma biblioteca como math.js ou similar
         try {
-            // Usa Function constructor como alternativa mais segura ao eval direto
-            return new Function('return ' + sanitized)();
+            // Cria um contexto seguro com as funções Math disponíveis
+            const safeContext = {
+                Math: Math,
+                parseInt: parseInt,
+                parseFloat: parseFloat,
+                Number: Number,
+                isNaN: isNaN,
+                isFinite: isFinite
+            };
+
+            // Usa Function constructor com contexto controlado
+            const func = new Function(...Object.keys(safeContext), `return ${sanitized}`);
+            const result = func(...Object.values(safeContext));
+            
+            console.log('Resultado da expressão:', result);
+            
+            // Converte o resultado para número se possível
+            if (typeof result === 'number' && !isNaN(result)) {
+                return result;
+            } else if (typeof result === 'string' && !isNaN(Number(result))) {
+                return Number(result);
+            } else if (typeof result === 'boolean') {
+                return result ? 1 : 0;
+            }
+            
+            return 0;
         } catch (error) {
             console.error('Erro ao avaliar expressão:', sanitized, error);
             return 0;

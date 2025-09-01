@@ -722,7 +722,7 @@
       "order": 2,
       "editable": false,
       "visible": true,
-      "expression": "8 + {Bônus de Proficiencia} + ({spellcastingAbility} === 'Inteligência' ? {Modificador de Inteligência} : {spellcastingAbility} === 'Sabedoria' ? {Modificador de Sabedoria} : {spellcastingAbility} === 'Carisma' ? {Modificador de Carisma} : 0)"
+      "expression": "8 + {Bônus de Proficiência} + ({spellcastingAbility} === 'Inteligência' ? {Modificador de Inteligência} : {spellcastingAbility} === 'Sabedoria' ? {Modificador de Sabedoria} : {spellcastingAbility} === 'Carisma' ? {Modificador de Carisma} : 0)"
     },
     {
       "name": "spellAttackBonus",
@@ -732,7 +732,7 @@
       "order": 3,
       "editable": false,
       "visible": true,
-      "expression": "{Bônus de Proficiencia} + ({spellcastingAbility} === 'Inteligência' ? {Modificador de Inteligência} : {spellcastingAbility} === 'Sabedoria' ? {Modificador de Sabedoria} : {spellcastingAbility} === 'Carisma' ? {Modificador de Carisma} : 0)",
+      "expression": "{Bônus de Proficiência} + ({spellcastingAbility} === 'Inteligência' ? {Modificador de Inteligência} : {spellcastingAbility} === 'Sabedoria' ? {Modificador de Sabedoria} : {spellcastingAbility} === 'Carisma' ? {Modificador de Carisma} : 0)",
       "rollable": {
         "enabled": true,
         "formula": "1d20 + {spellAttackBonus}"
