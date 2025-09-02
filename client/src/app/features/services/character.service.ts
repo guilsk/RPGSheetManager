@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, BehaviorSubject, map, tap, catchError, of, switchMap } from 'rxjs';
+import { Observable, BehaviorSubject, map, tap, catchError, of, switchMap, take } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { AuthService } from '@auth0/auth0-angular';
+import { AuthService, User } from '@auth0/auth0-angular';
 import { Character, CharacterData } from '../../shared/models/rpg-sheet-manager.model';
 
 @Injectable({
@@ -13,30 +13,19 @@ export class CharacterService {
     public characters$ = this.charactersSubject.asObservable();
 
     constructor(private http: HttpClient, private auth: AuthService) {
-        // Carregar personagens ao inicializar o serviço
         this.loadCharacters();
     }
 
-    private loadCharacters() {
-        this.getCharacters().subscribe({
-            next: (characters) => this.charactersSubject.next(characters),
-            error: (error) => {
-                console.error('Erro ao carregar personagens:', error);
-                this.charactersSubject.next([]);
-            }
-        });
-    }
-
-    getCharacters(): Observable<Character[]> {
+    public getCharacters(): Observable<Character[]> {
         return this.http.get<Character[]>(this.apiUrl).pipe(
             catchError(error => {
                 console.error('Erro ao buscar personagens:', error);
-                return of([]); // Retorna array vazio em caso de erro
+                return of([]);
             })
         );
     }
 
-    getCharacterById(id: string): Observable<Character | undefined> {
+    public getCharacterById(id: string): Observable<Character | undefined> {
         return this.http.get<Character>(`${this.apiUrl}/${id}`).pipe(
             catchError(error => {
                 console.error('Erro ao buscar personagem:', error);
@@ -45,65 +34,62 @@ export class CharacterService {
         );
     }
 
-    createCharacter(character: Character): Observable<Character> {
+    public createCharacter(character: Character): Observable<Character> {
         return this.auth.user$.pipe(
             switchMap(user => {
-                if (!user?.sub) {
-                    throw new Error('Usuário não autenticado');
-                }
-                
-                // Definir userId do usuário autenticado
                 const characterWithUser = {
                     ...character,
-                    userId: user.sub
+                    userId: user?.sub || ''
                 };
                 
-                try {
-                    const characterToCreate = this.prepareCharacterForApi(characterWithUser);
-                    
-                    return this.http.post<Character>(this.apiUrl, characterToCreate).pipe(
-                        tap(createdCharacter => {
-                            const currentCharacters = this.charactersSubject.value;
-                            this.charactersSubject.next([...currentCharacters, createdCharacter]);
-                        })
-                    );
-                } catch (error) {
-                    console.error('Erro na validação:', error);
-                    throw error;
-                }
+                const characterToCreate = this.prepareCharacterForApi(characterWithUser);
+                
+                return this.http.post<Character>(this.apiUrl, characterToCreate).pipe(
+                    tap(createdCharacter => {
+                        const currentCharacters = this.charactersSubject.value;
+                        this.charactersSubject.next([...currentCharacters, createdCharacter]);
+                    })
+                );
             })
         );
     }
 
-    updateCharacter(character: Character): Observable<Character> {
-        if (!character.id) {
-            throw new Error('ID do personagem é obrigatório para atualização');
-        }
+    public updateCharacter(character: Character): Observable<Character> {
+        return this.auth.user$.pipe(
+            take(1),
+            switchMap((user: User | null | undefined) => {
+                const characterWithUser = {
+                    ...character,
+                    userId: user?.sub || character.userId || ''
+                };
 
-        const characterToUpdate = this.prepareCharacterForApi(character);
+                const characterToUpdate = this.prepareCharacterForApi(characterWithUser);
 
-        return this.http.put<Character>(`${this.apiUrl}/${character.id}`, characterToUpdate).pipe(
-            tap(() => {
-                // Atualizar lista local
-                const currentCharacters = this.charactersSubject.value;
-                const index = currentCharacters.findIndex((c: Character) => c.id === character.id);
-                if (index !== -1) {
-                    currentCharacters[index] = character;
-                    this.charactersSubject.next([...currentCharacters]);
-                }
-            }),
-            map(() => character), // A API retorna NoContent, então retornamos o personagem
-            catchError(error => {
-                console.error('Erro ao atualizar personagem:', error);
-                throw error;
+                return this.http.put<Character>(`${this.apiUrl}/${character.id}`, characterToUpdate).pipe(
+                    tap(() => {
+                        const currentCharacters = this.charactersSubject.value;
+                        const index = currentCharacters.findIndex((c: Character) => c.id === character.id);
+                        if (index !== -1) {
+                            currentCharacters[index] = characterWithUser;
+                            this.charactersSubject.next([...currentCharacters]);
+                        }
+                    }),
+                    map(() => characterWithUser),
+                    catchError(error => {
+                        console.error('Erro ao atualizar personagem:', error);
+                        if (error.error?.errors) {
+                            console.error('Erros de validação:', error.error.errors);
+                        }
+                        throw error;
+                    })
+                );
             })
         );
     }
 
-    deleteCharacter(id: string): Observable<boolean> {
+    public deleteCharacter(id: string): Observable<boolean> {
         return this.http.delete(`${this.apiUrl}/${id}`).pipe(
             tap(() => {
-                // Remover da lista local
                 const currentCharacters = this.charactersSubject.value;
                 const filteredCharacters = currentCharacters.filter((c: Character) => c.id !== id);
                 this.charactersSubject.next(filteredCharacters);
@@ -116,96 +102,28 @@ export class CharacterService {
         );
     }
 
-    private prepareCharacterForApi(character: Character): any {
-        // Validar campos obrigatórios
-        if (!character.name?.trim()) {
-            throw new Error('Nome do personagem é obrigatório');
-        }
-        
-        if (!character.systemId?.trim()) {
-            throw new Error('SystemId é obrigatório');
-        }
-        
-        if (!character.userId?.trim()) {
-            throw new Error('UserId é obrigatório');
-        }
-
-        const payload: any = {
-            name: character.name.trim(),
-            systemId: character.systemId.trim(),
-            userId: character.userId.trim(),
-            data: character.data?.map(field => {
-                if (!field.name?.trim()) {
-                    throw new Error('Nome do campo é obrigatório');
-                }
-                if (!field.component?.trim()) {
-                    throw new Error('Componente do campo é obrigatório');
-                }
-                
-                return {
-                    name: field.name.trim(),
-                    value: field.value || '',
-                    rollable: field.rollable || null,
-                    expression: field.expression || '',
-                    editable: field.editable || false,
-                    edited: field.edited || false,
-                    sessionEditable: field.sessionEditable || false,
-                    visible: field.visible !== false,
-                    category: field.category || '',
-                    component: field.component.trim(),
-                    order: field.order || 0,
-                    options: field.options || []
-                };
-            }) || []
-        };
-
-        if (character.id?.trim() && character.id.trim() !== '') {
-            payload.id = character.id.trim();
-        }
-
-        return payload;
-    }
-
-    // Método para calcular valores baseados em expressões
-    calculateExpressions(data: CharacterData[]): CharacterData[] {
-        // Criar uma cópia profunda para evitar mutação direta
+    public calculateExpressions(data: CharacterData[]): CharacterData[] {
         const processedData = data.map(field => ({...field}));
-        
-        console.log('Iniciando cálculo de expressões para', processedData.length, 'campos');
-
-        // Primeira passagem: calcular expressões que não dependem de outras expressões
         let hasChanges = true;
         let iterations = 0;
-        const maxIterations = 5; // Prevenir loop infinito
+        const maxIterations = 5;
 
         while (hasChanges && iterations < maxIterations) {
             hasChanges = false;
             iterations++;
-            console.log(`Iteração ${iterations} de cálculo de expressões`);
 
             processedData.forEach(field => {
                 if (field.expression && !field.edited) {
                     let expression = field.expression;
                     const originalValue = field.value;
-                    
-                    console.log(`Processando campo "${field.name}" com expressão: "${expression}"`);
 
-                    // Substituir referências a outros campos
                     processedData.forEach(otherField => {
                         if (otherField.name && otherField.value !== undefined && otherField.value !== '') {
                             const regex = new RegExp(`{${otherField.name}}`, 'g');
-                            const oldExpression = expression;
                             expression = expression.replace(regex, otherField.value);
-                            
-                            if (oldExpression !== expression) {
-                                console.log(`Substituído {${otherField.name}} por "${otherField.value}" na expressão`);
-                            }
                         }
                     });
 
-                    console.log(`Expressão final para "${field.name}":`, expression);
-
-                    // Só calcular se todas as variáveis foram substituídas
                     if (!expression.includes('{')) {
                         try {
                             const result = this.evaluateSimpleExpression(expression);
@@ -214,33 +132,55 @@ export class CharacterService {
                             if (newValue !== originalValue) {
                                 field.value = newValue;
                                 hasChanges = true;
-                                console.log(`Resultado calculado para "${field.name}":`, result);
                             }
                         } catch (e) {
                             console.warn('Erro ao processar expressão:', expression, e);
                         }
-                    } else {
-                        console.log(`Expressão "${field.name}" ainda contém variáveis não resolvidas:`, expression);
                     }
                 }
             });
         }
 
-        if (iterations >= maxIterations) {
-            console.warn('Máximo de iterações atingido para cálculo de expressões');
-        }
-
         return processedData;
     }
 
+    private loadCharacters() {
+        this.getCharacters().subscribe({
+            next: (characters) => this.charactersSubject.next(characters),
+            error: (error) => {
+                console.error('Erro ao carregar personagens:', error);
+                this.charactersSubject.next([]);
+            }
+        });
+    }
+
+    private prepareCharacterForApi(character: Character): any {
+        const payload: any = {
+            name: character.name?.trim() || '',
+            systemId: character.systemId?.trim() || '',
+            userId: character.userId?.trim() || '',
+            data: character.data?.map(field => ({
+                name: field.name?.trim() || '',
+                value: (field.value !== null && field.value !== undefined) ? String(field.value) : '',
+                rollable: field.rollable || null,
+                expression: field.expression || '',
+                editable: field.editable || false,
+                edited: field.edited || false,
+                sessionEditable: field.sessionEditable || false,
+                visible: field.visible !== false,
+                category: field.category || '',
+                component: field.component?.trim() || '',
+                order: field.order || 0,
+                options: field.options || []
+            })) || []
+        };
+
+        return payload;
+    }
+
     private evaluateSimpleExpression(expression: string): number {
-        // Limpa a expressão mas preserva sua estrutura
         const sanitized = expression.trim();
         
-        console.log('Avaliando expressão:', sanitized);
-        
-        // Remove a validação restritiva que estava bloqueando as expressões válidas
-        // Apenas verifica se não contém caracteres claramente perigosos
         const dangerousPattern = /[;&|`${}]/;
         
         if (dangerousPattern.test(sanitized)) {
@@ -262,8 +202,6 @@ export class CharacterService {
             const func = new Function(...Object.keys(safeContext), `return ${sanitized}`);
             const result = func(...Object.values(safeContext));
             
-            console.log('Resultado da expressão:', result);
-            
             // Converte o resultado para número se possível
             if (typeof result === 'number' && !isNaN(result)) {
                 return result;
@@ -275,7 +213,6 @@ export class CharacterService {
             
             return 0;
         } catch (error) {
-            console.error('Erro ao avaliar expressão:', sanitized, error);
             return 0;
         }
     }
