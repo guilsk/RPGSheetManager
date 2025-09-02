@@ -52,7 +52,7 @@ export class CharacterEditComponent implements OnInit {
 	private initializeForm() {
 		this.characterForm = this.fb.group({
 			name: ['', Validators.required],
-			systemId: ['', Validators.required]
+			systemId: [{value: '', disabled: false}, Validators.required]
 		});
 	}
 
@@ -73,11 +73,15 @@ export class CharacterEditComponent implements OnInit {
 		console.log('Carregando sistemas disponíveis...');
 		this.loadingSystems = true;
 
+		this.characterForm.get('systemId')?.disable();
+
 		this.systemService.getSystems().subscribe({
 			next: (systems: RpgSystem[]) => {
 				console.log('Sistemas carregados:', systems);
 				this.systems = systems;
 				this.loadingSystems = false;
+
+				this.characterForm.get('systemId')?.enable();
 
 				if (systems.length === 0) {
 					console.warn('Nenhum sistema encontrado no banco de dados');
@@ -87,6 +91,8 @@ export class CharacterEditComponent implements OnInit {
 				console.error('Erro ao carregar sistemas:', error);
 				this.systems = [];
 				this.loadingSystems = false;
+
+				this.characterForm.get('systemId')?.enable();
 			}
 		});
 	}
@@ -350,5 +356,13 @@ export class CharacterEditComponent implements OnInit {
 	onDiceRoll(result: DiceRollResult) {
 		// TODO: Implementar histórico de rolagens ou mostrar resultado em um toast
 		console.log('🎲 Resultado da rolagem:', result);
+	}
+
+	get isFormValid(): boolean {
+		return this.characterForm.valid;
+	}
+
+	get isSubmitDisabled(): boolean {
+		return !this.isFormValid;
 	}
 }

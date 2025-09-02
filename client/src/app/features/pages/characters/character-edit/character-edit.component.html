@@ -23,7 +23,7 @@
 				<div class="form-group">
 					<label for="system">Sistema de RPG *</label>
 					<select id="system" formControlName="systemId" (change)="onSystemSelectionChange($event)"
-						class="form-control" [disabled]="loadingSystems">
+						class="form-control">
 						<option value="">
 							{{ loadingSystems ? 'Carregando sistemas...' : 'Selecione um sistema' }}
 						</option>
@@ -73,7 +73,7 @@
 			<button type="button" class="btn btn-secondary" (click)="onCancel()">
 				Cancelar
 			</button>
-			<button type="submit" class="btn btn-primary" [disabled]="characterForm.invalid">
+			<button type="submit" class="btn btn-primary" [disabled]="isSubmitDisabled">
 				{{ isEditMode ? 'Salvar Alterações' : 'Criar Personagem' }}
 			</button>
 		</div>

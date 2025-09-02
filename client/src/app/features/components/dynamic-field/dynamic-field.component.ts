@@ -22,9 +22,13 @@ export class DynamicFieldComponent implements OnInit {
 
   // Enum para uso no template
   ComponentType = ComponentType;
-  
+
   currentValue: any;
   lastRollResult?: DiceRollResult;
+
+  get isDisabled(): boolean {
+    return this.disabled;
+  }
 
   ngOnInit() {
     this.currentValue = this.field.value || '';
@@ -47,10 +51,10 @@ export class DynamicFieldComponent implements OnInit {
         // Rolar dados
         const result = this.diceService.rollDice(this.field.rollable.formula, fieldValues);
         this.lastRollResult = result;
-        
+
         // Emitir evento para componente pai
         this.diceRoll.emit(result);
-        
+
         console.log(`🎲 ${this.field.name}: ${result.breakdown} = ${result.result}`);
       } catch (error) {
         console.error('Erro ao rolar dados:', error);

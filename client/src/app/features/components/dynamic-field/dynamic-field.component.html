@@ -1,4 +1,4 @@
-<div class="dynamic-field" [class.field-disabled]="disabled">
+<div class="dynamic-field" [class.field-disabled]="isDisabled">
   <div class="field-header">
     <label [for]="getFieldId()" class="field-label">
       {{ field.name }}
@@ -21,7 +21,7 @@
       type="text"
       [id]="getFieldId()"
       [(ngModel)]="currentValue"
-      [disabled]="disabled"
+      [disabled]="isDisabled"
       (ngModelChange)="onValueChange($event)"
       class="form-control"
       [placeholder]="'Digite ' + field.name">
@@ -32,7 +32,7 @@
       type="number"
       [id]="getFieldId()"
       [(ngModel)]="currentValue"
-      [disabled]="disabled"
+      [disabled]="isDisabled"
       (ngModelChange)="onValueChange($event)"
       class="form-control"
       [placeholder]="'Digite ' + field.name">
@@ -42,7 +42,7 @@
       *ngIf="field.component === ComponentType.TEXTAREA"
       [id]="getFieldId()"
       [(ngModel)]="currentValue"
-      [disabled]="disabled"
+      [disabled]="isDisabled"
       (ngModelChange)="onValueChange($event)"
       class="form-control textarea"
       rows="3"
@@ -54,7 +54,7 @@
       *ngIf="field.component === ComponentType.SELECT"
       [id]="getFieldId()"
       [(ngModel)]="currentValue"
-      [disabled]="disabled"
+      [disabled]="isDisabled"
       (ngModelChange)="onValueChange($event)"
       class="form-control">
       <option value="">Selecione...</option>
@@ -69,7 +69,7 @@
         type="checkbox"
         [id]="getFieldId()"
         [(ngModel)]="currentValue"
-        [disabled]="disabled"
+        [disabled]="isDisabled"
         (ngModelChange)="onValueChange($event)"
         class="checkbox-input">
       <label [for]="getFieldId()" class="checkbox-label">
@@ -86,7 +86,7 @@
           [name]="getFieldId()"
           [value]="option"
           [(ngModel)]="currentValue"
-          [disabled]="disabled"
+          [disabled]="isDisabled"
           (ngModelChange)="onValueChange($event)"
           class="radio-input">
         <label [for]="getFieldId() + '-' + i" class="radio-label">
