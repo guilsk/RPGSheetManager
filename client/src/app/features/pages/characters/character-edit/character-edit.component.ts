@@ -57,11 +57,13 @@ export class CharacterEditComponent implements OnInit {
 	}
 
 	private loadData() {
-		// Verificar se é modo de edição
 		this.characterId = this.route.snapshot.paramMap.get('id') || undefined;
 		this.isEditMode = !!this.characterId;
 
-		// Carregar sistemas disponíveis
+		if (!this.isEditMode) {
+			this.character = {};
+		}
+
 		this.loadSystems();
 
 		if (this.isEditMode) {
@@ -304,6 +306,10 @@ export class CharacterEditComponent implements OnInit {
 				systemId: this.characterForm.value.systemId,
 				data: this.characterData
 			};
+
+			if (!this.isEditMode) {
+				delete characterToSave.id;
+			}
 
 			if (this.isEditMode) {
 				this.updateCharacter(characterToSave);

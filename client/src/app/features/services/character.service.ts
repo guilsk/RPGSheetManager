@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, BehaviorSubject, map, tap, catchError, of } from 'rxjs';
+import { Observable, BehaviorSubject, map, tap, catchError, of, switchMap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from '@auth0/auth0-angular';
 import { Character, CharacterData } from '../../shared/models/rpg-sheet-manager.model';
 
 @Injectable({
@@ -11,7 +12,7 @@ export class CharacterService {
     private charactersSubject = new BehaviorSubject<Character[]>([]);
     public characters$ = this.charactersSubject.asObservable();
 
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private auth: AuthService) {
         // Carregar personagens ao inicializar o serviço
         this.loadCharacters();
     }
@@ -45,18 +46,31 @@ export class CharacterService {
     }
 
     createCharacter(character: Character): Observable<Character> {
-        // Preparar dados para envio (remover campos opcionais vazios)
-        const characterToCreate = this.prepareCharacterForApi(character);
-
-        return this.http.post<Character>(this.apiUrl, characterToCreate).pipe(
-            tap(createdCharacter => {
-                // Atualizar lista local
-                const currentCharacters = this.charactersSubject.value;
-                this.charactersSubject.next([...currentCharacters, createdCharacter]);
-            }),
-            catchError(error => {
-                console.error('Erro ao criar personagem:', error);
-                throw error;
+        return this.auth.user$.pipe(
+            switchMap(user => {
+                if (!user?.sub) {
+                    throw new Error('Usuário não autenticado');
+                }
+                
+                // Definir userId do usuário autenticado
+                const characterWithUser = {
+                    ...character,
+                    userId: user.sub
+                };
+                
+                try {
+                    const characterToCreate = this.prepareCharacterForApi(characterWithUser);
+                    
+                    return this.http.post<Character>(this.apiUrl, characterToCreate).pipe(
+                        tap(createdCharacter => {
+                            const currentCharacters = this.charactersSubject.value;
+                            this.charactersSubject.next([...currentCharacters, createdCharacter]);
+                        })
+                    );
+                } catch (error) {
+                    console.error('Erro na validação:', error);
+                    throw error;
+                }
             })
         );
     }
@@ -103,29 +117,53 @@ export class CharacterService {
     }
 
     private prepareCharacterForApi(character: Character): any {
-        // Converter para o formato esperado pela API
-        return {
-            id: character.id,
-            systemId: character.systemId,
-            userId: character.userId,
-            name: character.name,
-            data: character.data?.map(field => ({
-                name: field.name,
-                value: field.value || '',
-                rollable: field.rollable ? {
-                    enabled: field.rollable.enabled || false,
-                    formula: field.rollable.formula || ''
-                } : null,
-                expression: field.expression || '',
-                editable: field.editable || false,
-                edited: field.edited || false,
-                sessionEditable: field.sessionEditable || false,
-                visible: field.visible || true,
-                category: field.category || '',
-                component: field.component || 'text',
-                order: field.order || 0
-            })) || []
+        // Validar campos obrigatórios
+        if (!character.name?.trim()) {
+            throw new Error('Nome do personagem é obrigatório');
+        }
+        
+        if (!character.systemId?.trim()) {
+            throw new Error('SystemId é obrigatório');
+        }
+        
+        if (!character.userId?.trim()) {
+            throw new Error('UserId é obrigatório');
+        }
+
+        const payload: any = {
+            name: character.name.trim(),
+            systemId: character.systemId.trim(),
+            userId: character.userId.trim(),
+            data: character.data?.map(field => {
+                if (!field.name?.trim()) {
+                    throw new Error('Nome do campo é obrigatório');
+                }
+                if (!field.component?.trim()) {
+                    throw new Error('Componente do campo é obrigatório');
+                }
+                
+                return {
+                    name: field.name.trim(),
+                    value: field.value || '',
+                    rollable: field.rollable || null,
+                    expression: field.expression || '',
+                    editable: field.editable || false,
+                    edited: field.edited || false,
+                    sessionEditable: field.sessionEditable || false,
+                    visible: field.visible !== false,
+                    category: field.category || '',
+                    component: field.component.trim(),
+                    order: field.order || 0,
+                    options: field.options || []
+                };
+            }) || []
         };
+
+        if (character.id?.trim() && character.id.trim() !== '') {
+            payload.id = character.id.trim();
+        }
+
+        return payload;
     }
 
     // Método para calcular valores baseados em expressões

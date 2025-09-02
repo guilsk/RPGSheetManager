@@ -5,10 +5,10 @@ namespace RPGSheetManager.Domain.Characters {
     public class Character {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public required string Id { get; set; }
-        [BsonRepresentation(BsonType.ObjectId)]
+        public string? Id { get; set; }
+        [BsonElement("systemId")]
         public required string SystemId { get; set; }
-        [BsonRepresentation(BsonType.ObjectId)]
+        [BsonElement("userId")]
         public required string UserId { get; set; }
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public DateTime CreatedAt { get; set; }

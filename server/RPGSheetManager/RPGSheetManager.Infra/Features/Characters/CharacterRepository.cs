@@ -17,8 +17,9 @@ namespace RPGSheetManager.Infra.Features.Characters {
             return await _collection.Find(c => c.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task AddAsync(Character character) {
+        public async Task<Character> AddAsync(Character character) {
             await _collection.InsertOneAsync(character);
+            return character;
         }
 
         public async Task UpdateAsync(string id, Character updated) {
