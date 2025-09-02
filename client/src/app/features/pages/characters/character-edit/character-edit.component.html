@@ -36,7 +36,8 @@
 						Sistema é obrigatório
 					</div>
 					<div class="form-help" *ngIf="systems.length === 0 && !loadingSystems">
-						<small>Nenhum sistema encontrado. Você pode ser o primeiro a cadastrar um sistema na aba 'Sistemas'</small>
+						<small>Nenhum sistema encontrado. Você pode ser o primeiro a cadastrar um sistema na aba
+							'Sistemas'</small>
 					</div>
 				</div>
 			</div>
@@ -60,8 +61,7 @@
 						[class.field-hidden]="!field.visible">
 
 						<app-dynamic-field [field]="field" [disabled]="!field.editable"
-							[allFieldValues]="getAllFieldValues()"
-							(valueChange)="onFieldValueChange(field.name!, $event)" (diceRoll)="onDiceRoll($event)">
+							(valueChange)="onFieldValueChange(field.name!, $event)">
 						</app-dynamic-field>
 					</div>
 				</div>

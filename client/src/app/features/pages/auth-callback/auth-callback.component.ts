@@ -20,7 +20,7 @@ import { Router } from '@angular/router';
 			height: 100vh;
 			text-align: center;
 		}
-		
+
 		.loading-spinner {
 			width: 40px;
 			height: 40px;
@@ -30,7 +30,7 @@ import { Router } from '@angular/router';
 			animation: spin 1s linear infinite;
 			margin-bottom: 20px;
 		}
-		
+
 		@keyframes spin {
 			0% { transform: rotate(0deg); }
 			100% { transform: rotate(360deg); }
