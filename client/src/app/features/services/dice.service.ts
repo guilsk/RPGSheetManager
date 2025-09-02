@@ -33,9 +33,15 @@ export class DiceService {
 	}
 
 	public validateFormula(formula: string): boolean {
-		const cleanFormula = formula.replace(/\s/g, '').replace(/\{[^}]+\}/g, '1');
-		const pattern = /^(\d+d\d+)([+-]?\d+)*$/;
-		return pattern.test(cleanFormula);
+		try {
+			let testFormula = formula.replace(/\{[^}]+\}/g, '1');
+			testFormula = testFormula.replace(/\s/g, '');
+
+			const pattern = /^(\d+d\d+([+-]\d+)*|[+-]?\d+)([+-](\d+d\d+|\d+))*$/;
+			return pattern.test(testFormula);
+		} catch {
+			return false;
+		}
 	}
 
 	public getCommonFormulas(): { name: string, formula: string }[] {
@@ -73,7 +79,7 @@ export class DiceService {
 
 		for (let i = 0; i < parts.length; i++) {
 			const part = parts[i];
-			
+
 			if (part.includes('d')) {
 				const [count, sides] = part.split('d').map(Number);
 				const diceRolls = this.rollMultipleDice(count, sides);
@@ -87,11 +93,11 @@ export class DiceService {
 
 			} else {
 				let mod = parseInt(part);
-				
+
 				if (!part.startsWith('+') && !part.startsWith('-') && i > 0) {
 					mod = Math.abs(mod);
 				}
-				
+
 				modifier += mod;
 				total += mod;
 

@@ -48,7 +48,7 @@ export class CharacterEditComponent implements OnInit {
 	private initializeForm() {
 		this.characterForm = this.fb.group({
 			name: ['', Validators.required],
-			systemId: [{value: '', disabled: false}, Validators.required]
+			systemId: [{ value: '', disabled: false }, Validators.required]
 		});
 	}
 
@@ -249,6 +249,10 @@ export class CharacterEditComponent implements OnInit {
 		}
 	}
 
+	public getAllFieldValues(): { [key: string]: string } {
+		return this.characterService.getAllFieldValues(this.characterData);
+	}
+
 	public onSubmit() {
 		if (this.characterForm.valid) {
 			const characterToSave: Character = {
@@ -284,11 +288,11 @@ export class CharacterEditComponent implements OnInit {
 
 	private processExpressions() {
 		const updatedData = this.characterService.calculateExpressions(this.characterData);
-		
-		const hasChanges = updatedData.some((field, index) => 
+
+		const hasChanges = updatedData.some((field, index) =>
 			field.value !== this.characterData[index]?.value
 		);
-		
+
 		if (hasChanges) {
 			this.characterData = updatedData;
 			this.organizeDataByCategory();

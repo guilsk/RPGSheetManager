@@ -61,6 +61,7 @@
 						[class.field-hidden]="!field.visible">
 
 						<app-dynamic-field [field]="field" [disabled]="!field.editable"
+							[allFieldValues]="getAllFieldValues()"
 							(valueChange)="onFieldValueChange(field.name!, $event)">
 						</app-dynamic-field>
 					</div>
