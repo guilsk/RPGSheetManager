@@ -1,0 +1,840 @@
+{
+	"name": "Dungeons & Dragons 5e",
+	"description": "Sistema de RPG Dungeons & Dragons 5ª Edição com fichas de personagem completas incluindo atributos, perícias, magias e equipamentos.",
+	"ownerId": "system-admin",
+	"createdAt": "2025-08-31T00:00:00Z",
+	"template": [
+		{
+			"name": "Classe",
+			"value": "",
+			"component": "select",
+			"category": "Informações Básicas",
+			"order": 2,
+			"editable": true,
+			"visible": true,
+			"options": [
+				"Bárbaro",
+				"Bardo",
+				"Clérigo",
+				"Druida",
+				"Guerreiro",
+				"Monge",
+				"Paladino",
+				"Patrulheiro",
+				"Ladino",
+				"Feiticeiro",
+				"Bruxo",
+				"Mago"
+			]
+		},
+		{
+			"name": "Level",
+			"value": "1",
+			"component": "numeric",
+			"category": "Informações Básicas",
+			"order": 3,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Raça",
+			"value": "",
+			"component": "select",
+			"category": "Informações Básicas",
+			"order": 4,
+			"editable": true,
+			"visible": true,
+			"options": [
+				"Humano",
+				"Elfo",
+				"Anão",
+				"Halfling",
+				"Draconato",
+				"Gnomo",
+				"Meio-elfo",
+				"Meio-orc",
+				"Tiefling"
+			]
+		},
+		{
+			"name": "Antecedente",
+			"value": "",
+			"component": "text",
+			"category": "Informações Básicas",
+			"order": 5,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Alinhamento",
+			"value": "",
+			"component": "select",
+			"category": "Informações Básicas",
+			"order": 6,
+			"editable": true,
+			"visible": true,
+			"options": [
+				"Leal e Bom",
+				"Neutro e Bom",
+				"Caótico e Bom",
+				"Leal e Neutro",
+				"Neutro",
+				"Caótico e Neutro",
+				"Leal e Mau",
+				"Neutro e Mau",
+				"Caótico e Mau"
+			]
+		},
+		{
+			"name": "Força",
+			"value": "10",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 1,
+			"editable": true,
+			"visible": true,
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Modificador de Força}"
+			}
+		},
+		{
+			"name": "Modificador de Força",
+			"value": "0",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 2,
+			"editable": false,
+			"visible": false,
+			"expression": "Math.floor(({Força} - 10) / 2)"
+		},
+		{
+			"name": "Destreza",
+			"value": "10",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 3,
+			"editable": true,
+			"visible": true,
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Modificador de Destreza}"
+			}
+		},
+		{
+			"name": "Modificador de Destreza",
+			"value": "0",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 4,
+			"editable": false,
+			"visible": false,
+			"expression": "Math.floor(({Destreza} - 10) / 2)"
+		},
+		{
+			"name": "Constituição",
+			"value": "10",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 5,
+			"editable": true,
+			"visible": true,
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Modificador de Constituição}"
+			}
+		},
+		{
+			"name": "Modificador de Constituição",
+			"value": "0",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 6,
+			"editable": false,
+			"visible": false,
+			"expression": "Math.floor(({Constituição} - 10) / 2)"
+		},
+		{
+			"name": "Inteligência",
+			"value": "10",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 7,
+			"editable": true,
+			"visible": true,
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Modificador de Inteligência}"
+			}
+		},
+		{
+			"name": "Modificador de Inteligência",
+			"value": "0",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 8,
+			"editable": false,
+			"visible": false,
+			"expression": "Math.floor(({Inteligência} - 10) / 2)"
+		},
+		{
+			"name": "Sabedoria",
+			"value": "10",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 9,
+			"editable": true,
+			"visible": true,
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Modificador de Sabedoria}"
+			}
+		},
+		{
+			"name": "Modificador de Sabedoria",
+			"value": "0",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 10,
+			"editable": false,
+			"visible": false,
+			"expression": "Math.floor(({Sabedoria} - 10) / 2)"
+		},
+		{
+			"name": "Carisma",
+			"value": "10",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 11,
+			"editable": true,
+			"visible": true,
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Modificador de Carisma}"
+			}
+		},
+		{
+			"name": "Modificador de Carisma",
+			"value": "0",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 12,
+			"editable": false,
+			"visible": false,
+			"expression": "Math.floor(({Carisma} - 10) / 2)"
+		},
+		{
+			"name": "Classe de Armadura",
+			"value": "10",
+			"component": "numeric",
+			"category": "Combate",
+			"order": 1,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Iniciativa",
+			"value": "0",
+			"component": "numeric",
+			"category": "Combate",
+			"order": 2,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Destreza}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Iniciativa}"
+			}
+		},
+		{
+			"name": "Movimentação",
+			"value": "30",
+			"component": "numeric",
+			"category": "Combate",
+			"order": 3,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Pontos de Vida Máximo",
+			"value": "8",
+			"component": "numeric",
+			"category": "Combate",
+			"order": 4,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Pontos de Vida",
+			"value": "8",
+			"component": "numeric",
+			"category": "Combate",
+			"order": 5,
+			"editable": true,
+			"visible": true,
+			"sessionEditable": true
+		},
+		{
+			"name": "Pontos de Vida Temporários",
+			"value": "0",
+			"component": "numeric",
+			"category": "Combate",
+			"order": 6,
+			"editable": true,
+			"visible": true,
+			"sessionEditable": true
+		},
+		{
+			"name": "Bônus de Proficiência",
+			"value": "2",
+			"component": "numeric",
+			"category": "Combate",
+			"order": 7,
+			"editable": false,
+			"visible": true,
+			"expression": "Math.ceil({Level} / 4) + 1"
+		},
+		{
+			"name": "Resistência de Força",
+			"value": "0",
+			"component": "numeric",
+			"category": "Testes de Resistência",
+			"order": 1,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Força}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Resistência de Força}"
+			}
+		},
+		{
+			"name": "Resistência de Destreza",
+			"value": "0",
+			"component": "numeric",
+			"category": "Testes de Resistência",
+			"order": 2,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Destreza}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Resistência de Destreza}"
+			}
+		},
+		{
+			"name": "Resistência de Constituição",
+			"value": "0",
+			"component": "numeric",
+			"category": "Testes de Resistência",
+			"order": 3,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Constituição}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Resistência de Constituição}"
+			}
+		},
+		{
+			"name": "Resistência de Inteligência",
+			"value": "0",
+			"component": "numeric",
+			"category": "Testes de Resistência",
+			"order": 4,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Inteligência}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Resistência de Inteligência}"
+			}
+		},
+		{
+			"name": "Resistência de Sabedoria",
+			"value": "0",
+			"component": "numeric",
+			"category": "Testes de Resistência",
+			"order": 5,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Sabedoria}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Resistência de Sabedoria}"
+			}
+		},
+		{
+			"name": "Resistência de Carisma",
+			"value": "0",
+			"component": "numeric",
+			"category": "Testes de Resistência",
+			"order": 6,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Carisma}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Resistência de Carisma}"
+			}
+		},
+		{
+			"name": "Acrobacia",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 1,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Destreza}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Acrobacia}"
+			}
+		},
+		{
+			"name": "Adestrar Animais",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 2,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Sabedoria}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Adestrar Animais}"
+			}
+		},
+		{
+			"name": "Arcanismo",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 3,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Inteligência}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Arcanismo}"
+			}
+		},
+		{
+			"name": "Atletismo",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 4,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Força}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Atletismo}"
+			}
+		},
+		{
+			"name": "Enganação",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 5,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Carisma}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Enganação}"
+			}
+		},
+		{
+			"name": "História",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 6,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Inteligência}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {História}"
+			}
+		},
+		{
+			"name": "Intuição",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 7,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Sabedoria}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Intuição}"
+			}
+		},
+		{
+			"name": "Intimidação",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 8,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Carisma}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Intimidação}"
+			}
+		},
+		{
+			"name": "Investigação",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 9,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Inteligência}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Investigação}"
+			}
+		},
+		{
+			"name": "Medicina",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 10,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Sabedoria}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Medicina}"
+			}
+		},
+		{
+			"name": "Natureza",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 11,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Inteligência}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Natureza}"
+			}
+		},
+		{
+			"name": "Percepção",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 12,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Sabedoria}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Percepção}"
+			}
+		},
+		{
+			"name": "Atuação",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 13,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Carisma}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Atuação}"
+			}
+		},
+		{
+			"name": "Persuasão",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 14,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Carisma}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Persuasão}"
+			}
+		},
+		{
+			"name": "Religião",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 15,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Inteligência}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Religião}"
+			}
+		},
+		{
+			"name": "Prestidigitação",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 16,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Destreza}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Prestidigitação}"
+			}
+		},
+		{
+			"name": "Furtividade",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 17,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Destreza}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Furtividade}"
+			}
+		},
+		{
+			"name": "Sobrevivência",
+			"value": "0",
+			"component": "numeric",
+			"category": "Perícias",
+			"order": 18,
+			"editable": false,
+			"visible": true,
+			"expression": "{Modificador de Sabedoria}",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Sobrevivência}"
+			}
+		},
+		{
+			"name": "Armas",
+			"value": "",
+			"component": "textarea",
+			"category": "Equipamentos",
+			"order": 1,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Armadura",
+			"value": "",
+			"component": "textarea",
+			"category": "Equipamentos",
+			"order": 2,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Outros Equipamentos",
+			"value": "",
+			"component": "textarea",
+			"category": "Equipamentos",
+			"order": 3,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Moedas e Tesouros",
+			"value": "",
+			"component": "textarea",
+			"category": "Equipamentos",
+			"order": 4,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Traços de Personalidade",
+			"value": "",
+			"component": "textarea",
+			"category": "Personalidade",
+			"order": 1,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Ideais",
+			"value": "",
+			"component": "textarea",
+			"category": "Personalidade",
+			"order": 2,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Vínculos",
+			"value": "",
+			"component": "textarea",
+			"category": "Personalidade",
+			"order": 3,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Defeitos",
+			"value": "",
+			"component": "textarea",
+			"category": "Personalidade",
+			"order": 4,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Características de Classe",
+			"value": "",
+			"component": "textarea",
+			"category": "Características",
+			"order": 1,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Traços Raciais",
+			"value": "",
+			"component": "textarea",
+			"category": "Características",
+			"order": 2,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Talentos",
+			"value": "",
+			"component": "textarea",
+			"category": "Características",
+			"order": 3,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Atributo de Conjuração",
+			"value": "",
+			"component": "select",
+			"category": "Magias",
+			"order": 1,
+			"editable": true,
+			"visible": true,
+			"options": [
+				"",
+				"Inteligência",
+				"Sabedoria",
+				"Carisma"
+			]
+		},
+		{
+			"name": "CD de Resistência de Magia",
+			"value": "8",
+			"component": "numeric",
+			"category": "Magias",
+			"order": 2,
+			"editable": false,
+			"visible": true,
+			"expression": "8 + {Bônus de Proficiência} + ({Atributo de Conjuração} === 'Inteligência' ? {Modificador de Inteligência} : {Atributo de Conjuração} === 'Sabedoria' ? {Modificador de Sabedoria} : {Atributo de Conjuração} === 'Carisma' ? {Modificador de Carisma} : 0)"
+		},
+		{
+			"name": "Bônus de Ataque Mágico",
+			"value": "0",
+			"component": "numeric",
+			"category": "Magias",
+			"order": 3,
+			"editable": false,
+			"visible": true,
+			"expression": "{Bônus de Proficiência} + ({Atributo de Conjuração} === 'Inteligência' ? {Modificador de Inteligência} : {Atributo de Conjuração} === 'Sabedoria' ? {Modificador de Sabedoria} : {Atributo de Conjuração} === 'Carisma' ? {Modificador de Carisma} : 0)",
+			"rollable": {
+				"enabled": true,
+				"formula": "1d20 + {Bônus de Ataque Mágico}"
+			}
+		},
+		{
+			"name": "Truques",
+			"value": "",
+			"component": "textarea",
+			"category": "Magias",
+			"order": 4,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Magias de 1º Nível",
+			"value": "",
+			"component": "textarea",
+			"category": "Magias",
+			"order": 5,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Magias de 2º Nível",
+			"value": "",
+			"component": "textarea",
+			"category": "Magias",
+			"order": 6,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Magias de 3º Nível",
+			"value": "",
+			"component": "textarea",
+			"category": "Magias",
+			"order": 7,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "História do Personagem",
+			"value": "",
+			"component": "textarea",
+			"category": "História",
+			"order": 1,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Anotações",
+			"value": "",
+			"component": "textarea",
+			"category": "Anotações",
+			"order": 1,
+			"editable": true,
+			"visible": true,
+			"sessionEditable": true
+		}
+	],
+	"categoryOrder": [
+		"Informações Básicas",
+		"Atributos",
+		"Combate",
+		"Testes de Resistência",
+		"Perícias",
+		"Equipamentos",
+		"Magias",
+		"Características",
+		"Personalidade",
+		"História",
+		"Anotações"
+	]
+}
