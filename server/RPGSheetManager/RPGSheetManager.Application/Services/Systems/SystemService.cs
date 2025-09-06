@@ -1,4 +1,4 @@
-﻿using RPGSheetManager.Domain.Systems;
+using RPGSheetManager.Domain.Systems;
 
 namespace RPGSheetManager.Application.Services.Systems {
     public class SystemService {
@@ -9,7 +9,7 @@ namespace RPGSheetManager.Application.Services.Systems {
 
         public Task<List<RPGSystem>> GetAllAsync() => _repository.GetAllAsync();
         public Task<RPGSystem?> GetByIdAsync(string id) => _repository.GetByIdAsync(id);
-        public Task AddAsync(RPGSystem system) => _repository.AddAsync(system);
+        public Task<RPGSystem> AddAsync(RPGSystem system) => _repository.AddAsync(system);
         public Task UpdateAsync(string id, RPGSystem system) => _repository.UpdateAsync(id, system);
         public Task DeleteAsync(string id)=> _repository.DeleteAsync(id);
     }

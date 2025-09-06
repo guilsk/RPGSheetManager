@@ -1,4 +1,4 @@
-﻿using MongoDB.Driver;
+using MongoDB.Driver;
 using RPGSheetManager.Domain.Systems;
 
 namespace RPGSheetManager.Infra.Features.Systems {
@@ -17,8 +17,9 @@ namespace RPGSheetManager.Infra.Features.Systems {
             return await _collection.Find(c => c.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task AddAsync(RPGSystem systems) {
+        public async Task<RPGSystem> AddAsync(RPGSystem systems) {
             await _collection.InsertOneAsync(systems);
+			return systems;
         }
 
         public async Task UpdateAsync(string id, RPGSystem updated) {

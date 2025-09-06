@@ -47,6 +47,7 @@ export interface RpgSystem {
     createdAt?: Date;
     template?: CharacterData[];
 	categoryOrder?: string[];
+	obsolete?: boolean; // Flag para marcar sistemas como obsoletos
 }
 
 // Campanhas

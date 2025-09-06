@@ -5,37 +5,77 @@
 	</div>
 
 	<div class="page-content">
-		<div class="actions">
-			<button class="btn btn-primary">Criar Novo Sistema</button>
+		<!-- Upload Area -->
+		<div class="upload-section">
+			<div 
+				class="upload-area"
+				[class.uploading]="isUploading"
+				[class.drag-over]="isDragOver"
+				(dragover)="onDragOver($event)"
+				(dragleave)="onDragLeave($event)"
+				(drop)="onDrop($event)">
+				
+				<div class="upload-content" *ngIf="!isUploading">
+					<div class="upload-icon">📁</div>
+					<h3>Adicionar Novo Sistema</h3>
+					<p>Arraste e solte um arquivo JSON aqui ou clique para selecionar</p>
+					<input 
+						type="file" 
+						accept=".json" 
+						(change)="onFileSelected($event)"
+						#fileInput
+						style="display: none;">
+					<button class="btn btn-primary" (click)="fileInput.click()">
+						Selecionar Arquivo JSON
+					</button>
+				</div>
+
+				<div class="upload-content" *ngIf="isUploading">
+					<div class="loading-spinner">⏳</div>
+					<h3>Processando Sistema...</h3>
+					<p>Aguarde enquanto validamos e salvamos o sistema.</p>
+				</div>
+			</div>
+
+			<div class="upload-error" *ngIf="uploadError">
+				<strong>Erro:</strong> {{ uploadError }}
+			</div>
 		</div>
 
-		<div class="systems-grid">
-			<div class="system-card">
-				<h3>D&D 5e</h3>
-				<p>Sistema clássico de Dungeons & Dragons, 5ª edição.</p>
+		<!-- Systems Grid -->
+		<div class="systems-grid" *ngIf="systems.length > 0">
+			<div class="system-card" *ngFor="let system of systems">
+				<div class="system-header">
+					<h3>{{ system.name }}</h3>
+					<span class="system-author">por {{ getOwnerDisplayName(system.ownerId || '') }}</span>
+				</div>
+				<p class="system-description">{{ system.description }}</p>
+				<div class="system-stats">
+					<div class="stat">
+						<span class="label">Campos:</span>
+						<span class="value">{{ getSystemFieldsCount(system) }}</span>
+					</div>
+					<div class="stat">
+						<span class="label">Categorias:</span>
+						<span class="value">{{ getSystemCategoriesCount(system) }}</span>
+					</div>
+					<div class="stat">
+						<span class="label">Criado:</span>
+						<span class="value">{{ system.createdAt | date:'dd/MM/yyyy' }}</span>
+					</div>
+				</div>
 				<div class="card-actions">
 					<button class="btn btn-secondary">Ver Detalhes</button>
-					<button class="btn btn-primary">Usar Sistema</button>
+					<button class="btn btn-danger" (click)="deleteSystem(system)">Marcar Obsoleto</button>
 				</div>
 			</div>
+		</div>
 
-			<div class="system-card">
-				<h3>Pathfinder 2e</h3>
-				<p>Sistema avançado baseado no d20, com mecânicas refinadas.</p>
-				<div class="card-actions">
-					<button class="btn btn-secondary">Ver Detalhes</button>
-					<button class="btn btn-primary">Usar Sistema</button>
-				</div>
-			</div>
-
-			<div class="system-card">
-				<h3>Call of Cthulhu</h3>
-				<p>Sistema focado em horror cósmico e investigação.</p>
-				<div class="card-actions">
-					<button class="btn btn-secondary">Ver Detalhes</button>
-					<button class="btn btn-primary">Usar Sistema</button>
-				</div>
-			</div>
+		<!-- Empty State -->
+		<div class="empty-state" *ngIf="systems.length === 0 && !isUploading">
+			<div class="empty-icon">🎲</div>
+			<h3>Nenhum Sistema Encontrado</h3>
+			<p>Adicione seu primeiro sistema de RPG fazendo upload de um arquivo JSON.</p>
 		</div>
 	</div>
 </div>

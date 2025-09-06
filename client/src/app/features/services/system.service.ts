@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of, catchError, map } from 'rxjs';
+import { Observable, of, catchError, map, switchMap } from 'rxjs';
 import { RpgSystem } from '../../shared/models/rpg-sheet-manager.model';
 import { HttpClient } from '@angular/common/http';
+import { AuthService } from '@auth0/auth0-angular';
+import { UserService } from './user.service';
 
 @Injectable({
     providedIn: 'root'
@@ -9,7 +11,11 @@ import { HttpClient } from '@angular/common/http';
 export class SystemService {
     private apiUrl = 'https://localhost:7111/api/system';
 
-    constructor(private http: HttpClient) { }
+    constructor(
+        private http: HttpClient,
+        private auth: AuthService,
+        private userService: UserService
+    ) { }
 
     public getSystems(): Observable<RpgSystem[]> {
         return this.http.get<RpgSystem[]>(this.apiUrl);
@@ -24,29 +30,76 @@ export class SystemService {
         );
     }
 
-    private prepareSystemForApi(system: RpgSystem): any {
-        // Converter para o formato esperado pela API
+    public uploadSystem(systemData: any): Observable<RpgSystem> {
+        console.log('Sistema original:', systemData);
+        console.log('URL da requisição:', this.apiUrl);
+        
+        // Primeiro obter o usuário logado
+        return this.auth.user$.pipe(
+            switchMap(user => {
+                if (!user?.sub) {
+                    throw new Error('Usuário não está logado');
+                }
+                
+                // Buscar o usuário no banco para obter o ID do MongoDB
+                return this.userService.getUserByAuthId(user.sub).pipe(
+                    switchMap(dbUser => {
+                        if (!dbUser?.authId) {
+                            throw new Error('Usuário não encontrado no banco de dados');
+                        }
+
+                        const preparedSystem = this.prepareSystemForApi(systemData, dbUser.authId);
+                        console.log('Sistema preparado para API:', preparedSystem);
+                        
+                        return this.http.post<RpgSystem>(this.apiUrl, preparedSystem).pipe(
+                            catchError(error => {
+                                console.error('Erro ao fazer upload do sistema:', error);
+                                console.error('Status:', error.status);
+                                console.error('Error body:', error.error);
+                                if (error.error && error.error.errors) {
+                                    console.error('Detalhes dos erros de validação:', error.error.errors);
+                                }
+                                throw error;
+                            })
+                        );
+                    })
+                );
+            })
+        );
+    }
+
+    public markSystemAsObsolete(systemId: string): Observable<boolean> {
+        return this.http.patch<boolean>(`${this.apiUrl}/${systemId}/obsolete`, {}).pipe(
+            map(() => true),
+            catchError(error => {
+                console.error('Erro ao marcar sistema como obsoleto:', error);
+                return of(false);
+            })
+        );
+    }
+
+    private prepareSystemForApi(system: any, ownerId: string): any {
+        // Manter os dados originais sem inventar fallbacks
         return {
-            id: system.id,
             name: system.name,
             description: system.description,
-            ownerId: system.ownerId,
-            template: system.template?.map(field => ({
+            ownerId: ownerId, // Usar o ID do usuário logado
+            createdAt: system.createdAt,
+            template: system.template?.map((field: any) => ({
                 name: field.name,
-                value: field.value || '',
-                rollable: field.rollable ? {
-                    enabled: field.rollable.enabled || false,
-                    formula: field.rollable.formula || ''
-                } : null,
-                expression: field.expression || '',
-                editable: field.editable || false,
-                edited: field.edited || false,
-                sessionEditable: field.sessionEditable || false,
-                visible: field.visible || true,
-                category: field.category || '',
-                component: field.component || 'text',
-                order: field.order || 0
-            })) || []
+                value: field.value,
+                rollable: field.rollable,
+                expression: field.expression,
+                editable: field.editable,
+                edited: field.edited,
+                sessionEditable: field.sessionEditable,
+                visible: field.visible,
+                category: field.category,
+                component: field.component,
+                order: field.order,
+                options: field.options
+            })) || [],
+            categoryOrder: system.categoryOrder
         };
     }
 }
