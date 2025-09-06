@@ -9,7 +9,7 @@ export const routes: Routes = [
 	},
 	{
 		path: 'callback',
-		loadComponent: () => import('./features/pages/auth-callback/auth-callback.component')
+		loadComponent: () => import('./auth/auth-callback.component')
 			.then(m => m.AuthCallbackComponent)
 	},
 	{
