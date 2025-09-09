@@ -7,23 +7,14 @@
 	<div class="page-content">
 		<!-- Upload Area -->
 		<div class="upload-section">
-			<div 
-				class="upload-area"
-				[class.uploading]="isUploading"
-				[class.drag-over]="isDragOver"
-				(dragover)="onDragOver($event)"
-				(dragleave)="onDragLeave($event)"
-				(drop)="onDrop($event)">
-				
+			<div class="upload-area" [class.uploading]="isUploading" [class.drag-over]="isDragOver"
+				(dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+
 				<div class="upload-content" *ngIf="!isUploading">
 					<div class="upload-icon">📁</div>
 					<h3>Adicionar Novo Sistema</h3>
 					<p>Arraste e solte um arquivo JSON aqui ou clique para selecionar</p>
-					<input 
-						type="file" 
-						accept=".json" 
-						(change)="onFileSelected($event)"
-						#fileInput
+					<input type="file" accept=".json" (change)="onFileSelected($event)" #fileInput
 						style="display: none;">
 					<button class="btn btn-primary" (click)="fileInput.click()">
 						Selecionar Arquivo JSON
@@ -65,7 +56,7 @@
 					</div>
 				</div>
 				<div class="card-actions">
-					<button class="btn btn-secondary">Ver Detalhes</button>
+					<button class="btn btn-secondary" [routerLink]="['/systems/view', system.id]">Ver Detalhes</button>
 					<button class="btn btn-danger" (click)="deleteSystem(system)">Marcar Obsoleto</button>
 				</div>
 			</div>

@@ -37,6 +37,12 @@ export const routes: Routes = [
 		canActivate: [authGuard]
 	},
 	{
+		path: 'systems/view/:id',
+		loadComponent: () => import('./features/pages/systems/system-view/system-view.component')
+			.then(m => m.SystemViewComponent),
+		canActivate: [authGuard]
+	},
+	{
 		path: 'campaigns',
 		loadComponent: () => import('./features/pages/campaigns/campaigns.component')
 			.then(m => m.CampaignsComponent),

@@ -28,9 +28,19 @@
     </textarea>
 
 		<!-- Select -->
-		<select *ngIf="field.component === ComponentType.SELECT" [id]="getFieldId()" [(ngModel)]="currentValue"
-			[disabled]="isDisabled" (ngModelChange)="onValueChange($event)" class="form-control">
+		<select *ngIf="field.component === ComponentType.SELECT && !isSelectPreviewMode" [id]="getFieldId()"
+			[(ngModel)]="currentValue" [disabled]="isDisabled" (ngModelChange)="onValueChange($event)"
+			class="form-control">
 			<option value="">Selecione...</option>
+			<option *ngFor="let option of field.options" [value]="option">
+				{{ option }}
+			</option>
+		</select>
+
+		<!-- Select Preview Mode -->
+		<select *ngIf="isSelectPreviewMode" [id]="getFieldId()" [(ngModel)]="currentValue"
+			class="form-control select-preview" title="Clique para ver opções">
+			<option value="">Ver opções disponíveis</option>
 			<option *ngFor="let option of field.options" [value]="option">
 				{{ option }}
 			</option>
