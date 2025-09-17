@@ -1,9 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { RpgSystem } from '../../../shared/models/rpg-sheet-manager.model';
+import { RpgSystem, User } from '../../../shared/models/rpg-sheet-manager.model';
 import { SystemService } from '../../services/system.service';
 import { UserService } from '../../services/user.service';
+import { AuthService } from '@auth0/auth0-angular';
+import { forkJoin, map, switchMap } from 'rxjs';
 
 @Component({
 	selector: 'app-systems',
@@ -15,21 +17,41 @@ import { UserService } from '../../services/user.service';
 export class SystemsComponent implements OnInit {
 	private systemService = inject(SystemService);
 	private userService = inject(UserService);
-	
+	private auth = inject(AuthService);
+
 	systems: RpgSystem[] = [];
+	currentUser: User | null = null;
+	currentUserId: string | null = null;
+	ownerNames: { [key: string]: string } = {}; // Cache para nomes dos usuários
+
+	// Estados do upload
 	isUploading = false;
 	uploadError: string | null = null;
 	isDragOver = false;
-	ownerNames: { [key: string]: string } = {}; // Cache para nomes dos usuários
 
 	ngOnInit() {
+		this.loadCurrentUser();
 		this.loadSystems();
+	}
+
+	private loadCurrentUser() {
+		this.auth.user$.pipe(
+			switchMap(authUser => {
+				this.currentUserId = authUser?.sub || null;
+				if (!authUser?.sub) {
+					return [null];
+				}
+				return this.userService.getUserByAuthId(authUser.sub);
+			})
+		).subscribe(user => {
+			this.currentUser = user;
+		});
 	}
 
 	private loadSystems() {
 		this.systemService.getSystems().subscribe((systems: RpgSystem[]) => {
-			this.systems = systems.filter(system => !system.obsolete); // Filtrar sistemas obsoletos
-			
+			this.systems = systems.filter(system => !system.obsolete);
+
 			// Carregar nomes dos donos
 			this.systems.forEach(system => {
 				if (system.ownerId && system.ownerId !== 'system-admin') {
@@ -41,7 +63,7 @@ export class SystemsComponent implements OnInit {
 
 	private loadOwnerName(ownerId: string) {
 		if (this.ownerNames[ownerId]) return; // Já foi carregado
-		
+
 		this.userService.getUserByAuthId(ownerId).subscribe({
 			next: (user) => {
 				this.ownerNames[ownerId] = user.displayName || 'Usuário desconhecido';
@@ -59,6 +81,122 @@ export class SystemsComponent implements OnInit {
 		return this.ownerNames[ownerId] || 'Carregando...';
 	}
 
+	// Verificações de estado do sistema
+	isSystemOwner(system: RpgSystem): boolean {
+		return system.ownerId === this.currentUserId;
+	}
+
+	isSystemSaved(system: RpgSystem): boolean {
+		if (!this.currentUser?.savedSystemIds) return false;
+		return this.currentUser.savedSystemIds.includes(system.id || '');
+	}
+
+	isSystemSavedOrOwned(system: RpgSystem): boolean {
+		return this.isSystemOwner(system) || this.isSystemSaved(system);
+	}
+
+	// Ações dos sistemas
+	saveSystem(system: RpgSystem) {
+		if (!system.id) return;
+
+		console.log('Tentando salvar sistema:', system.id);
+
+		// Verificar se o usuário está autenticado primeiro
+		this.auth.isAuthenticated$.subscribe(isAuth => {
+			console.log('Usuário autenticado:', isAuth);
+			if (!isAuth) {
+				alert('Você precisa estar logado para salvar sistemas.');
+				return;
+			}
+
+			// Verificar se conseguimos obter o token
+			this.auth.getAccessTokenSilently().subscribe({
+				next: (token) => {
+					console.log('Token obtido:', token ? 'Token presente' : 'Token ausente');
+					console.log('Chamando API para salvar sistema...');
+
+					this.systemService.saveSystem(system.id!).subscribe({
+						next: (success) => {
+							console.log('Resposta da API:', success);
+							if (success) {
+								// Atualizar localmente
+								if (!this.currentUser) {
+									this.currentUser = { savedSystemIds: [] };
+								}
+								if (!this.currentUser.savedSystemIds) {
+									this.currentUser.savedSystemIds = [];
+								}
+								this.currentUser.savedSystemIds.push(system.id!);
+								alert(`Sistema "${system.name}" salvo com sucesso!`);
+							} else {
+								alert('Erro ao salvar sistema. Tente novamente.');
+							}
+						},
+						error: (error) => {
+							console.error('Erro detalhado ao salvar sistema:', error);
+							console.error('Status:', error.status);
+							console.error('Mensagem:', error.message);
+							console.error('Headers:', error.headers);
+							alert('Erro ao salvar sistema. Verifique o console para mais detalhes.');
+						}
+					});
+				},
+				error: (tokenError) => {
+					console.error('Erro ao obter token:', tokenError);
+					alert('Erro de autenticação. Tente fazer login novamente.');
+				}
+			});
+		});
+	}
+
+	unsaveSystem(system: RpgSystem) {
+		if (!system.id) return;
+
+		this.systemService.unsaveSystem(system.id).subscribe({
+			next: (success) => {
+				if (success) {
+					// Atualizar localmente
+					if (this.currentUser?.savedSystemIds) {
+						this.currentUser.savedSystemIds = this.currentUser.savedSystemIds.filter(id => id !== system.id);
+					}
+					alert(`Sistema "${system.name}" removido dos salvos!`);
+				} else {
+					alert('Erro ao remover sistema dos salvos. Tente novamente.');
+				}
+			},
+			error: (error) => {
+				console.error('Erro ao remover sistema dos salvos:', error);
+				alert('Erro ao remover sistema dos salvos. Tente novamente.');
+			}
+		});
+	}
+
+	deleteSystem(system: RpgSystem) {
+		if (!system.id || !this.isSystemOwner(system)) return;
+
+		const confirmed = window.confirm(
+			`Tem certeza que deseja excluir o sistema "${system.name}"? Esta ação não pode ser desfeita.`
+		);
+
+		if (!confirmed) return;
+
+		this.systemService.markSystemAsObsolete(system.id).subscribe({
+			next: (success) => {
+				if (success) {
+					this.systems = this.systems.filter(s => s.id !== system.id);
+					alert(`Sistema "${system.name}" excluído com sucesso!`);
+				} else {
+					alert('Erro ao excluir sistema. Tente novamente.');
+				}
+			},
+			error: (error) => {
+				console.error('Erro ao excluir sistema:', error);
+				alert('Erro ao excluir sistema. Tente novamente.');
+			}
+		});
+	}
+
+	// Upload de sistemas
 	onFileSelected(event: Event) {
 		const input = event.target as HTMLInputElement;
 		if (input.files && input.files.length > 0) {
@@ -82,7 +220,7 @@ export class SystemsComponent implements OnInit {
 		event.preventDefault();
 		event.stopPropagation();
 		this.isDragOver = false;
-		
+
 		const files = event.dataTransfer?.files;
 		if (files && files.length > 0) {
 			this.handleFileUpload(files[0]);
@@ -115,56 +253,29 @@ export class SystemsComponent implements OnInit {
 
 	private uploadSystem(systemData: any) {
 		console.log('Dados do sistema antes do upload:', systemData);
-		console.log('Tamanho do JSON:', JSON.stringify(systemData).length);
-		
+
 		this.systemService.uploadSystem(systemData).subscribe({
 			next: (newSystem: RpgSystem) => {
 				this.systems.unshift(newSystem);
-				
+
 				// Carregar o nome do dono do novo sistema
 				if (newSystem.ownerId && newSystem.ownerId !== 'system-admin') {
 					this.loadOwnerName(newSystem.ownerId);
 				}
-				
+
 				this.isUploading = false;
 				this.uploadError = null;
-				console.log('Sistema carregado com sucesso:', newSystem);
+				alert(`Sistema "${newSystem.name}" criado com sucesso!`);
 			},
 			error: (error) => {
 				this.uploadError = 'Erro ao fazer upload do sistema. Verifique o formato do arquivo.';
 				this.isUploading = false;
 				console.error('Erro no upload:', error);
-				console.error('Status do erro:', error.status);
-				console.error('Mensagem do erro:', error.error);
-				console.error('Detalhes completos:', error);
 			}
 		});
 	}
 
-	deleteSystem(system: RpgSystem) {
-		if (!system.id) return;
-		
-		const confirmed = window.confirm(
-			`Tem certeza que deseja marcar o sistema "${system.name}" como obsoleto? Ele não será mais visível para novos usuários.`
-		);
-		
-		if (!confirmed) return;
-
-		this.systemService.markSystemAsObsolete(system.id).subscribe({
-			next: (success) => {
-				if (success) {
-					this.systems = this.systems.filter(s => s.id !== system.id);
-				} else {
-					alert('Erro ao marcar sistema como obsoleto. Tente novamente.');
-				}
-			},
-			error: (error) => {
-				console.error('Erro ao deletar sistema:', error);
-				alert('Erro ao marcar sistema como obsoleto. Tente novamente.');
-			}
-		});
-	}
-
+	// Utilitários
 	getSystemFieldsCount(system: RpgSystem): number {
 		return system.template?.length || 0;
 	}
@@ -172,5 +283,21 @@ export class SystemsComponent implements OnInit {
 	getSystemCategoriesCount(system: RpgSystem): number {
 		const categories = new Set(system.template?.map(field => field.category).filter(Boolean));
 		return categories.size;
+	}
+
+	// Ordenação para template
+	getSortedSystems(): RpgSystem[] {
+		return [...this.systems].sort((a, b) => {
+			// Sistemas salvos/próprios primeiro
+			const aIsSavedOrOwned = this.isSystemSavedOrOwned(a);
+			const bIsSavedOrOwned = this.isSystemSavedOrOwned(b);
+
+			if (aIsSavedOrOwned !== bIsSavedOrOwned) {
+				return aIsSavedOrOwned ? -1 : 1;
+			}
+
+			// Depois por nome
+			return (a.name || '').localeCompare(b.name || '');
+		});
 	}
 }

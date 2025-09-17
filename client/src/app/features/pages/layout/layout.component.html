@@ -4,7 +4,7 @@
 			<h1 class="logo">
 				<a routerLink="/">RPG Sheet Manager</a>
 			</h1>
-			
+
 			<nav class="nav" *ngIf="auth.isAuthenticated$ | async">
 				<a routerLink="/characters" routerLinkActive="active">Personagens</a>
 				<a routerLink="/systems" routerLinkActive="active">Sistemas</a>
@@ -20,7 +20,7 @@
 						</button>
 					</div>
 				</ng-container>
-				
+
 				<ng-template #loginSection>
 					<button class="btn btn-primary" (click)="auth.loginWithRedirect()">
 						Login

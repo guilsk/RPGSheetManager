@@ -20,5 +20,7 @@ namespace RPGSheetManager.Domain.Systems {
         public List<CharacterData> Template { get; set; } = new List<CharacterData>();
         [BsonElement("categoryOrder")]
         public string[]? CategoryOrder { get; set; }
+        [BsonElement("obsolete")]
+        public bool Obsolete { get; set; } = false;
     }
 }

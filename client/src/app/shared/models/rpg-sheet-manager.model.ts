@@ -40,34 +40,34 @@ export interface RollConfig {
 
 // Sistemas
 export interface RpgSystem {
-    id?: string;
-    name?: string;
-    description?: string;
-    ownerId?: string;
-    createdAt?: Date;
-    template?: CharacterData[];
+	id?: string;
+	name?: string;
+	description?: string;
+	ownerId?: string;
+	createdAt?: Date;
+	template?: CharacterData[];
 	categoryOrder?: string[];
 	obsolete?: boolean; // Flag para marcar sistemas como obsoletos
 }
 
 // Campanhas
 export interface Campaign {
-    id?: string;
-    title?: string;
-    systemId?: string;
-    masterId?: string;
-    playerIds?: string[];
-    createdAt?: Date;
-    activeSession?: boolean;
-    characters?: CampaignCharacter[];
-    chatMessages?: ChatMessage[];
-    diceHistory?: DiceRoll[];
+	id?: string;
+	title?: string;
+	systemId?: string;
+	masterId?: string;
+	playerIds?: string[];
+	createdAt?: Date;
+	activeSession?: boolean;
+	characters?: CampaignCharacter[];
+	chatMessages?: ChatMessage[];
+	diceHistory?: DiceRoll[];
 }
 
 export interface CampaignCharacter {
-    charId?: string;
-    playerId?: string;
-    dynamicData?: DynamicField[];
+	charId?: string;
+	playerId?: string;
+	dynamicData?: DynamicField[];
 }
 
 export interface ChatMessage {
@@ -91,7 +91,8 @@ export interface DynamicField {
 
 // Usuários
 export interface User {
-    authId?: string;
-    displayName?: string;
-    createdAt?: Date;
+	authId?: string;
+	displayName?: string;
+	createdAt?: Date;
+	savedSystemIds?: string[];
 }
