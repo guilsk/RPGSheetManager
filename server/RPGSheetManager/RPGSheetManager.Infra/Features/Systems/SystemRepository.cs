@@ -13,6 +13,10 @@ namespace RPGSheetManager.Infra.Features.Systems {
             return await _collection.Find(_ => true).ToListAsync();
         }
 
+        public async Task<List<RPGSystem>> GetByOwnerIdAsync(string ownerId) {
+            return await _collection.Find(s => s.OwnerId == ownerId).ToListAsync();
+        }
+
         public async Task<RPGSystem?> GetByIdAsync(string id) {
             return await _collection.Find(c => c.Id == id).FirstOrDefaultAsync();
         }

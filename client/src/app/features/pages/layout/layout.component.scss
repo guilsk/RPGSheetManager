@@ -9,6 +9,11 @@
 	color: white;
 	padding: 0 2rem;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 1000;
 }
 
 .header-content {
@@ -28,7 +33,7 @@
 	a {
 		color: white;
 		text-decoration: none;
-		
+
 		&:hover {
 			color: #3b82f6;
 		}
@@ -109,4 +114,5 @@
 	padding: 2rem;
 	width: 100%;
 	box-sizing: border-box;
+	margin-top: 64px;
 }

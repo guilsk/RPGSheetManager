@@ -13,6 +13,10 @@ namespace RPGSheetManager.Infra.Features.Characters {
             return await _collection.Find(_ => true).ToListAsync();
         }
 
+        public async Task<List<Character>> GetByUserIdAsync(string userId) {
+            return await _collection.Find(c => c.UserId == userId).ToListAsync();
+        }
+
         public async Task<Character?> GetByIdAsync(string id) {
             return await _collection.Find(c => c.Id == id).FirstOrDefaultAsync();
         }

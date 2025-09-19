@@ -71,7 +71,7 @@ export class CharacterEditComponent implements OnInit {
 		this.loadingSystems = true;
 		this.characterForm.get('systemId')?.disable();
 
-		this.systemService.getSystems().subscribe({
+		this.systemService.getSavedSystems().subscribe({
 			next: (systems: RpgSystem[]) => {
 				this.systems = systems;
 				this.loadingSystems = false;

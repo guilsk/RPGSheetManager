@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RPGSheetManager.Application.Services.Systems;
 using RPGSheetManager.Application.Services.Users;
+using RPGSheetManager.Domain.Systems;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace RPGSheetManager.API.Controllers.Systems
 {
@@ -33,6 +35,65 @@ namespace RPGSheetManager.API.Controllers.Systems
             }
         }
 
+        [HttpGet("my-systems")]
+        [Authorize]
+        public async Task<IActionResult> GetMySystems()
+        {
+            try
+            {
+                var userId = GetUserId();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User ID não encontrado no token");
+                }
+
+                var systems = await _systemService.GetByOwnerIdAsync(userId);
+                return Ok(systems);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro interno: {ex.Message}");
+            }
+        }
+
+        [HttpGet("saved-systems")]
+        [Authorize]
+        public async Task<IActionResult> GetSavedSystems()
+        {
+            try
+            {
+                var userId = GetUserId();
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User ID não encontrado no token");
+                }
+
+                // Buscar o usuário para obter os sistemas salvos
+                var user = await _userService.GetUserByAuthIdAsync(userId);
+                if (user == null || user.SavedSystemIds == null || !user.SavedSystemIds.Any())
+                {
+                    return Ok(new List<object>());
+                }
+
+                // Buscar os sistemas salvos
+                var savedSystems = new List<object>();
+                foreach (var systemId in user.SavedSystemIds)
+                {
+                    var system = await _systemService.GetByIdAsync(systemId);
+                    if (system != null)
+                    {
+                        savedSystems.Add(system);
+                    }
+                }
+
+                return Ok(savedSystems);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro interno: {ex.Message}");
+            }
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSystem(string id)
         {
@@ -53,7 +114,7 @@ namespace RPGSheetManager.API.Controllers.Systems
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreateSystem([FromBody] object systemData)
+        public async Task<IActionResult> CreateSystem([FromBody] JsonElement systemData)
         {
             try
             {
@@ -63,10 +124,32 @@ namespace RPGSheetManager.API.Controllers.Systems
                     return Unauthorized("User ID não encontrado no token");
                 }
 
-                // Por agora vou comentar esta funcionalidade pois não temos o método
-                // var system = await _systemService.CreateSystemAsync(systemData, userId);
-                // return CreatedAtAction(nameof(GetSystem), new { id = system.Id }, system);
-                return BadRequest("Funcionalidade não implementada");
+                // Deserializar o JSON para um objeto RPGSystem
+                var systemJson = systemData.GetRawText();
+                var system = JsonSerializer.Deserialize<RPGSystem>(systemJson, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (system == null)
+                {
+                    return BadRequest("Dados do sistema inválidos");
+                }
+
+                // Definir o ownerId como o usuário autenticado
+                system.OwnerId = userId;
+                system.CreatedAt = DateTime.UtcNow;
+                system.Id = null; // Garantir que o MongoDB vai gerar um novo ID
+
+                var createdSystem = await _systemService.AddAsync(system);
+
+                // Automaticamente adicionar o sistema aos sistemas salvos do usuário
+                if (!string.IsNullOrEmpty(createdSystem.Id))
+                {
+                    await _userService.AddSavedSystemAsync(userId, createdSystem.Id);
+                }
+
+                return CreatedAtAction(nameof(GetSystem), new { id = createdSystem.Id }, createdSystem);
             }
             catch (Exception ex)
             {

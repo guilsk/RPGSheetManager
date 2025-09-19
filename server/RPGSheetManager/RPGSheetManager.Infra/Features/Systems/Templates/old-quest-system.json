@@ -1,0 +1,164 @@
+{
+	"name": "Old Quest",
+	"description": "Sistema de RPG Old Quest com mecânicas clássicas de atributos, defesa, magia e vida representados por círculos preenchíveis.",
+	"ownerId": "system-admin",
+	"createdAt": "2025-09-17T00:00:00Z",
+	"template": [
+		{
+			"name": "Nome",
+			"value": "",
+			"component": "text",
+			"category": "Informações Básicas",
+			"order": 1,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Idade",
+			"value": "",
+			"component": "numeric",
+			"category": "Informações Básicas",
+			"order": 3,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Raça",
+			"value": "",
+			"component": "text",
+			"category": "Informações Básicas",
+			"order": 4,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Adjetivos",
+			"value": "",
+			"component": "textarea",
+			"category": "Informações Básicas",
+			"order": 5,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Nível",
+			"value": "0",
+			"component": "numeric",
+			"category": "Informações Básicas",
+			"order": 6,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "XP",
+			"value": "0",
+			"component": "numeric",
+			"category": "Informações Básicas",
+			"order": 7,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Ataque de Perto",
+			"value": "0",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 1,
+			"editable": true,
+			"visible": true,
+			"rollable": {
+				"enabled": true,
+				"formula": "1d6 + {Ataque de Perto}"
+			}
+		},
+		{
+			"name": "Ataque de Longe",
+			"value": "0",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 2,
+			"editable": true,
+			"visible": true,
+			"rollable": {
+				"enabled": true,
+				"formula": "1d6 + {Ataque de Longe}"
+			}
+		},
+		{
+			"name": "Defesa",
+			"value": "0",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 3,
+			"editable": true,
+			"visible": true,
+			"rollable": {
+				"enabled": true,
+				"formula": "1d6 + {Defesa}"
+			}
+		},
+		{
+			"name": "Magia",
+			"value": "0",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 4,
+			"editable": true,
+			"visible": true,
+			"rollable": {
+				"enabled": true,
+				"formula": "1d6 + {Magia}"
+			}
+		},
+		{
+			"name": "Vida",
+			"value": "0",
+			"component": "numeric",
+			"category": "Atributos",
+			"order": 5,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Equipamento",
+			"value": "",
+			"component": "textarea",
+			"category": "Equipamentos",
+			"order": 1,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Tesouros",
+			"value": "",
+			"component": "textarea",
+			"category": "Equipamentos",
+			"order": 2,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Itens Consumíveis",
+			"value": "",
+			"component": "textarea",
+			"category": "Equipamentos",
+			"order": 3,
+			"editable": true,
+			"visible": true
+		},
+		{
+			"name": "Feitiços",
+			"value": "",
+			"component": "textarea",
+			"category": "Equipamentos",
+			"order": 4,
+			"editable": true,
+			"visible": true
+		}
+	],
+	"categoryOrder": [
+		"Informações Básicas",
+		"Atributos",
+		"Equipamentos"
+	]
+}

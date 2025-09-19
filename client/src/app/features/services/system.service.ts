@@ -21,6 +21,14 @@ export class SystemService {
 		return this.http.get<RpgSystem[]>(this.apiUrl);
 	}
 
+	public getMySystems(): Observable<RpgSystem[]> {
+		return this.http.get<RpgSystem[]>(`${this.apiUrl}/my-systems`);
+	}
+
+	public getSavedSystems(): Observable<RpgSystem[]> {
+		return this.http.get<RpgSystem[]>(`${this.apiUrl}/saved-systems`);
+	}
+
 	public getSystemById(id: string): Observable<RpgSystem | undefined> {
 		return this.http.get<RpgSystem>(`${this.apiUrl}/${id}`).pipe(
 			catchError(error => {
