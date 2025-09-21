@@ -1,9 +1,10 @@
 ﻿namespace RPGSheetManager.Domain.Characters {
     public interface ICharacterRepository {
         Task<List<Character>> GetAllAsync();
-        Task<Character?> GetByIdAsync(Guid id);
-        Task AddAsync(Character character);
-        Task UpdateAsync(Guid id, Character character);
-        Task DeleteAsync(Guid id);
+        Task<List<Character>> GetByUserIdAsync(string userId);
+        Task<Character?> GetByIdAsync(string id);
+        Task<Character> AddAsync(Character character);
+        Task UpdateAsync(string id, Character character);
+        Task DeleteAsync(string id);
     }
 }

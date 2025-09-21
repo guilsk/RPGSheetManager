@@ -1,0 +1,81 @@
+<div class="dynamic-field" [class.field-disabled]="isDisabled">
+	<div class="field-header">
+		<label [for]="getFieldId()" class="field-label">
+			{{ field.name }}
+		</label>
+
+		<button *ngIf="field.rollable?.enabled" type="button" class="roll-button" (click)="onRoll()"
+			title="Rolar dados para {{ field.name }}">
+			🎲
+		</button>
+	</div>
+
+	<div class="field-input">
+		<!-- Text Input -->
+		<input *ngIf="field.component === ComponentType.TEXT" type="text" [id]="getFieldId()" [(ngModel)]="currentValue"
+			[disabled]="isDisabled" (ngModelChange)="onValueChange($event)" class="form-control"
+			[placeholder]="'Digite ' + field.name">
+
+		<!-- Numeric Input -->
+		<input *ngIf="field.component === ComponentType.NUMERIC" type="number" [id]="getFieldId()"
+			[(ngModel)]="currentValue" [disabled]="isDisabled" (ngModelChange)="onValueChange($event)"
+			class="form-control" [placeholder]="'Digite ' + field.name">
+
+		<!-- Textarea -->
+		<textarea *ngIf="field.component === ComponentType.TEXTAREA" [id]="getFieldId()" [(ngModel)]="currentValue"
+			[disabled]="isDisabled" (ngModelChange)="onValueChange($event)" class="form-control textarea" rows="3"
+			[placeholder]="'Digite ' + field.name">
+    </textarea>
+
+		<!-- Select -->
+		<select *ngIf="field.component === ComponentType.SELECT && !isSelectPreviewMode" [id]="getFieldId()"
+			[(ngModel)]="currentValue" [disabled]="isDisabled" (ngModelChange)="onValueChange($event)"
+			class="form-control">
+			<option value="">Selecione...</option>
+			<option *ngFor="let option of field.options" [value]="option">
+				{{ option }}
+			</option>
+		</select>
+
+		<!-- Select Preview Mode -->
+		<select *ngIf="isSelectPreviewMode" [id]="getFieldId()" [(ngModel)]="currentValue"
+			class="form-control select-preview" title="Clique para ver opções">
+			<option value="">Ver opções disponíveis</option>
+			<option *ngFor="let option of field.options" [value]="option">
+				{{ option }}
+			</option>
+		</select>
+
+		<!-- Checkbox -->
+		<div *ngIf="field.component === ComponentType.CHECKBOX" class="checkbox-container">
+			<input type="checkbox" [id]="getFieldId()" [(ngModel)]="currentValue" [disabled]="isDisabled"
+				(ngModelChange)="onValueChange($event)" class="checkbox-input">
+			<label [for]="getFieldId()" class="checkbox-label">
+				{{ field.name }}
+			</label>
+		</div>
+
+		<!-- Radio Buttons -->
+		<div *ngIf="field.component === ComponentType.RADIO" class="radio-container">
+			<div *ngFor="let option of field.options; let i = index" class="radio-option">
+				<input type="radio" [id]="getFieldId() + '-' + i" [name]="getFieldId()" [value]="option"
+					[(ngModel)]="currentValue" [disabled]="isDisabled" (ngModelChange)="onValueChange($event)"
+					class="radio-input">
+				<label [for]="getFieldId() + '-' + i" class="radio-label">
+					{{ option }}
+				</label>
+			</div>
+		</div>
+	</div>
+
+	<!-- Field Info -->
+	<div class="field-info" *ngIf="field.rollable?.formula || lastRollResult">
+		<small class="formula-info" *ngIf="field.rollable?.formula">
+			Fórmula: {{ field.rollable?.formula }}
+		</small>
+		<div class="roll-result" *ngIf="lastRollResult">
+			<span class="roll-breakdown">{{ lastRollResult.breakdown }}</span>
+			<span class="roll-total"> = {{ lastRollResult.result }}</span>
+		</div>
+	</div>
+</div>

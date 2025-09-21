@@ -1,0 +1,102 @@
+<div class="page-container">
+	<div class="page-header">
+		<h1>Sistemas de RPG</h1>
+		<p>Explore sistemas de RPG da comunidade, salve seus favoritos e crie novos sistemas para compartilhar.</p>
+	</div>
+
+	<div class="page-content">
+		<!-- Upload Area -->
+		<div class="upload-section">
+			<div class="upload-area" [class.uploading]="isUploading" [class.drag-over]="isDragOver"
+				(dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+
+				<div class="upload-content" *ngIf="!isUploading">
+					<div class="upload-icon">📁</div>
+					<h3>Criar Novo Sistema</h3>
+					<p>Arraste e solte um arquivo JSON aqui ou clique para selecionar</p>
+					<input type="file" accept=".json" (change)="onFileSelected($event)" #fileInput
+						style="display: none;">
+					<button class="btn btn-primary" (click)="fileInput.click()">
+						Selecionar Arquivo JSON
+					</button>
+				</div>
+
+				<div class="upload-content" *ngIf="isUploading">
+					<div class="loading-spinner">⏳</div>
+					<h3>Processando Sistema...</h3>
+					<p>Aguarde enquanto validamos e salvamos o sistema.</p>
+				</div>
+			</div>
+
+			<div class="upload-error" *ngIf="uploadError">
+				<strong>Erro:</strong> {{ uploadError }}
+			</div>
+		</div>
+
+		<!-- Systems Grid -->
+		<div class="systems-grid" *ngIf="getSortedSystems().length > 0">
+			<div class="system-card" *ngFor="let system of getSortedSystems()"
+				[class.saved-system]="isSystemSavedOrOwned(system)" [class.own-system]="isSystemOwner(system)">
+
+				<div class="system-header">
+					<h3>{{ system.name }}</h3>
+					<div class="system-meta">
+						<span class="system-author">por {{ getOwnerDisplayName(system.ownerId || '') }}</span>
+						<div class="system-badges">
+							<span class="badge badge-own" *ngIf="isSystemOwner(system)">Meu Sistema</span>
+							<span class="badge badge-saved"
+								*ngIf="!isSystemOwner(system) && isSystemSaved(system)">Salvo</span>
+						</div>
+					</div>
+				</div>
+
+				<p class="system-description">{{ system.description }}</p>
+
+				<div class="system-stats">
+					<div class="stat">
+						<span class="label">Campos:</span>
+						<span class="value">{{ getSystemFieldsCount(system) }}</span>
+					</div>
+					<div class="stat">
+						<span class="label">Categorias:</span>
+						<span class="value">{{ getSystemCategoriesCount(system) }}</span>
+					</div>
+					<div class="stat">
+						<span class="label">Criado:</span>
+						<span class="value">{{ system.createdAt | date:'dd/MM/yyyy' }}</span>
+					</div>
+				</div>
+
+				<div class="card-actions">
+					<button class="btn btn-secondary" [routerLink]="['/systems/view', system.id]">
+						Ver Detalhes
+					</button>
+
+					<!-- Botão para sistemas próprios -->
+					<button class="btn btn-danger" *ngIf="isSystemOwner(system)" (click)="deleteSystem(system)">
+						Excluir
+					</button>
+
+					<!-- Botão para sistemas de outros não salvos -->
+					<button class="btn btn-primary" *ngIf="!isSystemOwner(system) && !isSystemSaved(system)"
+						(click)="saveSystem(system)">
+						Salvar
+					</button>
+
+					<!-- Botão para sistemas de outros já salvos -->
+					<button class="btn btn-outline-primary" *ngIf="!isSystemOwner(system) && isSystemSaved(system)"
+						(click)="unsaveSystem(system)">
+						Remover dos Salvos
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Empty State -->
+		<div class="empty-state" *ngIf="getSortedSystems().length === 0 && !isUploading">
+			<div class="empty-icon">🎲</div>
+			<h3>Nenhum Sistema Disponível</h3>
+			<p>Seja o primeiro a criar um sistema de RPG! Faça upload de um arquivo JSON para começar.</p>
+		</div>
+	</div>
+</div>

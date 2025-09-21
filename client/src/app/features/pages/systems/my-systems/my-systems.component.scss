@@ -1,0 +1,16 @@
+// Importar estilos do componente pai
+@import '../systems.component.scss';
+
+// Estilos específicos para meus sistemas
+.system-author {
+	color: var(--primary-color, #007bff);
+	font-weight: 500;
+}
+
+.page-header h1 {
+	color: var(--primary-color, #007bff);
+}
+
+.upload-section {
+	margin-bottom: 2rem;
+}

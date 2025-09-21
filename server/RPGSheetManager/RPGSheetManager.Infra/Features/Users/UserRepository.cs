@@ -16,5 +16,19 @@ namespace RPGSheetManager.Infra.Features.Users {
         public async Task<User?> GetByAuthIdAsync(string authId) {
             return await _collection.Find(u => u.AuthId == authId).FirstOrDefaultAsync();
         }
+
+        public async Task<bool> AddSavedSystemAsync(string authId, string systemId) {
+            var filter = Builders<User>.Filter.Eq(u => u.AuthId, authId);
+            var update = Builders<User>.Update.AddToSet(u => u.SavedSystemIds, systemId);
+            var result = await _collection.UpdateOneAsync(filter, update);
+            return result.ModifiedCount > 0;
+        }
+
+        public async Task<bool> RemoveSavedSystemAsync(string authId, string systemId) {
+            var filter = Builders<User>.Filter.Eq(u => u.AuthId, authId);
+            var update = Builders<User>.Update.Pull(u => u.SavedSystemIds, systemId);
+            var result = await _collection.UpdateOneAsync(filter, update);
+            return result.ModifiedCount > 0;
+        }
     }
 }

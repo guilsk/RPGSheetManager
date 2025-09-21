@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RPGSheetManager.Application.Services.Users;
+using RPGSheetManager.Domain.Users;
 
 namespace RPGSheetManager.API.Controllers.Users {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase {
@@ -19,7 +22,7 @@ namespace RPGSheetManager.API.Controllers.Users {
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddOrUpdateUser([FromBody] Domain.Users.User user) {
+        public async Task<IActionResult> AddOrUpdateUser([FromBody] User user) {
             if (user == null || string.IsNullOrEmpty(user.AuthId)) {
                 return BadRequest("Invalid user data.");
             }

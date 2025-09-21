@@ -7,6 +7,10 @@ namespace RPGSheetManager.API {
         public static void Main(string[] args) {
             var builder = WebApplication.CreateBuilder(args);
 
+            var allowed = builder.Configuration.GetSection("AllowedCors").Get<string[]>() ?? [];
+            builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
+                p.WithOrigins(allowed).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
+
             // Add services to the container.
             builder.Services.AddJwtAuthentication(builder.Configuration);
             builder.Services.AddSwaggerDocumentation();
@@ -36,6 +40,7 @@ namespace RPGSheetManager.API {
             }
 
             app.UseHttpsRedirection();
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();

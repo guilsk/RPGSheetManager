@@ -9,9 +9,10 @@ namespace RPGSheetManager.Application.Services.Characters {
         }
 
         public Task<List<Character>> GetAllAsync() => _repository.GetAllAsync();
-        public Task<Character?> GetByIdAsync(Guid id) => _repository.GetByIdAsync(id);
-        public Task AddAsync(Character character) => _repository.AddAsync(character);
-        public Task UpdateAsync(Guid id, Character character) => _repository.UpdateAsync(id, character);
-        public Task DeleteAsync(Guid id) => _repository.DeleteAsync(id);
+        public Task<List<Character>> GetByUserIdAsync(string userId) => _repository.GetByUserIdAsync(userId);
+        public Task<Character?> GetByIdAsync(string id) => _repository.GetByIdAsync(id);
+        public Task<Character> AddAsync(Character character) => _repository.AddAsync(character);
+        public Task UpdateAsync(string id, Character character) => _repository.UpdateAsync(id, character);
+        public Task DeleteAsync(string id) => _repository.DeleteAsync(id);
     }
 }

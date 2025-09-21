@@ -1,0 +1,13 @@
+{
+	"rules": {
+		"@typescript-eslint/indent": [
+			"error",
+			"tab"
+		],
+		"indent": [
+			"error",
+			"tab"
+		],
+		"no-mixed-spaces-and-tabs": "error"
+	}
+}

@@ -12,6 +12,17 @@ namespace RPGSheetManager.API.Extensions
                 {
                     options.Authority = $"https://{configuration["Auth0:Domain"]}/";
                     options.Audience = configuration["Auth0:Audience"];
+                    options.MapInboundClaims = false;
+                    
+                    // Configurações adicionais para desenvolvimento
+                    options.RequireHttpsMetadata = false; // Para desenvolvimento local
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
+                    };
                 });
             return services;
         }

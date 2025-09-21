@@ -1,0 +1,24 @@
+<ng-container *ngIf="auth.isLoading$ | async; else appContent">
+	<div class="loading-container">
+		<div class="loading-spinner"></div>
+		<p>Carregando...</p>
+	</div>
+</ng-container>
+
+<ng-template #appContent>
+	<ng-container *ngIf="auth.isAuthenticated$ | async; else loginPage">
+		<app-layout></app-layout>
+	</ng-container>
+
+	<ng-template #loginPage>
+		<div class="login-container">
+			<div class="login-card">
+				<h1>RPG Sheet Manager</h1>
+				<p>Gerencie seus personagens, campanhas e sistemas de RPG</p>
+				<button class="btn btn-primary" (click)="auth.loginWithRedirect()">
+					Entrar com Auth0
+				</button>
+			</div>
+		</div>
+	</ng-template>
+</ng-template>

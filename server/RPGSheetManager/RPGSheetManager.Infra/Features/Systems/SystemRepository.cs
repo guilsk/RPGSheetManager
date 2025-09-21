@@ -1,4 +1,4 @@
-﻿using MongoDB.Driver;
+using MongoDB.Driver;
 using RPGSheetManager.Domain.Systems;
 
 namespace RPGSheetManager.Infra.Features.Systems {
@@ -13,19 +13,24 @@ namespace RPGSheetManager.Infra.Features.Systems {
             return await _collection.Find(_ => true).ToListAsync();
         }
 
-        public async Task<RPGSystem?> GetByIdAsync(Guid id) {
+        public async Task<List<RPGSystem>> GetByOwnerIdAsync(string ownerId) {
+            return await _collection.Find(s => s.OwnerId == ownerId).ToListAsync();
+        }
+
+        public async Task<RPGSystem?> GetByIdAsync(string id) {
             return await _collection.Find(c => c.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task AddAsync(RPGSystem systems) {
+        public async Task<RPGSystem> AddAsync(RPGSystem systems) {
             await _collection.InsertOneAsync(systems);
+			return systems;
         }
 
-        public async Task UpdateAsync(Guid id, RPGSystem updated) {
+        public async Task UpdateAsync(string id, RPGSystem updated) {
             await _collection.ReplaceOneAsync(c => c.Id == id, updated);
         }
 
-        public async Task DeleteAsync(Guid id) {
+        public async Task DeleteAsync(string id) {
             await _collection.DeleteOneAsync(c => c.Id == id);
         }
     }
