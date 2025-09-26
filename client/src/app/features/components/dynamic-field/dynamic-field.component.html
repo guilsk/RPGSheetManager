@@ -4,8 +4,9 @@
 			{{ field.name }}
 		</label>
 
-		<button *ngIf="field.rollable?.enabled" type="button" class="roll-button" (click)="onRoll()"
-			title="Rolar dados para {{ field.name }}">
+		<button *ngIf="field.rollable?.enabled" type="button" class="roll-button" (click)="!previewMode && onRoll()"
+			[class.roll-button-disabled]="previewMode"
+			[title]="previewMode ? 'Dado não disponível na visualização' : 'Rolar dados para ' + field.name">
 			🎲
 		</button>
 	</div>

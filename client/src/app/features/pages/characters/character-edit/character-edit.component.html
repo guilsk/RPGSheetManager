@@ -24,8 +24,8 @@
 					<label for="system">Sistema de RPG *</label>
 					<select id="system" formControlName="systemId" (change)="onSystemSelectionChange($event)"
 						class="form-control">
-						<option value="">
-							{{ loadingSystems ? 'Carregando sistemas...' : 'Selecione um sistema' }}
+						<option value="" disabled>
+							{{ loadingSystems ? 'Carregando sistemas...' : '-- Selecione um sistema --' }}
 						</option>
 						<option *ngFor="let system of systems" [value]="system.id">
 							{{ system.name }}

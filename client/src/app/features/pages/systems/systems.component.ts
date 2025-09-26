@@ -127,7 +127,6 @@ export class SystemsComponent implements OnInit {
 									this.currentUser.savedSystemIds = [];
 								}
 								this.currentUser.savedSystemIds.push(system.id!);
-								alert(`Sistema "${system.name}" salvo com sucesso!`);
 							} else {
 								alert('Erro ao salvar sistema. Tente novamente.');
 							}
@@ -159,7 +158,6 @@ export class SystemsComponent implements OnInit {
 					if (this.currentUser?.savedSystemIds) {
 						this.currentUser.savedSystemIds = this.currentUser.savedSystemIds.filter(id => id !== system.id);
 					}
-					alert(`Sistema "${system.name}" removido dos salvos!`);
 				} else {
 					alert('Erro ao remover sistema dos salvos. Tente novamente.');
 				}

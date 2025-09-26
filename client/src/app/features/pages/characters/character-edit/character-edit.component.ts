@@ -75,13 +75,25 @@ export class CharacterEditComponent implements OnInit {
 			next: (systems: RpgSystem[]) => {
 				this.systems = systems;
 				this.loadingSystems = false;
-				this.characterForm.get('systemId')?.enable();
+
+				if (this.isEditMode) {
+					this.characterForm.get('systemId')?.disable();
+				} else {
+					this.characterForm.get('systemId')?.enable();
+
+					if (systems.length === 1) {
+						this.characterForm.get('systemId')?.setValue(systems[0].id);
+						this.onSystemChange(systems[0].id || '');
+					}
+				}
 			},
 			error: (error) => {
 				console.error('Erro ao carregar sistemas:', error);
 				this.systems = [];
 				this.loadingSystems = false;
-				this.characterForm.get('systemId')?.enable();
+				if (!this.isEditMode) {
+					this.characterForm.get('systemId')?.enable();
+				}
 			}
 		});
 	}
