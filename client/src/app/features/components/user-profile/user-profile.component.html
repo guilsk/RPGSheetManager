@@ -1,0 +1,48 @@
+<div class="profile-container">
+	<div class="profile-card">
+		<div class="profile-header">
+			<h2>Meu Perfil</h2>
+			<p>Gerencie suas informações pessoais</p>
+		</div>
+
+		<div class="loading-container" *ngIf="isLoading">
+			<div class="loading-spinner"></div>
+			<p>Carregando perfil...</p>
+		</div>
+
+		<form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+			<!-- Nome de exibição -->
+			<div class="form-group">
+				<label for="displayName">Nome de Exibição *</label>
+				<input id="displayName" type="text" formControlName="displayName" class="form-control"
+					[class.invalid]="isFieldInvalid('displayName')" placeholder="Digite seu nome de exibição"
+					maxlength="50">
+				<div class="error-message" *ngIf="isFieldInvalid('displayName')">
+					{{ getFieldError('displayName') }}
+				</div>
+			</div>
+
+			<!-- Email (readonly) -->
+			<div class="form-group">
+				<label for="email">Email</label>
+				<input id="email" type="email" formControlName="email" class="form-control" readonly>
+				<small class="form-text">O email é gerenciado pelo seu provedor de autenticação e não pode ser alterado
+					aqui.</small>
+			</div>
+
+			<!-- Mensagens de feedback -->
+			<div class="feedback-messages">
+				<div class="error-message" *ngIf="error">{{ error }}</div>
+				<div class="success-message" *ngIf="success">{{ success }}</div>
+			</div>
+
+			<!-- Botões -->
+			<div class="form-actions">
+				<button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || isSubmitting">
+					<span *ngIf="isSubmitting" class="spinner"></span>
+					{{ isSubmitting ? 'Salvando...' : 'Salvar Alterações' }}
+				</button>
+			</div>
+		</form>
+	</div>
+</div>

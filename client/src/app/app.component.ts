@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@auth0/auth0-angular';
 import { UserService } from './features/services/user.service';
+import { CurrentUserService } from './features/services/current-user.service';
 import { LayoutComponent } from './features/pages/layout/layout.component';
 import { User } from './shared/models/rpg-sheet-manager.model';
 import { catchError, switchMap } from 'rxjs/operators';
@@ -17,7 +18,8 @@ import { of } from 'rxjs';
 export class AppComponent implements OnInit {
 	constructor(
 		public auth: AuthService,
-		public userService: UserService
+		public userService: UserService,
+		private currentUserService: CurrentUserService
 	) { }
 
 	public async ngOnInit(): Promise<void> {
@@ -31,13 +33,43 @@ export class AppComponent implements OnInit {
 		// Processar usuário autenticado
 		this.auth.user$.pipe(
 			switchMap(profile => {
-				if (profile) {
-					const user: User = {
-						authId: profile.sub,
-						displayName: profile.name,
-						createdAt: profile.updated_at ? new Date(profile.updated_at) : new Date()
-					};
-					return this.userService.post(user);
+				if (profile?.sub) {
+					// Primeiro, verificar se o usuário já existe
+					return this.userService.getUserByAuthId(profile.sub).pipe(
+						switchMap(existingUser => {
+							if (existingUser) {
+								// Usuário já existe, apenas atualizar email se necessário
+								if (profile.email && existingUser.email !== profile.email) {
+									const updatedUser: User = {
+										...existingUser,
+										email: profile.email
+									};
+									return this.userService.post(updatedUser);
+								}
+								// Usuário existe e email é o mesmo, não fazer nada
+								return of(existingUser);
+							} else {
+								// Usuário não existe, criar novo
+								const newUser: User = {
+									authId: profile.sub,
+									displayName: profile.name || profile.email || 'Usuário',
+									email: profile.email,
+									createdAt: new Date()
+								};
+								return this.userService.post(newUser);
+							}
+						}),
+						catchError(() => {
+							// Se deu 404, o usuário não existe, criar novo
+							const newUser: User = {
+								authId: profile.sub,
+								displayName: profile.name || profile.email || 'Usuário',
+								email: profile.email,
+								createdAt: new Date()
+							};
+							return this.userService.post(newUser);
+						})
+					);
 				}
 				return of(null);
 			}),
@@ -45,6 +77,11 @@ export class AppComponent implements OnInit {
 				console.error('Erro ao processar usuário:', error);
 				return of(null);
 			})
-		).subscribe();
+		).subscribe(user => {
+			// Notificar o CurrentUserService sempre que o usuário for processado
+			if (user) {
+				this.currentUserService.updateCurrentUser(user);
+			}
+		});
 	}
 }

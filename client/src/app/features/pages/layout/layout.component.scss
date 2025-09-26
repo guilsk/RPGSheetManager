@@ -105,6 +105,19 @@
 			background-color: #4b5563;
 		}
 	}
+
+	&.btn-outline {
+		background-color: transparent;
+		color: #d1d5db;
+		border: 1px solid #4b5563;
+		text-decoration: none;
+
+		&:hover {
+			background-color: rgba(59, 130, 246, 0.1);
+			border-color: #3b82f6;
+			color: #3b82f6;
+		}
+	}
 }
 
 .main {

@@ -47,5 +47,11 @@ export const routes: Routes = [
 		loadComponent: () => import('./features/pages/campaigns/campaigns.component')
 			.then(m => m.CampaignsComponent),
 		canActivate: [authGuard]
+	},
+	{
+		path: 'profile',
+		loadComponent: () => import('./features/components/user-profile/user-profile.component')
+			.then(m => m.UserProfileComponent),
+		canActivate: [authGuard]
 	}
 ];

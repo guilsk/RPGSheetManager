@@ -14,7 +14,10 @@
 			<div class="auth-section">
 				<ng-container *ngIf="auth.isAuthenticated$ | async; else loginSection">
 					<div class="user-info">
-						<span>{{ (auth.user$ | async)?.name }}</span>
+						<span>{{ (currentUserService.currentUser$ | async)?.displayName || 'Carregando...' }}</span>
+						<a routerLink="/profile" class="btn btn-outline" title="Meu Perfil">
+							👤 Perfil
+						</a>
 						<button class="btn btn-secondary" (click)="auth.logout()">
 							Logout
 						</button>

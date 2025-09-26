@@ -29,5 +29,26 @@ namespace RPGSheetManager.API.Controllers.Users {
             await _service.AddOrUpdateUserAsync(user);
             return Ok(user);
         }
+
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] User user) {
+            if (user == null || string.IsNullOrEmpty(user.AuthId)) {
+                return BadRequest("Invalid user data.");
+            }
+
+            // Verificar se o usuário está tentando atualizar seu próprio perfil
+            var currentUserId = User.FindFirst("sub")?.Value;
+
+            if (currentUserId != user.AuthId) {
+                return StatusCode(403, new {
+                    message = "You can only update your own profile.",
+                    currentUserId = currentUserId,
+                    requestedUserId = user.AuthId
+                });
+            }
+
+            await _service.UpdateProfileAsync(user);
+            return Ok(user);
+        }
     }
 }

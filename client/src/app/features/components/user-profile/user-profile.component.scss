@@ -1,0 +1,221 @@
+.profile-container {
+	display: flex;
+	justify-content: center;
+	padding: 2rem 1rem;
+	min-height: 100vh;
+	background-color: #f8fafc;
+}
+
+.profile-card {
+	background: white;
+	border-radius: 12px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	width: 100%;
+	max-width: 500px;
+	padding: 2rem;
+}
+
+.profile-header {
+	text-align: center;
+	margin-bottom: 2rem;
+	border-bottom: 1px solid #e2e8f0;
+	padding-bottom: 1.5rem;
+
+	h2 {
+		color: #1e293b;
+		margin: 0 0 0.5rem 0;
+		font-size: 1.8rem;
+		font-weight: 600;
+	}
+
+	p {
+		color: #64748b;
+		margin: 0;
+		font-size: 0.9rem;
+	}
+}
+
+.loading-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem 0;
+
+	.loading-spinner {
+		width: 2rem;
+		height: 2rem;
+		border: 3px solid #e2e8f0;
+		border-top: 3px solid #3b82f6;
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+		margin-bottom: 1rem;
+	}
+
+	p {
+		color: #64748b;
+		margin: 0;
+	}
+}
+
+.form-group {
+	margin-bottom: 1.5rem;
+
+	label {
+		display: block;
+		margin-bottom: 0.5rem;
+		font-weight: 500;
+		color: #374151;
+		font-size: 0.9rem;
+	}
+
+	.form-control {
+		width: 100%;
+		padding: 0.75rem;
+		border: 2px solid #d1d5db;
+		border-radius: 8px;
+		font-size: 0.9rem;
+		transition: all 0.2s ease;
+		box-sizing: border-box;
+
+		&:focus {
+			outline: none;
+			border-color: #3b82f6;
+			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+		}
+
+		&.invalid {
+			border-color: #ef4444;
+
+			&:focus {
+				border-color: #ef4444;
+				box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+			}
+		}
+
+		&[readonly] {
+			background-color: #f8fafc;
+			color: #64748b;
+			cursor: not-allowed;
+		}
+
+		&::placeholder {
+			color: #9ca3af;
+		}
+	}
+
+	.form-text {
+		color: #64748b;
+		font-size: 0.8rem;
+		margin-top: 0.25rem;
+		display: block;
+	}
+}
+
+.feedback-messages {
+	margin-bottom: 1.5rem;
+
+	.error-message {
+		background-color: #fef2f2;
+		color: #dc2626;
+		border: 1px solid #fecaca;
+		border-radius: 8px;
+		padding: 0.75rem;
+		margin-bottom: 0.5rem;
+		font-size: 0.9rem;
+	}
+
+	.success-message {
+		background-color: #f0fdf4;
+		color: #16a34a;
+		border: 1px solid #bbf7d0;
+		border-radius: 8px;
+		padding: 0.75rem;
+		margin-bottom: 0.5rem;
+		font-size: 0.9rem;
+	}
+}
+
+.error-message {
+	color: #ef4444;
+	font-size: 0.8rem;
+	margin-top: 0.25rem;
+	display: block;
+}
+
+.form-actions {
+	display: flex;
+	justify-content: flex-end;
+	padding-top: 1rem;
+	border-top: 1px solid #e2e8f0;
+}
+
+.btn {
+	padding: 0.75rem 1.5rem;
+	border-radius: 8px;
+	font-size: 0.9rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	border: none;
+
+	&.btn-primary {
+		background-color: #3b82f6;
+		color: white;
+
+		&:hover:not(:disabled) {
+			background-color: #2563eb;
+		}
+
+		&:disabled {
+			opacity: 0.6;
+			cursor: not-allowed;
+		}
+	}
+}
+
+.spinner {
+	width: 16px;
+	height: 16px;
+	border: 2px solid rgba(255, 255, 255, 0.3);
+	border-radius: 50%;
+	border-top-color: white;
+	animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+// Responsividade
+@media (max-width: 640px) {
+	.profile-container {
+		padding: 1rem 0.5rem;
+	}
+
+	.profile-card {
+		padding: 1.5rem;
+	}
+
+	.profile-header {
+		h2 {
+			font-size: 1.5rem;
+		}
+	}
+
+	.form-actions {
+		.btn {
+			width: 100%;
+			justify-content: center;
+		}
+	}
+}

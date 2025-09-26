@@ -8,6 +8,7 @@ namespace RPGSheetManager.Domain.Users {
         [BsonRepresentation(BsonType.String)]
         public string AuthId { get; set; } = null!;
         public string DisplayName { get; set; } = null!;
+        public string? Email { get; set; }
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public List<string> SavedSystemIds { get; set; } = new List<string>();

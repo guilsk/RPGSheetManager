@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
+import { CurrentUserService } from '../../services/current-user.service';
 
 @Component({
 	selector: 'app-layout',
@@ -11,5 +12,8 @@ import { AuthService } from '@auth0/auth0-angular';
 	styleUrl: './layout.component.scss'
 })
 export class LayoutComponent {
-	constructor(public auth: AuthService) { }
+	constructor(
+		public auth: AuthService,
+		public currentUserService: CurrentUserService
+	) { }
 }

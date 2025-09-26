@@ -93,6 +93,7 @@ export interface DynamicField {
 export interface User {
 	authId?: string;
 	displayName?: string;
+	email?: string;
 	createdAt?: Date;
 	savedSystemIds?: string[];
 }

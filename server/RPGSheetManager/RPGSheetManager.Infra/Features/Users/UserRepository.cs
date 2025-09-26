@@ -30,5 +30,13 @@ namespace RPGSheetManager.Infra.Features.Users {
             var result = await _collection.UpdateOneAsync(filter, update);
             return result.ModifiedCount > 0;
         }
+
+        public async Task UpdateProfileAsync(User user) {
+            var filter = Builders<User>.Filter.Eq(u => u.AuthId, user.AuthId);
+            var update = Builders<User>.Update
+                .Set(u => u.DisplayName, user.DisplayName)
+                .Set(u => u.Email, user.Email);
+            await _collection.UpdateOneAsync(filter, update);
+        }
     }
 }
