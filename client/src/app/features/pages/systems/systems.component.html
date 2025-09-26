@@ -46,6 +46,7 @@
 							<span class="badge badge-own" *ngIf="isSystemOwner(system)">Meu Sistema</span>
 							<span class="badge badge-saved"
 								*ngIf="!isSystemOwner(system) && isSystemSaved(system)">Salvo</span>
+							<span class="badge badge-obsolete" *ngIf="isSystemObsolete(system)">Obsoleto</span>
 						</div>
 					</div>
 				</div>
@@ -83,10 +84,18 @@
 						Salvar
 					</button>
 
-					<!-- Botão para sistemas de outros já salvos -->
-					<button class="btn btn-outline-primary" *ngIf="!isSystemOwner(system) && isSystemSaved(system)"
+					<!-- Botão para sistemas de outros já salvos (não obsoletos) -->
+					<button class="btn btn-outline-primary"
+						*ngIf="!isSystemOwner(system) && isSystemSaved(system) && !isSystemObsolete(system)"
 						(click)="unsaveSystem(system)">
 						Remover dos Salvos
+					</button>
+
+					<!-- Botão para sistemas obsoletos salvos -->
+					<button class="btn btn-danger"
+						*ngIf="!isSystemOwner(system) && isSystemSaved(system) && isSystemObsolete(system)"
+						(click)="deleteObsoleteSystem(system)">
+						Excluir Definitivamente
 					</button>
 				</div>
 			</div>

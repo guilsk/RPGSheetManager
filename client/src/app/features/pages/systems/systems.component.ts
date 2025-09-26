@@ -50,13 +50,19 @@ export class SystemsComponent implements OnInit {
 
 	private loadSystems() {
 		this.systemService.getSystems().subscribe((systems: RpgSystem[]) => {
-			this.systems = systems.filter(system => !system.obsolete);
+			const nonObsoleteSystems = systems.filter(system => !system.obsolete);
 
-			// Carregar nomes dos donos
-			this.systems.forEach(system => {
-				if (system.ownerId && system.ownerId !== 'system-admin') {
-					this.loadOwnerName(system.ownerId);
-				}
+			this.systemService.getSavedSystems().subscribe((savedSystems: RpgSystem[]) => {
+				const obsoleteSavedSystems = savedSystems.filter(system => system.obsolete);
+
+				this.systems = [...nonObsoleteSystems, ...obsoleteSavedSystems];
+
+				// Carregar nomes dos donos
+				this.systems.forEach(system => {
+					if (system.ownerId && system.ownerId !== 'system-admin') {
+						this.loadOwnerName(system.ownerId);
+					}
+				});
 			});
 		});
 	}
@@ -93,6 +99,10 @@ export class SystemsComponent implements OnInit {
 
 	isSystemSavedOrOwned(system: RpgSystem): boolean {
 		return this.isSystemOwner(system) || this.isSystemSaved(system);
+	}
+
+	isSystemObsolete(system: RpgSystem): boolean {
+		return system.obsolete === true;
 	}
 
 	// Ações dos sistemas
@@ -182,7 +192,6 @@ export class SystemsComponent implements OnInit {
 			next: (success) => {
 				if (success) {
 					this.systems = this.systems.filter(s => s.id !== system.id);
-					alert(`Sistema "${system.name}" excluído com sucesso!`);
 				} else {
 					alert('Erro ao excluir sistema. Tente novamente.');
 				}
@@ -190,6 +199,38 @@ export class SystemsComponent implements OnInit {
 			error: (error) => {
 				console.error('Erro ao excluir sistema:', error);
 				alert('Erro ao excluir sistema. Tente novamente.');
+			}
+		});
+	}
+
+	deleteObsoleteSystem(system: RpgSystem) {
+		if (!system.id || !this.isSystemSaved(system) || !this.isSystemObsolete(system)) return;
+
+		const confirmed = window.confirm(
+			`ATENÇÃO: O sistema "${system.name}" está obsoleto e será excluído permanentemente.\n\n` +
+			`Este sistema não está mais disponível publicamente e ao excluí-lo você perderá acesso definitivamente.\n\n` +
+			`Seus personagens criados com este sistema não serão afetados, mas você não poderá criar novos personagens com ele.\n\n` +
+			`Tem certeza que deseja excluir este sistema obsoleto?`
+		);
+
+		if (!confirmed) return;
+
+		this.systemService.unsaveSystem(system.id).subscribe({
+			next: (success) => {
+				if (success) {
+					// Atualizar localmente
+					if (this.currentUser?.savedSystemIds) {
+						this.currentUser.savedSystemIds = this.currentUser.savedSystemIds.filter(id => id !== system.id);
+					}
+					// Remover da lista de sistemas exibidos
+					this.systems = this.systems.filter(s => s.id !== system.id);
+				} else {
+					alert('Erro ao excluir sistema obsoleto. Tente novamente.');
+				}
+			},
+			error: (error) => {
+				console.error('Erro ao excluir sistema obsoleto:', error);
+				alert('Erro ao excluir sistema obsoleto. Tente novamente.');
 			}
 		});
 	}
@@ -263,7 +304,6 @@ export class SystemsComponent implements OnInit {
 
 				this.isUploading = false;
 				this.uploadError = null;
-				alert(`Sistema "${newSystem.name}" criado com sucesso!`);
 			},
 			error: (error) => {
 				this.uploadError = 'Erro ao fazer upload do sistema. Verifique o formato do arquivo.';
