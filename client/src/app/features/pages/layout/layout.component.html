@@ -36,4 +36,10 @@
 	<main class="main">
 		<router-outlet></router-outlet>
 	</main>
+
+	<!-- Dialog Global -->
+	<app-dialog [config]="(dialogService.dialog$ | async)?.config!"
+		[isVisible]="(dialogService.dialog$ | async)?.isVisible || false" (confirmed)="onDialogConfirmed($event)"
+		(closed)="onDialogClosed()">
+	</app-dialog>
 </div>

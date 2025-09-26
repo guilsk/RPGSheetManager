@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { Character, CharacterData } from '../../../shared/models/rpg-sheet-manager.model';
 import { CharacterService } from '../../services/character.service';
 import { SystemService } from '../../services/system.service';
+import { DialogService } from '../../services/dialog.service';
 
 @Component({
 	selector: 'app-characters',
@@ -15,7 +16,8 @@ import { SystemService } from '../../services/system.service';
 export class CharactersComponent implements OnInit {
 	private characterService = inject(CharacterService);
 	private systemService = inject(SystemService);
-	
+	private dialogService = inject(DialogService);
+
 	characters: Character[] = [];
 	systems: { [key: string]: string } = {};
 
@@ -45,9 +47,9 @@ export class CharactersComponent implements OnInit {
 		if (levelField?.value) {
 			return `Nível ${levelField.value}`;
 		}
-		
-		const classField = character.data?.find(d => 
-			d.name?.toLowerCase().includes('classe') || 
+
+		const classField = character.data?.find(d =>
+			d.name?.toLowerCase().includes('classe') ||
 			d.name?.toLowerCase().includes('ocupação') ||
 			d.name?.toLowerCase().includes('ocupacao')
 		);
@@ -60,7 +62,7 @@ export class CharactersComponent implements OnInit {
 
 	getMainStats(character: Character): CharacterData[] {
 		if (!character.data) return [];
-		
+
 		// Pegar os primeiros 3 atributos numéricos visíveis
 		return character.data
 			.filter(d => d.visible && d.component?.includes('numeric'))
@@ -68,15 +70,20 @@ export class CharactersComponent implements OnInit {
 			.slice(0, 3);
 	}
 
-	public deleteCharacter(character: Character) {
+	public async deleteCharacter(character: Character) {
 		if (!character.id) return;
-		const confirmed = window.confirm(
-			`Você está prestes a apagar o personagem "${character.name}". Esta decisão é definitiva... nem mesmo a magia pode trazê-lo de volta no tempo para salvá-lo. Deseja realmente prosseguir?`
+		const confirmed = await this.dialogService.showDeleteConfirmation(
+			'Excluir Personagem',
+			`Você está prestes a apagar o personagem "${character.name}". Esta decisão é definitiva... nem mesmo a magia pode trazê-lo de volta no tempo para salvá-lo. Deseja realmente prosseguir?`,
+			'Excluir Personagem'
 		);
 		if (!confirmed) return;
 		this.characterService.deleteCharacter(character.id).subscribe(success => {
 			if (success) {
 				this.characters = this.characters.filter(c => c.id !== character.id);
+				this.dialogService.success('Sucesso', 'Personagem excluído com sucesso.');
+			} else {
+				this.dialogService.error('Erro', 'Erro ao excluir personagem. Tente novamente.');
 			}
 		});
 	}

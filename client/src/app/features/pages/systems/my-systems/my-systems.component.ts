@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { RpgSystem } from '../../../../shared/models/rpg-sheet-manager.model';
 import { SystemService } from '../../../services/system.service';
 import { UserService } from '../../../services/user.service';
+import { DialogService } from '../../../services/dialog.service';
 
 @Component({
 	selector: 'app-my-systems',
@@ -15,6 +16,7 @@ import { UserService } from '../../../services/user.service';
 export class MySystemsComponent implements OnInit {
 	private systemService = inject(SystemService);
 	private userService = inject(UserService);
+	private dialogService = inject(DialogService);
 
 	systems: RpgSystem[] = [];
 	isUploading = false;
@@ -104,11 +106,13 @@ export class MySystemsComponent implements OnInit {
 		});
 	}
 
-	deleteSystem(system: RpgSystem) {
+	async deleteSystem(system: RpgSystem) {
 		if (!system.id) return;
 
-		const confirmed = window.confirm(
-			`Tem certeza que deseja marcar o sistema "${system.name}" como obsoleto? Ele não será mais visível para novos usuários.`
+		const confirmed = await this.dialogService.showDeleteConfirmation(
+			'Marcar Sistema como Obsoleto',
+			`Tem certeza que deseja marcar o sistema "${system.name}" como obsoleto? Ele não será mais visível para novos usuários.`,
+			'Marcar como Obsoleto'
 		);
 
 		if (!confirmed) return;
@@ -118,12 +122,12 @@ export class MySystemsComponent implements OnInit {
 				if (success) {
 					this.systems = this.systems.filter(s => s.id !== system.id);
 				} else {
-					alert('Erro ao marcar sistema como obsoleto. Tente novamente.');
+					this.dialogService.error('Erro', 'Erro ao marcar sistema como obsoleto. Tente novamente.');
 				}
 			},
 			error: (error) => {
 				console.error('Erro ao deletar sistema:', error);
-				alert('Erro ao marcar sistema como obsoleto. Tente novamente.');
+				this.dialogService.error('Erro', 'Erro ao marcar sistema como obsoleto. Tente novamente.');
 			}
 		});
 	}

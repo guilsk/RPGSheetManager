@@ -5,6 +5,7 @@ import { RpgSystem, User } from '../../../shared/models/rpg-sheet-manager.model'
 import { SystemService } from '../../services/system.service';
 import { UserService } from '../../services/user.service';
 import { AuthService } from '@auth0/auth0-angular';
+import { DialogService } from '../../services/dialog.service';
 import { forkJoin, map, switchMap } from 'rxjs';
 
 @Component({
@@ -18,6 +19,7 @@ export class SystemsComponent implements OnInit {
 	private systemService = inject(SystemService);
 	private userService = inject(UserService);
 	private auth = inject(AuthService);
+	private dialogService = inject(DialogService);
 
 	systems: RpgSystem[] = [];
 	currentUser: User | null = null;
@@ -115,7 +117,7 @@ export class SystemsComponent implements OnInit {
 		this.auth.isAuthenticated$.subscribe(isAuth => {
 			console.log('Usuário autenticado:', isAuth);
 			if (!isAuth) {
-				alert('Você precisa estar logado para salvar sistemas.');
+				this.dialogService.error('Erro de Autenticação', 'Você precisa estar logado para salvar sistemas.');
 				return;
 			}
 
@@ -138,7 +140,7 @@ export class SystemsComponent implements OnInit {
 								}
 								this.currentUser.savedSystemIds.push(system.id!);
 							} else {
-								alert('Erro ao salvar sistema. Tente novamente.');
+								this.dialogService.error('Erro', 'Erro ao salvar sistema. Tente novamente.');
 							}
 						},
 						error: (error) => {
@@ -146,13 +148,13 @@ export class SystemsComponent implements OnInit {
 							console.error('Status:', error.status);
 							console.error('Mensagem:', error.message);
 							console.error('Headers:', error.headers);
-							alert('Erro ao salvar sistema. Verifique o console para mais detalhes.');
+							this.dialogService.error('Erro', 'Erro ao salvar sistema. Verifique o console para mais detalhes.');
 						}
 					});
 				},
 				error: (tokenError) => {
 					console.error('Erro ao obter token:', tokenError);
-					alert('Erro de autenticação. Tente fazer login novamente.');
+					this.dialogService.error('Erro de Autenticação', 'Erro de autenticação. Tente fazer login novamente.');
 				}
 			});
 		});
@@ -169,21 +171,23 @@ export class SystemsComponent implements OnInit {
 						this.currentUser.savedSystemIds = this.currentUser.savedSystemIds.filter(id => id !== system.id);
 					}
 				} else {
-					alert('Erro ao remover sistema dos salvos. Tente novamente.');
+					this.dialogService.error('Erro', 'Erro ao remover sistema dos salvos. Tente novamente.');
 				}
 			},
 			error: (error) => {
 				console.error('Erro ao remover sistema dos salvos:', error);
-				alert('Erro ao remover sistema dos salvos. Tente novamente.');
+				this.dialogService.error('Erro', 'Erro ao remover sistema dos salvos. Tente novamente.');
 			}
 		});
 	}
 
-	deleteSystem(system: RpgSystem) {
+	async deleteSystem(system: RpgSystem) {
 		if (!system.id || !this.isSystemOwner(system)) return;
 
-		const confirmed = window.confirm(
-			`Tem certeza que deseja excluir o sistema "${system.name}"? Esta ação não pode ser desfeita.`
+		const confirmed = await this.dialogService.showDeleteConfirmation(
+			'Excluir Sistema',
+			`Tem certeza que deseja excluir o sistema "${system.name}"? Esta ação não pode ser desfeita.`,
+			'Excluir'
 		);
 
 		if (!confirmed) return;
@@ -193,24 +197,25 @@ export class SystemsComponent implements OnInit {
 				if (success) {
 					this.systems = this.systems.filter(s => s.id !== system.id);
 				} else {
-					alert('Erro ao excluir sistema. Tente novamente.');
+					this.dialogService.error('Erro', 'Erro ao excluir sistema. Tente novamente.');
 				}
 			},
 			error: (error) => {
 				console.error('Erro ao excluir sistema:', error);
-				alert('Erro ao excluir sistema. Tente novamente.');
+				this.dialogService.error('Erro', 'Erro ao excluir sistema. Tente novamente.');
 			}
 		});
 	}
 
-	deleteObsoleteSystem(system: RpgSystem) {
+	async deleteObsoleteSystem(system: RpgSystem) {
 		if (!system.id || !this.isSystemSaved(system) || !this.isSystemObsolete(system)) return;
 
-		const confirmed = window.confirm(
+		const confirmed = await this.dialogService.showDeleteConfirmation(
+			'Excluir Sistema Obsoleto',
 			`ATENÇÃO: O sistema "${system.name}" está obsoleto e será excluído permanentemente.\n\n` +
 			`Este sistema não está mais disponível publicamente e ao excluí-lo você perderá acesso definitivamente.\n\n` +
-			`Seus personagens criados com este sistema não serão afetados, mas você não poderá criar novos personagens com ele.\n\n` +
-			`Tem certeza que deseja excluir este sistema obsoleto?`
+			`Seus personagens criados com este sistema não serão afetados, mas você não poderá criar novos personagens com ele.`,
+			'Excluir Definitivamente'
 		);
 
 		if (!confirmed) return;
@@ -225,12 +230,12 @@ export class SystemsComponent implements OnInit {
 					// Remover da lista de sistemas exibidos
 					this.systems = this.systems.filter(s => s.id !== system.id);
 				} else {
-					alert('Erro ao excluir sistema obsoleto. Tente novamente.');
+					this.dialogService.error('Erro', 'Erro ao excluir sistema obsoleto. Tente novamente.');
 				}
 			},
 			error: (error) => {
 				console.error('Erro ao excluir sistema obsoleto:', error);
-				alert('Erro ao excluir sistema obsoleto. Tente novamente.');
+				this.dialogService.error('Erro', 'Erro ao excluir sistema obsoleto. Tente novamente.');
 			}
 		});
 	}
