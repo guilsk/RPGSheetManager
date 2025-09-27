@@ -5,11 +5,13 @@ import { Character, CharacterData } from '../../../shared/models/rpg-sheet-manag
 import { CharacterService } from '../../../shared/services/character.service';
 import { SystemService } from '../../../shared/services/system.service';
 import { DialogService } from '../../../shared/services/dialog.service';
+import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
+import { SearchBarConfig } from '../../../shared/models/search-bar.model';
 
 @Component({
 	selector: 'app-characters',
 	standalone: true,
-	imports: [CommonModule, RouterModule],
+	imports: [CommonModule, RouterModule, SearchBarComponent],
 	templateUrl: './characters.component.html',
 	styleUrl: './characters.component.scss'
 })
@@ -19,7 +21,16 @@ export class CharactersComponent implements OnInit {
 	private dialogService = inject(DialogService);
 
 	characters: Character[] = [];
+	filteredCharacters: Character[] = [];
 	systems: { [key: string]: string } = {};
+
+	searchConfig: SearchBarConfig<Character> = {
+		placeholder: 'Buscar personagens...',
+		searchProperty: 'name',
+		debounceTime: 300,
+		maxResults: 10,
+		caseSensitive: false
+	};
 
 	ngOnInit() {
 		this.loadCharacters();
@@ -29,7 +40,12 @@ export class CharactersComponent implements OnInit {
 	private loadCharacters() {
 		this.characterService.getCharacters().subscribe((characters: Character[]) => {
 			this.characters = characters;
+			this.filteredCharacters = [...characters];
 		});
+	}
+
+	onSearchResults(filteredCharacters: Character[]) {
+		this.filteredCharacters = filteredCharacters;
 	}
 
 	private loadSystems() {

@@ -9,8 +9,16 @@
 			<button class="btn btn-primary" routerLink="/characters/new">Criar Novo Personagem</button>
 		</div>
 
+		<div class="search-section">
+			<app-search-bar
+				[items]="characters"
+				[config]="searchConfig"
+				(searchResultsEmit)="onSearchResults($event)">
+			</app-search-bar>
+		</div>
+
 		<div class="characters-grid">
-			<div class="character-card" *ngFor="let character of characters">
+			<div class="character-card" *ngFor="let character of filteredCharacters">
 				<div class="character-header">
 					<h3>{{ character.name }}</h3>
 					<span class="level">{{ getCharacterLevel(character) }}</span>

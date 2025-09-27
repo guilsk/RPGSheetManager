@@ -1,0 +1,31 @@
+<div class="search-bar-container">
+	<div class="search-input-wrapper">
+		<input type="text" class="search-input" [placeholder]="config.placeholder" [(ngModel)]="searchTerm"
+			(input)="onSearchInput($event)" (focus)="onFocus()" (blur)="onBlur()" (keydown)="onKeyDown($event)"
+			#searchInput />
+		<div class="search-icon" *ngIf="!searchTerm">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<circle cx="11" cy="11" r="8"></circle>
+				<path d="m21 21-4.35-4.35"></path>
+			</svg>
+		</div>
+		<button class="clear-button" *ngIf="searchTerm" (click)="clearSearch()" type="button">
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<line x1="18" y1="6" x2="6" y2="18"></line>
+				<line x1="6" y1="6" x2="18" y2="18"></line>
+			</svg>
+		</button>
+	</div>
+
+	<div class="search-results"
+		*ngIf="showResults && (searchResults.length > 0 || (searchTerm && filteredItems.length === 0))">
+		<div class="search-result-item" *ngFor="let result of searchResults; trackBy: trackByFn; let i = index"
+			[class.highlighted]="i === selectedIndex" (click)="selectResult(result)" (mouseenter)="selectedIndex = i">
+			<span [innerHTML]="result.highlightedText"></span>
+		</div>
+
+		<div class="no-results" *ngIf="searchTerm && filteredItems.length === 0">
+			Nenhum resultado encontrado
+		</div>
+	</div>
+</div>

@@ -33,8 +33,16 @@
 			</div>
 		</div>
 
+		<div class="search-section">
+			<app-search-bar
+				[items]="systems"
+				[config]="searchConfig"
+				(searchResultsEmit)="onSearchResults($event)">
+			</app-search-bar>
+		</div>
+
 		<!-- Systems Grid -->
-		<div class="systems-grid" *ngIf="getSortedSystems().length > 0">
+		<div class="systems-grid" *ngIf="filteredSystems.length > 0">
 			<div class="system-card" *ngFor="let system of getSortedSystems()"
 				[class.saved-system]="isSystemSavedOrOwned(system)" [class.own-system]="isSystemOwner(system)">
 

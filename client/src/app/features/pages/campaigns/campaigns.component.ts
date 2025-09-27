@@ -7,11 +7,13 @@ import { SystemService } from '../../../shared/services/system.service';
 import { UserService } from '../../../shared/services/user.service';
 import { DialogService } from '../../../shared/services/dialog.service';
 import { CurrentUserService } from '../../../shared/services/current-user.service';
+import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
+import { SearchBarConfig } from '../../../shared/models/search-bar.model';
 
 @Component({
 	selector: 'app-campaigns',
 	standalone: true,
-	imports: [CommonModule],
+	imports: [CommonModule, SearchBarComponent],
 	templateUrl: './campaigns.component.html',
 	styleUrl: './campaigns.component.scss'
 })
@@ -25,9 +27,27 @@ export class CampaignsComponent implements OnInit {
 
 	myCampaigns: Campaign[] = [];
 	playerCampaigns: Campaign[] = [];
+	filteredMyCampaigns: Campaign[] = [];
+	filteredPlayerCampaigns: Campaign[] = [];
 	systems: { [key: string]: string } = {};
 	users: { [key: string]: string } = {};
 	currentUserId: string = '';
+
+	mySearchConfig: SearchBarConfig<Campaign> = {
+		placeholder: 'Buscar minhas campanhas...',
+		searchProperty: 'title',
+		debounceTime: 300,
+		maxResults: 10,
+		caseSensitive: false
+	};
+
+	playerSearchConfig: SearchBarConfig<Campaign> = {
+		placeholder: 'Buscar campanhas como jogador...',
+		searchProperty: 'title',
+		debounceTime: 300,
+		maxResults: 10,
+		caseSensitive: false
+	};
 
 	ngOnInit() {
 		const currentUser = this.currentUserService.getCurrentUser();
@@ -51,12 +71,22 @@ export class CampaignsComponent implements OnInit {
 		// Carregar campanhas como mestre
 		this.campaignService.getCampaignsByMaster(this.currentUserId).subscribe((campaigns: Campaign[]) => {
 			this.myCampaigns = campaigns;
+			this.filteredMyCampaigns = [...campaigns];
 		});
 
 		// Carregar campanhas como jogador
 		this.campaignService.getCampaignsByPlayer(this.currentUserId).subscribe((campaigns: Campaign[]) => {
 			this.playerCampaigns = campaigns;
+			this.filteredPlayerCampaigns = [...campaigns];
 		});
+	}
+
+	onMySearchResults(filteredCampaigns: Campaign[]) {
+		this.filteredMyCampaigns = filteredCampaigns;
+	}
+
+	onPlayerSearchResults(filteredCampaigns: Campaign[]) {
+		this.filteredPlayerCampaigns = filteredCampaigns;
 	}
 
 	getSystemName(systemId?: string): string {

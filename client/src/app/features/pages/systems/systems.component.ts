@@ -7,11 +7,13 @@ import { UserService } from '../../../shared/services/user.service';
 import { AuthService } from '@auth0/auth0-angular';
 import { DialogService } from '../../../shared/services/dialog.service';
 import { forkJoin, map, switchMap } from 'rxjs';
+import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
+import { SearchBarConfig } from '../../../shared/models/search-bar.model';
 
 @Component({
 	selector: 'app-systems',
 	standalone: true,
-	imports: [CommonModule, RouterModule],
+	imports: [CommonModule, RouterModule, SearchBarComponent],
 	templateUrl: './systems.component.html',
 	styleUrl: './systems.component.scss'
 })
@@ -22,9 +24,18 @@ export class SystemsComponent implements OnInit {
 	private dialogService = inject(DialogService);
 
 	systems: RpgSystem[] = [];
+	filteredSystems: RpgSystem[] = [];
 	currentUser: User | null = null;
 	currentUserId: string | null = null;
 	ownerNames: { [key: string]: string } = {}; // Cache para nomes dos usuários
+
+	searchConfig: SearchBarConfig<RpgSystem> = {
+		placeholder: 'Buscar sistemas de RPG...',
+		searchProperty: 'name',
+		debounceTime: 300,
+		maxResults: 15,
+		caseSensitive: false
+	};
 
 	// Estados do upload
 	isUploading = false;
@@ -58,6 +69,7 @@ export class SystemsComponent implements OnInit {
 				const obsoleteSavedSystems = savedSystems.filter(system => system.obsolete);
 
 				this.systems = [...nonObsoleteSystems, ...obsoleteSavedSystems];
+				this.filteredSystems = [...this.systems];
 
 				// Carregar nomes dos donos
 				this.systems.forEach(system => {
@@ -196,6 +208,7 @@ export class SystemsComponent implements OnInit {
 			next: (success) => {
 				if (success) {
 					this.systems = this.systems.filter(s => s.id !== system.id);
+					this.filteredSystems = this.filteredSystems.filter(s => s.id !== system.id);
 				} else {
 					this.dialogService.error('Erro', 'Erro ao excluir sistema. Tente novamente.');
 				}
@@ -229,6 +242,7 @@ export class SystemsComponent implements OnInit {
 					}
 					// Remover da lista de sistemas exibidos
 					this.systems = this.systems.filter(s => s.id !== system.id);
+					this.filteredSystems = this.filteredSystems.filter(s => s.id !== system.id);
 				} else {
 					this.dialogService.error('Erro', 'Erro ao excluir sistema obsoleto. Tente novamente.');
 				}
@@ -330,7 +344,7 @@ export class SystemsComponent implements OnInit {
 
 	// Ordenação para template
 	getSortedSystems(): RpgSystem[] {
-		return [...this.systems].sort((a, b) => {
+		return [...this.filteredSystems].sort((a, b) => {
 			// Sistemas salvos/próprios primeiro
 			const aIsSavedOrOwned = this.isSystemSavedOrOwned(a);
 			const bIsSavedOrOwned = this.isSystemSavedOrOwned(b);
@@ -342,5 +356,9 @@ export class SystemsComponent implements OnInit {
 			// Depois por nome
 			return (a.name || '').localeCompare(b.name || '');
 		});
+	}
+
+	onSearchResults(filteredSystems: RpgSystem[]) {
+		this.filteredSystems = filteredSystems;
 	}
 }
