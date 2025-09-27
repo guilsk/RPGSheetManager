@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CharacterData, ComponentType } from '../../../shared/models/rpg-sheet-manager.model';
-import { DiceService, DiceRollResult } from '../../services/dice.service';
+import { DiceService, DiceRollResult } from '../../../shared/services/dice.service';
 
 @Component({
 	selector: 'app-dynamic-field',

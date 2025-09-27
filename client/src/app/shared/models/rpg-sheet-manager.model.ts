@@ -53,35 +53,31 @@ export interface RpgSystem {
 // Campanhas
 export interface Campaign {
 	id?: string;
-	title?: string;
-	systemId?: string;
-	masterId?: string;
-	playerIds?: string[];
+	title: string;
+	description?: string;
+	systemId: string;
+	masterId: string;
+	playerIds: string[];
+	characters: CampaignCharacter[];
+	diceHistory: DiceRoll[];
+	activeSession: boolean;
 	createdAt?: Date;
-	activeSession?: boolean;
-	characters?: CampaignCharacter[];
-	chatMessages?: ChatMessage[];
-	diceHistory?: DiceRoll[];
+	updatedAt?: Date;
 }
 
 export interface CampaignCharacter {
-	charId?: string;
-	playerId?: string;
-	dynamicData?: DynamicField[];
-}
-
-export interface ChatMessage {
-	senderId?: string;
-	timestamp?: Date;
-	message?: string;
+	characterId: string;
+	playerId: string;
+	dynamicData: DynamicField[];
 }
 
 export interface DiceRoll {
-	rollerId?: string;
-	expression?: string;
-	result?: number;
-	individualRolls?: number[];
-	timestamp?: Date;
+	playerId: string;
+	characterName?: string;
+	diceExpression: string;
+	result: number;
+	details: string;
+	timestamp: Date;
 }
 
 export interface DynamicField {

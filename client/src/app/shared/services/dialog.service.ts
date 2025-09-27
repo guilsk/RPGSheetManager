@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { DialogConfig } from '../components/dialog/dialog.component';
+import { DialogConfig } from '../../features/components/dialog/dialog.component';
 
 export interface DialogState {
   isVisible: boolean;

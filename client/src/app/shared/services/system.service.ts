@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, of, catchError, map, switchMap } from 'rxjs';
-import { RpgSystem } from '../../shared/models/rpg-sheet-manager.model';
+import { RpgSystem } from '../models/rpg-sheet-manager.model';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '@auth0/auth0-angular';
 import { UserService } from './user.service';

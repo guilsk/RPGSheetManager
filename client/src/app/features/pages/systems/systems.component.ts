@@ -2,10 +2,10 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RpgSystem, User } from '../../../shared/models/rpg-sheet-manager.model';
-import { SystemService } from '../../services/system.service';
-import { UserService } from '../../services/user.service';
+import { SystemService } from '../../../shared/services/system.service';
+import { UserService } from '../../../shared/services/user.service';
 import { AuthService } from '@auth0/auth0-angular';
-import { DialogService } from '../../services/dialog.service';
+import { DialogService } from '../../../shared/services/dialog.service';
 import { forkJoin, map, switchMap } from 'rxjs';
 
 @Component({

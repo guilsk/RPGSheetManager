@@ -119,6 +119,11 @@
 		background-color: #d1fae5;
 		color: #065f46;
 	}
+
+	&.badge-inactive {
+		background-color: #f3f4f6;
+		color: #6b7280;
+	}
 }
 
 .btn {
@@ -146,6 +151,51 @@
 
 		&:hover {
 			background-color: #4b5563;
+		}
+	}
+
+	&.btn-warning {
+		background-color: #f59e0b;
+		color: white;
+
+		&:hover {
+			background-color: #d97706;
+		}
+	}
+}
+
+.new-campaign-card {
+	border: 2px dashed #d1d5db;
+	background: #f9fafb;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 200px;
+
+	&:hover {
+		border-color: #3b82f6;
+		background: #eff6ff;
+	}
+
+	.new-campaign-content {
+		text-align: center;
+		color: #6b7280;
+
+		.new-campaign-icon {
+			font-size: 3rem;
+			margin-bottom: 0.5rem;
+			color: #9ca3af;
+		}
+
+		h3 {
+			margin: 0 0 0.5rem;
+			color: #374151;
+		}
+
+		p {
+			margin: 0;
+			font-size: 0.875rem;
 		}
 	}
 }

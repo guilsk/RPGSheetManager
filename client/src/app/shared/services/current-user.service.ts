@@ -3,7 +3,7 @@ import { AuthService } from '@auth0/auth0-angular';
 import { UserService } from './user.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { switchMap, catchError, tap } from 'rxjs/operators';
-import { User } from '../../shared/models/rpg-sheet-manager.model';
+import { User } from '../models/rpg-sheet-manager.model';
 
 @Injectable({
 	providedIn: 'root'

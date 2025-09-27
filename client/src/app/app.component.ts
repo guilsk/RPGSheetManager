@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@auth0/auth0-angular';
-import { UserService } from './features/services/user.service';
-import { CurrentUserService } from './features/services/current-user.service';
+import { UserService } from './shared/services/user.service';
+import { CurrentUserService } from './shared/services/current-user.service';
 import { LayoutComponent } from './features/pages/layout/layout.component';
 import { User } from './shared/models/rpg-sheet-manager.model';
 import { catchError, switchMap } from 'rxjs/operators';

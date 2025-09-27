@@ -6,26 +6,40 @@
 
 	<div class="page-content">
 		<div class="actions">
-			<button class="btn btn-primary">Criar Nova Campanha</button>
+			<button class="btn btn-primary" (click)="createCampaign()">Criar Nova Campanha</button>
 		</div>
 
 		<div class="campaigns-section">
 			<div class="section">
 				<h2>Minhas Campanhas como Mestre</h2>
 				<div class="campaigns-grid">
-					<div class="campaign-card master">
+					<div class="campaign-card master" *ngFor="let campaign of myCampaigns">
 						<div class="campaign-header">
-							<h3>A Ascensão dos Dragões</h3>
-							<span class="badge badge-active">Ativa</span>
+							<h3>{{ campaign.title }}</h3>
+							<span class="badge" [class]="campaign.activeSession ? 'badge-active' : 'badge-inactive'">
+								{{ campaign.activeSession ? 'Em Sessão' : 'Pausada' }}
+							</span>
 						</div>
-						<p class="system">Sistema: D&D 5e</p>
-						<p class="description">Uma épica jornada através das terras devastadas pelos dragões antigos.</p>
+						<p class="system">Sistema: {{ getSystemName(campaign.systemId) }}</p>
+						<p class="description">{{ campaign.description || 'Sem descrição' }}</p>
 						<div class="players-info">
-							<span>4/6 jogadores</span>
+							<span>{{ campaign.playerIds.length || 0 }} jogadores</span>
 						</div>
 						<div class="card-actions">
-							<button class="btn btn-secondary">Gerenciar</button>
-							<button class="btn btn-primary">Iniciar Sessão</button>
+							<button class="btn btn-secondary" (click)="viewCampaign(campaign)">Gerenciar</button>
+							<button class="btn btn-primary" *ngIf="!campaign.activeSession"
+								(click)="startSession(campaign)">Iniciar Sessão</button>
+							<button class="btn btn-warning" *ngIf="campaign.activeSession"
+								(click)="endSession(campaign)">Finalizar Sessão</button>
+						</div>
+					</div>
+
+					<!-- Card para criar nova campanha -->
+					<div class="campaign-card new-campaign-card" (click)="createCampaign()">
+						<div class="new-campaign-content">
+							<div class="new-campaign-icon">+</div>
+							<h3>Criar Nova Campanha</h3>
+							<p>Inicie uma nova aventura épica</p>
 						</div>
 					</div>
 				</div>
@@ -34,19 +48,22 @@
 			<div class="section">
 				<h2>Campanhas como Jogador</h2>
 				<div class="campaigns-grid">
-					<div class="campaign-card player">
+					<div class="campaign-card player" *ngFor="let campaign of playerCampaigns">
 						<div class="campaign-header">
-							<h3>Mistérios de Arkham</h3>
-							<span class="badge badge-active">Ativa</span>
+							<h3>{{ campaign.title }}</h3>
+							<span class="badge" [class]="campaign.activeSession ? 'badge-active' : 'badge-inactive'">
+								{{ campaign.activeSession ? 'Em Sessão' : 'Pausada' }}
+							</span>
 						</div>
-						<p class="system">Sistema: Call of Cthulhu</p>
-						<p class="description">Investigações sobrenaturais na cidade de Arkham.</p>
+						<p class="system">Sistema: {{ getSystemName(campaign.systemId) }}</p>
+						<p class="description">{{ campaign.description || 'Sem descrição' }}</p>
 						<div class="players-info">
-							<span>Mestre: João Silva</span>
+							<span>Mestre: {{ getMasterName(campaign.masterId) }}</span>
 						</div>
 						<div class="card-actions">
-							<button class="btn btn-secondary">Ver Personagem</button>
-							<button class="btn btn-primary">Entrar na Sessão</button>
+							<button class="btn btn-secondary" (click)="viewCampaign(campaign)">Ver Detalhes</button>
+							<button class="btn btn-primary" *ngIf="campaign.activeSession"
+								(click)="joinSession(campaign)">Entrar na Sessão</button>
 						</div>
 					</div>
 				</div>

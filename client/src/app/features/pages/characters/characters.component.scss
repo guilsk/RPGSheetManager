@@ -38,6 +38,9 @@
 	padding: 1.5rem;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	transition: all 0.2s;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 
 	&:hover {
 		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
@@ -134,7 +137,7 @@
 
 	.new-character-content {
 		text-align: center;
-		
+
 		.new-character-icon {
 			font-size: 3rem;
 			color: #9ca3af;

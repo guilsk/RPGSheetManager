@@ -8,48 +8,52 @@ namespace RPGSheetManager.Application.Services.Campaigns {
             _repository = repository;
         }
 
-        public Task<Campaign?> GetByIdAsync(Guid id) {
-            return _repository.GetByIdAsync(id);
+        public async Task<List<Campaign>> GetAllAsync() {
+            return await _repository.GetAllAsync();
         }
 
-        public Task AddAsync(Campaign campaign) {
-            return _repository.AddAsync(campaign);
+        public async Task<List<Campaign>> GetByMasterIdAsync(string masterId) {
+            return await _repository.GetByMasterIdAsync(masterId);
         }
 
-        public Task UpdateAsync(Campaign campaign) {
-            return _repository.UpdateAsync(campaign);
+        public async Task<List<Campaign>> GetByPlayerIdAsync(string playerId) {
+            return await _repository.GetByPlayerIdAsync(playerId);
         }
 
-        public Task DeleteAsync(Guid id) {
-            return _repository.DeleteAsync(id);
+        public async Task<Campaign?> GetByIdAsync(string id) {
+            return await _repository.GetByIdAsync(id);
         }
 
-        public Task AddCharacterAsync(Guid campaignId, CampaignCharacter character) {
-            return _repository.AddCharacterAsync(campaignId, character);
+        public async Task<Campaign> AddAsync(Campaign campaign) {
+            return await _repository.AddAsync(campaign);
         }
 
-        public Task UpdateCharacterDataAsync(Guid campaignId, Guid characterId, List<DynamicField> data) {
-            return _repository.UpdateCharacterDataAsync(campaignId, characterId, data);
+        public async Task UpdateAsync(string id, Campaign campaign) {
+            await _repository.UpdateAsync(id, campaign);
         }
 
-        public Task AddChatMessageAsync(Guid campaignId, ChatMessage message) {
-            return _repository.AddChatMessageAsync(campaignId, message);
+        public async Task DeleteAsync(string id) {
+            await _repository.DeleteAsync(id);
         }
 
-        public Task<List<ChatMessage>> GetChatHistoryAsync(Guid campaignId) {
-            return _repository.GetChatHistoryAsync(campaignId);
+        public async Task AddCharacterAsync(string campaignId, CampaignCharacter character) {
+            await _repository.AddCharacterAsync(campaignId, character);
         }
 
-        public Task SaveRollHistoryAsync(Guid campaignId, DiceRoll roll) {
-            return _repository.SaveRollHistoryAsync(campaignId, roll);
+        public async Task UpdateCharacterDataAsync(string campaignId, string characterId, List<DynamicField> data) {
+            await _repository.UpdateCharacterDataAsync(campaignId, characterId, data);
         }
 
-        public Task StartSessionAsync(Guid campaignId) {
-            return _repository.StartSessionAsync(campaignId);
+        public async Task SaveRollHistoryAsync(string campaignId, DiceRoll roll) {
+            await _repository.SaveRollHistoryAsync(campaignId, roll);
         }
 
-        public Task EndSessionAsync(Guid campaignId) {
-            return _repository.EndSessionAsync(campaignId);
+        public async Task StartSessionAsync(string campaignId) {
+            await _repository.StartSessionAsync(campaignId);
+        }
+
+        public async Task EndSessionAsync(string campaignId) {
+            await _repository.EndSessionAsync(campaignId);
         }
     }
 }

@@ -1,0 +1,68 @@
+<div class="page-container">
+	<div class="page-header">
+		<h1>{{ isEditing ? 'Editar Campanha' : 'Nova Campanha' }}</h1>
+		<p>{{ isEditing ? 'Modifique as informações da sua campanha' : 'Crie uma nova aventura épica para seus jogadores' }}</p>
+	</div>
+
+	<div class="page-content">
+		<div class="form-container">
+			<form [formGroup]="campaignForm" (ngSubmit)="saveCampaign()">
+
+				<div class="form-group">
+					<label for="title">Nome da Campanha*</label>
+					<input
+						id="title"
+						type="text"
+						formControlName="title"
+						class="form-control"
+						placeholder="Ex: A Ascensão dos Dragões"
+						[class.error]="campaignForm.get('title')?.invalid && campaignForm.get('title')?.touched">
+					<div class="error-message" *ngIf="campaignForm.get('title')?.invalid && campaignForm.get('title')?.touched">
+						Nome é obrigatório
+					</div>
+				</div>				<div class="form-group">
+					<label for="systemId">Sistema de RPG*</label>
+					<select
+						id="systemId"
+						formControlName="systemId"
+						class="form-control"
+						[class.error]="campaignForm.get('systemId')?.invalid && campaignForm.get('systemId')?.touched">
+						<option value="" disabled>
+							{{ loadingSystems ? 'Carregando sistemas...' : '-- Selecione um sistema --' }}
+						</option>
+						<option *ngFor="let system of systems" [value]="system.id">
+							{{ system.name }}
+						</option>
+					</select>
+					<div class="error-message" *ngIf="campaignForm.get('systemId')?.invalid && campaignForm.get('systemId')?.touched">
+						Sistema é obrigatório
+					</div>
+					<div class="form-help" *ngIf="systems.length === 0 && !loadingSystems">
+						<small>Nenhum sistema encontrado. Você pode ser o primeiro a cadastrar um sistema na aba 'Sistemas'</small>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="description">Descrição da Campanha</label>
+					<textarea
+						id="description"
+						formControlName="description"
+						class="form-control"
+						rows="4"
+						placeholder="Descreva a história, ambientação e objetivos da campanha...">
+					</textarea>
+				</div>
+
+				<div class="form-actions">
+					<button type="button" class="btn btn-secondary" (click)="cancel()">Cancelar</button>
+					<button
+						type="submit"
+						class="btn btn-primary"
+						[disabled]="campaignForm.invalid || isLoading">
+						{{ isLoading ? 'Salvando...' : (isEditing ? 'Atualizar' : 'Criar Campanha') }}
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

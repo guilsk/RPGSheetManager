@@ -2,9 +2,9 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Character, CharacterData } from '../../../shared/models/rpg-sheet-manager.model';
-import { CharacterService } from '../../services/character.service';
-import { SystemService } from '../../services/system.service';
-import { DialogService } from '../../services/dialog.service';
+import { CharacterService } from '../../../shared/services/character.service';
+import { SystemService } from '../../../shared/services/system.service';
+import { DialogService } from '../../../shared/services/dialog.service';
 
 @Component({
 	selector: 'app-characters',
@@ -61,13 +61,8 @@ export class CharactersComponent implements OnInit {
 	}
 
 	getMainStats(character: Character): CharacterData[] {
-		if (!character.data) return [];
-
-		// Pegar os primeiros 3 atributos numéricos visíveis
-		return character.data
-			.filter(d => d.visible && d.component?.includes('numeric'))
-			.sort((a, b) => (a.order || 0) - (b.order || 0))
-			.slice(0, 3);
+		// Não mostrar atributos específicos nos cards - apenas informações básicas
+		return [];
 	}
 
 	public async deleteCharacter(character: Character) {

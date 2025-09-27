@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, BehaviorSubject, map, tap, catchError, of, switchMap, take } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { AuthService, User } from '@auth0/auth0-angular';
-import { Character, CharacterData } from '../../shared/models/rpg-sheet-manager.model';
+import { Character, CharacterData } from '../models/rpg-sheet-manager.model';
 
 @Injectable({
 	providedIn: 'root'

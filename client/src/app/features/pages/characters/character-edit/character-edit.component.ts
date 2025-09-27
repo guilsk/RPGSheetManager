@@ -9,9 +9,9 @@ import {
 	RpgSystem
 } from '../../../../shared/models/rpg-sheet-manager.model';
 import { DynamicFieldComponent } from '../../../components/dynamic-field/dynamic-field.component';
-import { CharacterService } from '../../../services/character.service';
-import { SystemService } from '../../../services/system.service';
-import { DiceRollResult } from '../../../services/dice.service';
+import { CharacterService } from '../../../../shared/services/character.service';
+import { SystemService } from '../../../../shared/services/system.service';
+import { DiceRollResult } from '../../../../shared/services/dice.service';
 
 @Component({
 	selector: 'app-character-edit',

@@ -2,9 +2,9 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RpgSystem } from '../../../../shared/models/rpg-sheet-manager.model';
-import { SystemService } from '../../../services/system.service';
-import { UserService } from '../../../services/user.service';
-import { DialogService } from '../../../services/dialog.service';
+import { SystemService } from '../../../../shared/services/system.service';
+import { UserService } from '../../../../shared/services/user.service';
+import { DialogService } from '../../../../shared/services/dialog.service';
 
 @Component({
 	selector: 'app-my-systems',

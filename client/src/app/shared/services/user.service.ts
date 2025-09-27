@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { User } from '../../shared/models/rpg-sheet-manager.model';
+import { User } from '../models/rpg-sheet-manager.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -8,8 +8,9 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
 	private apiUrl = 'https://localhost:7111/api/user';
+	private http = inject(HttpClient);
 
-	constructor(private http: HttpClient) { }
+	constructor() { }
 
 	public post(userInfo: User): Observable<User> {
 		return this.http.post<User>(this.apiUrl, userInfo);
@@ -21,5 +22,11 @@ export class UserService {
 
 	public updateProfile(user: User): Observable<User> {
 		return this.http.put<User>(`${this.apiUrl}/profile`, user);
+	}
+
+	public getCurrentUserId(): string {
+		// Evitando dependência circular, vamos implementar diferente
+		// Vamos usar o AuthService diretamente no component onde precisar
+		return 'user-mock-id'; // Temporário - usar CurrentUserService nos components
 	}
 }

@@ -16,12 +16,7 @@
 					<span class="level">{{ getCharacterLevel(character) }}</span>
 				</div>
 				<p class="system">Sistema: {{ getSystemName(character.systemId) }}</p>
-				<div class="character-stats">
-					<div class="stat" *ngFor="let stat of getMainStats(character); let i = index" [hidden]="i >= 3">
-						<span class="label">{{ stat.name }}:</span>
-						<span class="value">{{ stat.value }}</span>
-					</div>
-				</div>
+
 				<div class="card-actions">
 					<button class="btn btn-secondary" [routerLink]="['/characters/edit', character.id]">Editar</button>
 					<button class="btn btn-danger" (click)="deleteCharacter(character)">Deletar</button>

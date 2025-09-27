@@ -53,21 +53,6 @@
 
 				<p class="system-description">{{ system.description }}</p>
 
-				<div class="system-stats">
-					<div class="stat">
-						<span class="label">Campos:</span>
-						<span class="value">{{ getSystemFieldsCount(system) }}</span>
-					</div>
-					<div class="stat">
-						<span class="label">Categorias:</span>
-						<span class="value">{{ getSystemCategoriesCount(system) }}</span>
-					</div>
-					<div class="stat">
-						<span class="label">Criado:</span>
-						<span class="value">{{ system.createdAt | date:'dd/MM/yyyy' }}</span>
-					</div>
-				</div>
-
 				<div class="card-actions">
 					<button class="btn btn-secondary" [routerLink]="['/systems/view', system.id]">
 						Ver Detalhes

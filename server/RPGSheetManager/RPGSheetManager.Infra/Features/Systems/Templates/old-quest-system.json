@@ -5,15 +5,6 @@
 	"createdAt": "2025-09-17T00:00:00Z",
 	"template": [
 		{
-			"name": "Nome",
-			"value": "",
-			"component": "text",
-			"category": "Informações Básicas",
-			"order": 1,
-			"editable": true,
-			"visible": true
-		},
-		{
 			"name": "Idade",
 			"value": "",
 			"component": "numeric",

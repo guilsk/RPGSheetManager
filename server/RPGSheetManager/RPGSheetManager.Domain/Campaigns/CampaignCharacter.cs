@@ -3,12 +3,11 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace RPGSheetManager.Domain.Campaigns {
     public class CampaignCharacter {
-        [BsonRepresentation(BsonType.String)]
-        public Guid CharId { get; set; }
-
-        [BsonRepresentation(BsonType.String)]
-        public Guid PlayerId { get; set; }
-
+        [BsonElement("characterId")]
+        public required string CharacterId { get; set; }
+        [BsonElement("playerId")]
+        public required string PlayerId { get; set; }
+        [BsonElement("dynamicData")]
         public List<DynamicField> DynamicData { get; set; } = new();
     }
 }

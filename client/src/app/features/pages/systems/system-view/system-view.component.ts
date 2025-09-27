@@ -7,8 +7,8 @@ import {
 	ComponentType
 } from '../../../../shared/models/rpg-sheet-manager.model';
 import { DynamicFieldComponent } from '../../../components/dynamic-field/dynamic-field.component';
-import { SystemService } from '../../../services/system.service';
-import { UserService } from '../../../services/user.service';
+import { SystemService } from '../../../../shared/services/system.service';
+import { UserService } from '../../../../shared/services/user.service';
 
 @Component({
 	selector: 'app-system-view',

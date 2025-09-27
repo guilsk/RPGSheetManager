@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
-import { CurrentUserService } from '../../services/current-user.service';
+import { CurrentUserService } from '../../../shared/services/current-user.service';
 import { DialogComponent } from '../../components/dialog/dialog.component';
-import { DialogService } from '../../services/dialog.service';
+import { DialogService } from '../../../shared/services/dialog.service';
 
 @Component({
 	selector: 'app-layout',
