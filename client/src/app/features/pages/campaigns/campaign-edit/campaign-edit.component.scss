@@ -74,6 +74,28 @@
                 min-height: 120px;
                 line-height: var.$line-relaxed;
             }
+
+            // Quando é um select
+            &:not(input):not(textarea) {
+                cursor: pointer;
+
+                // Estilo para a opção placeholder (primeira opção desabilitada)
+                option:first-child:disabled {
+                    color: var.$text-muted;
+                    font-style: italic;
+                }
+
+                // Estilo para as outras opções
+                option:not(:first-child) {
+                    color: var.$text-color;
+                    font-style: normal;
+                }
+
+                // Quando nenhuma opção está selecionada, mostrar texto como placeholder
+                &:invalid {
+                    color: var.$text-muted;
+                }
+            }
         }
 
         &-error {

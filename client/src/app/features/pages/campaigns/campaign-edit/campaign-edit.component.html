@@ -41,8 +41,8 @@
 					formControlName="systemId"
 					class="campaign-edit__form-group-control"
 					[class.campaign-edit__form-group-control--error]="campaignForm.get('systemId')?.invalid && campaignForm.get('systemId')?.touched">
-					<option value="" disabled>
-						{{ loadingSystems ? 'Carregando sistemas...' : '-- Selecione um sistema --' }}
+					<option value="" disabled hidden>
+						{{ loadingSystems ? 'Carregando sistemas...' : 'Selecione um sistema de RPG' }}
 					</option>
 					<option *ngFor="let system of systems" [value]="system.id">
 						{{ system.name }}
