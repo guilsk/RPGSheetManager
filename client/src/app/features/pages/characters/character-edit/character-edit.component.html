@@ -1,42 +1,42 @@
-<div class="character-edit-container">
-	<div class="page-header">
-		<h1>{{ isEditMode ? 'Editar Personagem' : 'Criar Novo Personagem' }}</h1>
-		<p>{{ isEditMode ? 'Modifique os dados do seu personagem' : 'Preencha os dados do seu novo personagem' }}</p>
+<div class="character-edit">
+	<div class="character-edit__header">
+		<h1 class="character-edit__title">{{ isEditMode ? 'Editar Personagem' : 'Criar Novo Personagem' }}</h1>
+		<p class="character-edit__description">{{ isEditMode ? 'Modifique os dados do seu personagem' : 'Preencha os dados do seu novo personagem' }}</p>
 	</div>
 
-	<form [formGroup]="characterForm" (ngSubmit)="onSubmit()" class="character-form">
+	<form [formGroup]="characterForm" (ngSubmit)="onSubmit()" class="character-edit__form">
 		<!-- Informações Básicas -->
-		<div class="form-section">
-			<h2>Informações Básicas</h2>
+		<div class="character-edit__section">
+			<h2 class="character-edit__section-title">Informações Básicas</h2>
 
-			<div class="form-row">
-				<div class="form-group">
-					<label for="name">Nome do Personagem *</label>
-					<input type="text" id="name" formControlName="name" class="form-control"
+			<div class="character-edit__row">
+				<div class="character-edit__field">
+					<label for="name" class="character-edit__label">Nome do Personagem *</label>
+					<input type="text" id="name" formControlName="name" class="character-edit__input"
 						placeholder="Digite o nome do personagem">
-					<div class="form-error"
+					<div class="character-edit__error"
 						*ngIf="characterForm.get('name')?.invalid && characterForm.get('name')?.touched">
 						Nome é obrigatório
 					</div>
 				</div>
 
-				<div class="form-group">
-					<label for="system">Sistema de RPG *</label>
+				<div class="character-edit__field">
+					<label for="system" class="character-edit__label">Sistema de RPG *</label>
 					<select id="system" formControlName="systemId" (change)="onSystemSelectionChange($event)"
-						class="form-control">
-						<option value="" disabled>
-							{{ loadingSystems ? 'Carregando sistemas...' : '-- Selecione um sistema --' }}
+						class="character-edit__select">
+						<option value="" disabled hidden>
+							{{ loadingSystems ? 'Carregando sistemas...' : 'Selecione um sistema de RPG' }}
 						</option>
 						<option *ngFor="let system of systems" [value]="system.id">
 							{{ system.name }}
 						</option>
 					</select>
-					<div class="form-error"
+					<div class="character-edit__error"
 						*ngIf="characterForm.get('systemId')?.invalid && characterForm.get('systemId')?.touched">
 						Sistema é obrigatório
 					</div>
-					<div class="form-help" *ngIf="systems.length === 0 && !loadingSystems">
-						<small>Nenhum sistema encontrado. Você pode ser o primeiro a cadastrar um sistema na aba
+					<div class="character-edit__help" *ngIf="systems.length === 0 && !loadingSystems">
+						<small class="character-edit__help-text">Nenhum sistema encontrado. Você pode ser o primeiro a cadastrar um sistema na aba
 							'Sistemas'</small>
 					</div>
 				</div>
@@ -44,21 +44,21 @@
 		</div>
 
 		<!-- Dados do Personagem -->
-		<div class="character-data" *ngIf="categories.length > 0 || loadingTemplate">
+		<div class="character-edit__data" *ngIf="categories.length > 0 || loadingTemplate">
 
 			<!-- Loading Template -->
-			<div class="loading-template" *ngIf="loadingTemplate">
-				<p>Carregando template do sistema...</p>
+			<div class="character-edit__loading" *ngIf="loadingTemplate">
+				<p class="character-edit__loading-text">Carregando template do sistema...</p>
 			</div>
 
 			<!-- Categorias de dados -->
-			<div class="category-section" *ngFor="let category of categories"
+			<div class="character-edit__category" *ngFor="let category of categories"
 				[style.display]="loadingTemplate ? 'none' : 'block'">
-				<h3>{{ category }}</h3>
+				<h3 class="character-edit__category-title">{{ category }}</h3>
 
-				<div class="fields-grid">
-					<div class="field-container" *ngFor="let field of categorizedData[category]"
-						[class.field-hidden]="!field.visible">
+				<div class="character-edit__fields">
+					<div class="character-edit__field-wrapper" *ngFor="let field of categorizedData[category]"
+						[class.character-edit__field-wrapper--hidden]="!field.visible">
 
 						<app-dynamic-field [field]="field" [disabled]="!field.editable"
 							[allFieldValues]="getAllFieldValues()"
@@ -70,11 +70,11 @@
 		</div>
 
 		<!-- Ações -->
-		<div class="form-actions">
-			<button type="button" class="btn btn-secondary" (click)="onCancel()">
+		<div class="character-edit__actions">
+			<button type="button" class="character-edit__button character-edit__button--secondary" (click)="onCancel()">
 				Cancelar
 			</button>
-			<button type="submit" class="btn btn-primary" [disabled]="isSubmitDisabled">
+			<button type="submit" class="character-edit__button character-edit__button--primary" [disabled]="isSubmitDisabled">
 				{{ isEditMode ? 'Salvar Alterações' : 'Criar Personagem' }}
 			</button>
 		</div>

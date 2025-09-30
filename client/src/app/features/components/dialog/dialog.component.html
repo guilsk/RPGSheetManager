@@ -1,7 +1,7 @@
-<div class="dialog-overlay" *ngIf="isVisible" (click)="onOverlayClick()">
-	<div class="dialog-container" (click)="$event.stopPropagation()">
-		<div class="dialog-header" [class]="'dialog-' + config.type">
-			<div class="dialog-icon">
+<div class="dialog" *ngIf="isVisible" (click)="onOverlayClick()">
+	<div class="dialog__container" (click)="$event.stopPropagation()">
+		<div class="dialog__header dialog__header--{{ config.type }}">
+			<div class="dialog__icon">
 				<span [ngSwitch]="config.type">
 					<span *ngSwitchCase="'success'">✅</span>
 					<span *ngSwitchCase="'error'">❌</span>
@@ -10,18 +10,18 @@
 					<span *ngSwitchDefault>ℹ️</span>
 				</span>
 			</div>
-			<h3>{{ config.title }}</h3>
+			<h3 class="dialog__title">{{ config.title }}</h3>
 		</div>
 
-		<div class="dialog-body">
-			<p>{{ config.message }}</p>
+		<div class="dialog__body">
+			<p class="dialog__message">{{ config.message }}</p>
 		</div>
 
-		<div class="dialog-actions">
-			<button class="btn btn-secondary" *ngIf="config.showCancel" (click)="onCancel()">
+		<div class="dialog__actions">
+			<button class="dialog__button dialog__button--secondary" *ngIf="config.showCancel" (click)="onCancel()">
 				{{ config.cancelText || 'Cancelar' }}
 			</button>
-			<button class="btn" [class]="getConfirmButtonClass()" (click)="onConfirm()">
+			<button class="dialog__button" [class]="'dialog__button--' + config.type" (click)="onConfirm()">
 				{{ config.confirmText || 'OK' }}
 			</button>
 		</div>

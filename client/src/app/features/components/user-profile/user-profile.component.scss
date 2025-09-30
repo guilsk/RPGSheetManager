@@ -1,189 +1,192 @@
-.profile-container {
+@use '../../../shared/styles/variables' as var;
+
+.user-profile {
 	display: flex;
 	justify-content: center;
 	padding: 2rem 1rem;
 	min-height: 100vh;
-	background-color: #f8fafc;
-}
+	background-color: var.$gray-50;
 
-.profile-card {
-	background: white;
-	border-radius: 12px;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-	width: 100%;
-	max-width: 500px;
-	padding: 2rem;
-}
+	&__card {
+		background: var.$white;
+		border-radius: var.$card-radius-large;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		width: 100%;
+		max-width: 500px;
+		padding: 2rem;
+	}
 
-.profile-header {
-	text-align: center;
-	margin-bottom: 2rem;
-	border-bottom: 1px solid #e2e8f0;
-	padding-bottom: 1.5rem;
+	&__header {
+		text-align: center;
+		margin-bottom: 2rem;
+		border-bottom: 1px solid var.$gray-200;
+		padding-bottom: 1.5rem;
+	}
 
-	h2 {
+	&__title {
 		color: #1e293b;
 		margin: 0 0 0.5rem 0;
 		font-size: 1.8rem;
-		font-weight: 600;
+		font-weight: var.$font-semibold;
 	}
 
-	p {
-		color: #64748b;
+	&__description {
+		color: var.$gray-500;
 		margin: 0;
 		font-size: 0.9rem;
 	}
-}
 
-.loading-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	padding: 3rem 0;
+	&__loading {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 3rem 0;
+	}
 
-	.loading-spinner {
+	&__spinner {
 		width: 2rem;
 		height: 2rem;
-		border: 3px solid #e2e8f0;
-		border-top: 3px solid #3b82f6;
+		border: 3px solid var.$gray-200;
+		border-top: 3px solid var.$info-color;
 		border-radius: 50%;
 		animation: spin 1s linear infinite;
 		margin-bottom: 1rem;
+
+		&:not(.user-profile__loading &) {
+			// Spinner do botão
+			width: 16px;
+			height: 16px;
+			border: 2px solid rgba(255, 255, 255, 0.3);
+			border-radius: 50%;
+			border-top-color: var.$white;
+			animation: spin 1s ease-in-out infinite;
+			margin-bottom: 0;
+		}
 	}
 
-	p {
-		color: #64748b;
+	&__loading-text {
+		color: var.$gray-500;
 		margin: 0;
 	}
-}
 
-.form-group {
-	margin-bottom: 1.5rem;
+	&__field {
+		margin-bottom: 1.5rem;
+	}
 
-	label {
+	&__label {
 		display: block;
 		margin-bottom: 0.5rem;
-		font-weight: 500;
-		color: #374151;
+		font-weight: var.$font-medium;
+		color: var.$gray-700;
 		font-size: 0.9rem;
 	}
 
-	.form-control {
+	&__input {
 		width: 100%;
 		padding: 0.75rem;
-		border: 2px solid #d1d5db;
-		border-radius: 8px;
+		border: 2px solid var.$gray-300;
+		border-radius: var.$input-radius;
 		font-size: 0.9rem;
-		transition: all 0.2s ease;
+		transition: all var.$transition-normal;
 		box-sizing: border-box;
 
 		&:focus {
 			outline: none;
-			border-color: #3b82f6;
-			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+			border-color: var.$info-color;
+			box-shadow: 0 0 0 3px var.$info-light;
 		}
 
-		&.invalid {
-			border-color: #ef4444;
+		&--invalid {
+			border-color: var.$danger-color;
 
 			&:focus {
-				border-color: #ef4444;
-				box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+				border-color: var.$danger-color;
+				box-shadow: 0 0 0 3px var.$danger-light;
 			}
 		}
 
-		&[readonly] {
-			background-color: #f8fafc;
-			color: #64748b;
+		&--readonly {
+			background-color: var.$gray-50;
+			color: var.$gray-500;
 			cursor: not-allowed;
 		}
 
 		&::placeholder {
-			color: #9ca3af;
+			color: var.$gray-400;
 		}
 	}
 
-	.form-text {
-		color: #64748b;
+	&__help-text {
+		color: var.$gray-500;
 		font-size: 0.8rem;
 		margin-top: 0.25rem;
 		display: block;
 	}
-}
 
-.feedback-messages {
-	margin-bottom: 1.5rem;
+	&__error {
+		color: var.$danger-color;
+		font-size: 0.8rem;
+		margin-top: 0.25rem;
+		display: block;
+	}
 
-	.error-message {
-		background-color: #fef2f2;
-		color: #dc2626;
-		border: 1px solid #fecaca;
-		border-radius: 8px;
+	&__feedback {
+		margin-bottom: 1.5rem;
+	}
+
+	&__message {
+		border-radius: var.$btn-radius;
 		padding: 0.75rem;
 		margin-bottom: 0.5rem;
 		font-size: 0.9rem;
+
+		&--error {
+			background-color: #fef2f2;
+			color: var.$danger-color;
+			border: 1px solid #fecaca;
+		}
+
+		&--success {
+			background-color: #f0fdf4;
+			color: var.$success-color;
+			border: 1px solid #bbf7d0;
+		}
 	}
 
-	.success-message {
-		background-color: #f0fdf4;
-		color: #16a34a;
-		border: 1px solid #bbf7d0;
-		border-radius: 8px;
-		padding: 0.75rem;
-		margin-bottom: 0.5rem;
+	&__actions {
+		display: flex;
+		justify-content: flex-end;
+		padding-top: 1rem;
+		border-top: 1px solid var.$gray-200;
+	}
+
+	&__button {
+		padding: 0.75rem 1.5rem;
+		border-radius: var.$btn-radius;
 		font-size: 0.9rem;
-	}
-}
+		font-weight: var.$font-medium;
+		cursor: pointer;
+		transition: all var.$transition-normal;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		border: none;
 
-.error-message {
-	color: #ef4444;
-	font-size: 0.8rem;
-	margin-top: 0.25rem;
-	display: block;
-}
+		&--primary {
+			background-color: var.$info-color;
+			color: var.$white;
 
-.form-actions {
-	display: flex;
-	justify-content: flex-end;
-	padding-top: 1rem;
-	border-top: 1px solid #e2e8f0;
-}
+			&:hover:not(:disabled) {
+				background-color: #2563eb;
+			}
 
-.btn {
-	padding: 0.75rem 1.5rem;
-	border-radius: 8px;
-	font-size: 0.9rem;
-	font-weight: 500;
-	cursor: pointer;
-	transition: all 0.2s ease;
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	border: none;
-
-	&.btn-primary {
-		background-color: #3b82f6;
-		color: white;
-
-		&:hover:not(:disabled) {
-			background-color: #2563eb;
-		}
-
-		&:disabled {
-			opacity: 0.6;
-			cursor: not-allowed;
+			&:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+			}
 		}
 	}
-}
-
-.spinner {
-	width: 16px;
-	height: 16px;
-	border: 2px solid rgba(255, 255, 255, 0.3);
-	border-radius: 50%;
-	border-top-color: white;
-	animation: spin 1s ease-in-out infinite;
 }
 
 @keyframes spin {
@@ -198,22 +201,18 @@
 
 // Responsividade
 @media (max-width: 640px) {
-	.profile-container {
+	.user-profile {
 		padding: 1rem 0.5rem;
-	}
 
-	.profile-card {
-		padding: 1.5rem;
-	}
+		&__card {
+			padding: 1.5rem;
+		}
 
-	.profile-header {
-		h2 {
+		&__title {
 			font-size: 1.5rem;
 		}
-	}
 
-	.form-actions {
-		.btn {
+		&__button {
 			width: 100%;
 			justify-content: center;
 		}

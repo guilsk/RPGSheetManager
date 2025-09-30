@@ -1,19 +1,19 @@
-<div class="page-container">
-	<div class="page-header">
-		<h1>Campanhas</h1>
-		<p>Gerencie suas campanhas de RPG, seja como mestre ou jogador.</p>
+<div class="campaigns-page">
+	<div class="campaigns-page__header">
+		<h1 class="campaigns-page__title">Campanhas</h1>
+		<p class="campaigns-page__description">Gerencie suas campanhas de RPG, seja como mestre ou jogador.</p>
 	</div>
 
-	<div class="page-content">
-		<div class="actions">
-			<button class="btn btn-primary" (click)="createCampaign()">Criar Nova Campanha</button>
+	<div class="campaigns-page__content">
+		<div class="campaigns-page__actions">
+			<button class="campaigns-page__button campaigns-page__button--primary" (click)="createCampaign()">Criar Nova Campanha</button>
 		</div>
 
-		<div class="campaigns-section">
-			<div class="section">
-				<h2>Minhas Campanhas como Mestre</h2>
+		<div class="campaigns-page__sections">
+			<div class="campaigns-page__section">
+				<h2 class="campaigns-page__section-title">Minhas Campanhas como Mestre</h2>
 
-				<div class="search-section">
+				<div class="campaigns-page__search">
 					<app-search-bar
 						[items]="myCampaigns"
 						[config]="mySearchConfig"
@@ -21,43 +21,43 @@
 					</app-search-bar>
 				</div>
 
-				<div class="campaigns-grid">
-					<div class="campaign-card master" *ngFor="let campaign of filteredMyCampaigns">
-						<div class="campaign-header">
-							<h3>{{ campaign.title }}</h3>
-							<span class="badge" [class]="campaign.activeSession ? 'badge-active' : 'badge-inactive'">
+				<div class="campaigns-page__grid">
+					<div class="campaign-card campaign-card--master" *ngFor="let campaign of filteredMyCampaigns">
+						<div class="campaign-card__header">
+							<h3 class="campaign-card__title">{{ campaign.title }}</h3>
+							<span class="campaign-card__badge" [class]="campaign.activeSession ? 'campaign-card__badge--active' : 'campaign-card__badge--inactive'">
 								{{ campaign.activeSession ? 'Em Sessão' : 'Pausada' }}
 							</span>
 						</div>
-						<p class="system">Sistema: {{ getSystemName(campaign.systemId) }}</p>
-						<p class="description">{{ campaign.description || 'Sem descrição' }}</p>
-						<div class="players-info">
+						<p class="campaign-card__system">Sistema: {{ getSystemName(campaign.systemId) }}</p>
+						<p class="campaign-card__description">{{ campaign.description || 'Sem descrição' }}</p>
+						<div class="campaign-card__info">
 							<span>{{ campaign.playerIds.length || 0 }} jogadores</span>
 						</div>
-						<div class="card-actions">
-							<button class="btn btn-secondary" (click)="viewCampaign(campaign)">Gerenciar</button>
-							<button class="btn btn-primary" *ngIf="!campaign.activeSession"
+						<div class="campaign-card__actions">
+							<button class="campaign-card__button campaign-card__button--secondary" (click)="viewCampaign(campaign)">Gerenciar</button>
+							<button class="campaign-card__button campaign-card__button--primary" *ngIf="!campaign.activeSession"
 								(click)="startSession(campaign)">Iniciar Sessão</button>
-							<button class="btn btn-warning" *ngIf="campaign.activeSession"
+							<button class="campaign-card__button campaign-card__button--warning" *ngIf="campaign.activeSession"
 								(click)="endSession(campaign)">Finalizar Sessão</button>
 						</div>
 					</div>
 
 					<!-- Card para criar nova campanha -->
-					<div class="campaign-card new-campaign-card" (click)="createCampaign()">
-						<div class="new-campaign-content">
-							<div class="new-campaign-icon">+</div>
-							<h3>Criar Nova Campanha</h3>
-							<p>Inicie uma nova aventura épica</p>
+					<div class="new-campaign-card" (click)="createCampaign()">
+						<div class="new-campaign-card__content">
+							<div class="new-campaign-card__icon">+</div>
+							<h3 class="new-campaign-card__title">Criar Nova Campanha</h3>
+							<p class="new-campaign-card__description">Inicie uma nova aventura épica</p>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="section">
-				<h2>Campanhas como Jogador</h2>
+			<div class="campaigns-page__section">
+				<h2 class="campaigns-page__section-title">Campanhas como Jogador</h2>
 
-				<div class="search-section">
+				<div class="campaigns-page__search">
 					<app-search-bar
 						[items]="playerCampaigns"
 						[config]="playerSearchConfig"
@@ -65,22 +65,22 @@
 					</app-search-bar>
 				</div>
 
-				<div class="campaigns-grid">
-					<div class="campaign-card player" *ngFor="let campaign of filteredPlayerCampaigns">
-						<div class="campaign-header">
-							<h3>{{ campaign.title }}</h3>
-							<span class="badge" [class]="campaign.activeSession ? 'badge-active' : 'badge-inactive'">
+				<div class="campaigns-page__grid">
+					<div class="campaign-card campaign-card--player" *ngFor="let campaign of filteredPlayerCampaigns">
+						<div class="campaign-card__header">
+							<h3 class="campaign-card__title">{{ campaign.title }}</h3>
+							<span class="campaign-card__badge" [class]="campaign.activeSession ? 'campaign-card__badge--active' : 'campaign-card__badge--inactive'">
 								{{ campaign.activeSession ? 'Em Sessão' : 'Pausada' }}
 							</span>
 						</div>
-						<p class="system">Sistema: {{ getSystemName(campaign.systemId) }}</p>
-						<p class="description">{{ campaign.description || 'Sem descrição' }}</p>
-						<div class="players-info">
+						<p class="campaign-card__system">Sistema: {{ getSystemName(campaign.systemId) }}</p>
+						<p class="campaign-card__description">{{ campaign.description || 'Sem descrição' }}</p>
+						<div class="campaign-card__info">
 							<span>Mestre: {{ getMasterName(campaign.masterId) }}</span>
 						</div>
-						<div class="card-actions">
-							<button class="btn btn-secondary" (click)="viewCampaign(campaign)">Ver Detalhes</button>
-							<button class="btn btn-primary" *ngIf="campaign.activeSession"
+						<div class="campaign-card__actions">
+							<button class="campaign-card__button campaign-card__button--secondary" (click)="viewCampaign(campaign)">Ver Detalhes</button>
+							<button class="campaign-card__button campaign-card__button--primary" *ngIf="campaign.activeSession"
 								(click)="joinSession(campaign)">Entrar na Sessão</button>
 						</div>
 					</div>

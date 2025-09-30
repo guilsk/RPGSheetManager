@@ -32,23 +32,23 @@ export class CharactersComponent implements OnInit {
 		caseSensitive: false
 	};
 
-	ngOnInit() {
+	public ngOnInit(): void {
 		this.loadCharacters();
 		this.loadSystems();
 	}
 
-	private loadCharacters() {
+	private loadCharacters(): void {
 		this.characterService.getCharacters().subscribe((characters: Character[]) => {
 			this.characters = characters;
 			this.filteredCharacters = [...characters];
 		});
 	}
 
-	onSearchResults(filteredCharacters: Character[]) {
+	public onSearchResults(filteredCharacters: Character[]): void {
 		this.filteredCharacters = filteredCharacters;
 	}
 
-	private loadSystems() {
+	private loadSystems(): void {
 		this.systemService.getSystems().subscribe((systems: any[]) => {
 			systems.forEach((system: any) => {
 				if (system.id && system.name) {
@@ -58,7 +58,7 @@ export class CharactersComponent implements OnInit {
 		});
 	}
 
-	getCharacterLevel(character: Character): string {
+	public getCharacterLevel(character: Character): string {
 		const levelField = character.data?.find(d => d.name?.toLowerCase().includes('nível') || d.name?.toLowerCase().includes('nivel'));
 		if (levelField?.value) {
 			return `Nível ${levelField.value}`;
@@ -72,28 +72,39 @@ export class CharactersComponent implements OnInit {
 		return classField?.value || 'Personagem';
 	}
 
-	getSystemName(systemId?: string): string {
+	public getSystemName(systemId?: string): string {
 		return systemId ? this.systems[systemId] || 'Sistema Desconhecido' : 'Sem Sistema';
 	}
 
-	getMainStats(character: Character): CharacterData[] {
+	public getMainStats(character: Character): CharacterData[] {
 		// Não mostrar atributos específicos nos cards - apenas informações básicas
 		return [];
 	}
 
-	public async deleteCharacter(character: Character) {
+	public async deleteCharacter(character: Character): Promise<void> {
 		if (!character.id) return;
+
 		const confirmed = await this.dialogService.showDeleteConfirmation(
 			'Excluir Personagem',
 			`Você está prestes a apagar o personagem "${character.name}". Esta decisão é definitiva... nem mesmo a magia pode trazê-lo de volta no tempo para salvá-lo. Deseja realmente prosseguir?`,
 			'Excluir Personagem'
 		);
+
 		if (!confirmed) return;
-		this.characterService.deleteCharacter(character.id).subscribe(success => {
-			if (success) {
-				this.characters = this.characters.filter(c => c.id !== character.id);
-				this.dialogService.success('Sucesso', 'Personagem excluído com sucesso.');
-			} else {
+
+		this.characterService.deleteCharacter(character.id).subscribe({
+			next: (success) => {
+				if (success) {
+					// Remover da lista principal
+					this.characters = this.characters.filter(c => c.id !== character.id);
+					// Remover também da lista filtrada para atualização imediata na tela
+					this.filteredCharacters = this.filteredCharacters.filter(c => c.id !== character.id);
+				} else {
+					this.dialogService.error('Erro', 'Erro ao excluir personagem. Tente novamente.');
+				}
+			},
+			error: (error) => {
+				console.error('Erro ao excluir personagem:', error);
 				this.dialogService.error('Erro', 'Erro ao excluir personagem. Tente novamente.');
 			}
 		});

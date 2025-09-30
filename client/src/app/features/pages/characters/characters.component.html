@@ -1,17 +1,17 @@
-<div class="page-container">
-	<div class="page-header">
-		<h1>Meus Personagens</h1>
-		<p>Gerencie seus personagens de RPG e suas fichas de atributos.</p>
+<div class="characters-page">
+	<div class="characters-page__header">
+		<h1 class="characters-page__title">Meus Personagens</h1>
+		<p class="characters-page__description">Gerencie seus personagens de RPG e suas fichas de atributos.</p>
 	</div>
 
-	<div class="page-content">
-		<div class="actions">
-			<button class="btn btn-primary" routerLink="/characters/new">Criar Novo Personagem</button>
+	<div class="characters-page__content">
+		<div class="characters-page__actions">
+			<button class="btn btn--primary" routerLink="/characters/new">Criar Novo Personagem</button>
 		</div>
 
-		<div class="search-section">
+		<div class="characters-page__search">
 			<app-search-bar
-				[items]="characters"
+			[items]="characters"
 				[config]="searchConfig"
 				(searchResultsEmit)="onSearchResults($event)">
 			</app-search-bar>
@@ -19,24 +19,24 @@
 
 		<div class="characters-grid">
 			<div class="character-card" *ngFor="let character of filteredCharacters">
-				<div class="character-header">
-					<h3>{{ character.name }}</h3>
-					<span class="level">{{ getCharacterLevel(character) }}</span>
+				<div class="character-card__header">
+					<h3 class="character-card__title">{{ character.name }}</h3>
+					<span class="character-card__level">{{ getCharacterLevel(character) }}</span>
 				</div>
-				<p class="system">Sistema: {{ getSystemName(character.systemId) }}</p>
+				<p class="character-card__system">Sistema: {{ getSystemName(character.systemId) }}</p>
 
-				<div class="card-actions">
-					<button class="btn btn-secondary" [routerLink]="['/characters/edit', character.id]">Editar</button>
-					<button class="btn btn-danger" (click)="deleteCharacter(character)">Deletar</button>
+				<div class="character-card__actions">
+					<button class="btn btn--secondary" [routerLink]="['/characters/edit', character.id]">Editar</button>
+					<button class="btn btn--danger" (click)="deleteCharacter(character)">Deletar</button>
 				</div>
 			</div>
 
 			<!-- Card para criar novo personagem -->
-			<div class="character-card new-character-card" routerLink="/characters/new">
-				<div class="new-character-content">
-					<div class="new-character-icon">+</div>
-					<h3>Criar Novo Personagem</h3>
-					<p>Adicione um novo personagem ao seu grupo</p>
+			<div class="new-character-card" routerLink="/characters/new">
+				<div class="new-character-card__content">
+					<div class="new-character-card__icon">+</div>
+					<h3 class="new-character-card__title">Criar Novo Personagem</h3>
+					<p class="new-character-card__description">Adicione um novo personagem ao seu grupo</p>
 				</div>
 			</div>
 		</div>

@@ -1,39 +1,39 @@
-<div class="page-container">
-	<div class="page-header">
-		<h1>Sistemas de RPG</h1>
-		<p>Explore sistemas de RPG da comunidade, salve seus favoritos e crie novos sistemas para compartilhar.</p>
+<div class="systems-page">
+	<div class="systems-page__header">
+		<h1 class="systems-page__title">Sistemas de RPG</h1>
+		<p class="systems-page__description">Explore sistemas de RPG da comunidade, salve seus favoritos e crie novos sistemas para compartilhar.</p>
 	</div>
 
-	<div class="page-content">
+	<div class="systems-page__content">
 		<!-- Upload Area -->
-		<div class="upload-section">
-			<div class="upload-area" [class.uploading]="isUploading" [class.drag-over]="isDragOver"
+		<div class="systems-page__upload">
+			<div class="upload-area" [class.upload-area--uploading]="isUploading" [class.upload-area--drag-over]="isDragOver"
 				(dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
 
-				<div class="upload-content" *ngIf="!isUploading">
-					<div class="upload-icon">📁</div>
-					<h3>Criar Novo Sistema</h3>
-					<p>Arraste e solte um arquivo JSON aqui ou clique para selecionar</p>
+				<div class="upload-area__content" *ngIf="!isUploading">
+					<div class="upload-area__icon">📁</div>
+					<h3 class="upload-area__title">Criar Novo Sistema</h3>
+					<p class="upload-area__description">Arraste e solte um arquivo JSON aqui ou clique para selecionar</p>
 					<input type="file" accept=".json" (change)="onFileSelected($event)" #fileInput
 						style="display: none;">
-					<button class="btn btn-primary" (click)="fileInput.click()">
+					<button class="upload-area__button" (click)="fileInput.click()">
 						Selecionar Arquivo JSON
 					</button>
 				</div>
 
-				<div class="upload-content" *ngIf="isUploading">
-					<div class="loading-spinner">⏳</div>
-					<h3>Processando Sistema...</h3>
-					<p>Aguarde enquanto validamos e salvamos o sistema.</p>
+				<div class="upload-area__content" *ngIf="isUploading">
+					<div class="upload-area__spinner">⏳</div>
+					<h3 class="upload-area__title">Processando Sistema...</h3>
+					<p class="upload-area__description">Aguarde enquanto validamos e salvamos o sistema.</p>
 				</div>
 			</div>
 
-			<div class="upload-error" *ngIf="uploadError">
+			<div class="upload-area__error" *ngIf="uploadError">
 				<strong>Erro:</strong> {{ uploadError }}
 			</div>
 		</div>
 
-		<div class="search-section">
+		<div class="systems-page__search">
 			<app-search-bar
 				[items]="systems"
 				[config]="searchConfig"
@@ -42,50 +42,50 @@
 		</div>
 
 		<!-- Systems Grid -->
-		<div class="systems-grid" *ngIf="filteredSystems.length > 0">
+		<div class="systems-page__grid" *ngIf="filteredSystems.length > 0">
 			<div class="system-card" *ngFor="let system of getSortedSystems()"
-				[class.saved-system]="isSystemSavedOrOwned(system)" [class.own-system]="isSystemOwner(system)">
+				[class.system-card--saved]="isSystemSavedOrOwned(system)" [class.system-card--own]="isSystemOwner(system)">
 
-				<div class="system-header">
-					<h3>{{ system.name }}</h3>
-					<div class="system-meta">
-						<span class="system-author">por {{ getOwnerDisplayName(system.ownerId || '') }}</span>
-						<div class="system-badges">
-							<span class="badge badge-own" *ngIf="isSystemOwner(system)">Meu Sistema</span>
-							<span class="badge badge-saved"
+				<div class="system-card__header">
+					<h3 class="system-card__title">{{ system.name }}</h3>
+					<div class="system-card__meta">
+						<span class="system-card__author">por {{ getOwnerDisplayName(system.ownerId || '') }}</span>
+						<div class="system-card__badges">
+							<span class="system-card__badge system-card__badge--own" *ngIf="isSystemOwner(system)">Meu Sistema</span>
+							<span class="system-card__badge system-card__badge--saved"
 								*ngIf="!isSystemOwner(system) && isSystemSaved(system)">Salvo</span>
-							<span class="badge badge-obsolete" *ngIf="isSystemObsolete(system)">Obsoleto</span>
+							<span class="system-card__badge system-card__badge--obsolete" *ngIf="isSystemObsolete(system)">Obsoleto</span>
 						</div>
 					</div>
 				</div>
 
-				<p class="system-description">{{ system.description }}</p>
+				<p class="system-card__description">{{ system.description }}</p>
 
-				<div class="card-actions">
-					<button class="btn btn-secondary" [routerLink]="['/systems/view', system.id]">
+				<div class="system-card__actions">
+					<button class="system-card__button system-card__button--secondary" [routerLink]="['/systems/view', system.id]">
 						Ver Detalhes
 					</button>
 
 					<!-- Botão para sistemas próprios -->
-					<button class="btn btn-danger" *ngIf="isSystemOwner(system)" (click)="deleteSystem(system)">
+					<button class="system-card__button system-card__button--danger" *ngIf="isSystemOwner(system)" (click)="deleteSystem(system)">
 						Excluir
 					</button>
 
 					<!-- Botão para sistemas de outros não salvos -->
-					<button class="btn btn-primary" *ngIf="!isSystemOwner(system) && !isSystemSaved(system)"
+					<button class="system-card__button system-card__button--primary" *ngIf="!isSystemOwner(system) && !isSystemSaved(system)"
 						(click)="saveSystem(system)">
 						Salvar
 					</button>
 
 					<!-- Botão para sistemas de outros já salvos (não obsoletos) -->
-					<button class="btn btn-outline-primary"
+					<button class="system-card__button system-card__button--outline"
 						*ngIf="!isSystemOwner(system) && isSystemSaved(system) && !isSystemObsolete(system)"
 						(click)="unsaveSystem(system)">
 						Remover dos Salvos
 					</button>
 
 					<!-- Botão para sistemas obsoletos salvos -->
-					<button class="btn btn-danger"
+					<button class="system-card__button system-card__button--danger"
 						*ngIf="!isSystemOwner(system) && isSystemSaved(system) && isSystemObsolete(system)"
 						(click)="deleteObsoleteSystem(system)">
 						Excluir Definitivamente
@@ -95,10 +95,10 @@
 		</div>
 
 		<!-- Empty State -->
-		<div class="empty-state" *ngIf="getSortedSystems().length === 0 && !isUploading">
-			<div class="empty-icon">🎲</div>
-			<h3>Nenhum Sistema Disponível</h3>
-			<p>Seja o primeiro a criar um sistema de RPG! Faça upload de um arquivo JSON para começar.</p>
+		<div class="systems-page__empty" *ngIf="getSortedSystems().length === 0 && !isUploading">
+			<div class="systems-page__empty-icon">🎲</div>
+			<h3 class="systems-page__empty-title">Nenhum Sistema Disponível</h3>
+			<p class="systems-page__empty-description">Seja o primeiro a criar um sistema de RPG! Faça upload de um arquivo JSON para começar.</p>
 		</div>
 	</div>
 </div>

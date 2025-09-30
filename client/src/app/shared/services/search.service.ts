@@ -109,7 +109,7 @@ export class SearchService {
 
       // Adiciona o match com destaque
       const matchText = text.slice(position, position + termLength);
-      result += `<strong class="search-highlight">${matchText}</strong>`;
+      result += `<strong class="search-bar__highlight">${matchText}</strong>`;
 
       lastIndex = position + termLength;
     }

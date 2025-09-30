@@ -27,14 +27,15 @@ export class CampaignEditComponent implements OnInit {
 	private dialogService = inject(DialogService);
 	private currentUserService = inject(CurrentUserService);
 
-	campaignForm!: FormGroup;
-	systems: RpgSystem[] = [];
-	isEditing = false;
-	isLoading = false;
-	loadingSystems = false;
-	campaignId: string | null = null;
+	public campaignForm!: FormGroup;
+	public systems: RpgSystem[] = [];
+	public isEditing = false;
+	public isLoading = false;
+	public loadingSystems = false;
+	public campaignId: string | null = null;
+	public currentCampaign: Campaign | null = null;
 
-	ngOnInit() {
+	public ngOnInit(): void {
 		this.campaignId = this.route.snapshot.paramMap.get('id');
 		this.isEditing = this.campaignId !== null && this.campaignId !== 'new';
 
@@ -46,7 +47,7 @@ export class CampaignEditComponent implements OnInit {
 		}
 	}
 
-	initForm() {
+	private initForm(): void {
 		this.campaignForm = this.fb.group({
 			title: ['', [Validators.required, Validators.minLength(3)]],
 			systemId: ['', Validators.required],
@@ -54,7 +55,7 @@ export class CampaignEditComponent implements OnInit {
 		});
 	}
 
-	loadSystems() {
+	private loadSystems(): void {
 		this.loadingSystems = true;
 		this.campaignForm.get('systemId')?.disable();
 
@@ -77,11 +78,12 @@ export class CampaignEditComponent implements OnInit {
 		});
 	}
 
-	loadCampaign() {
+	private loadCampaign(): void {
 		if (!this.campaignId) return;
 
 		this.campaignService.getCampaignById(this.campaignId).subscribe(campaign => {
 			if (campaign) {
+				this.currentCampaign = campaign;
 				this.campaignForm.patchValue({
 					title: campaign.title,
 					systemId: campaign.systemId,
@@ -94,7 +96,7 @@ export class CampaignEditComponent implements OnInit {
 		});
 	}
 
-	saveCampaign() {
+	public saveCampaign(): void {
 		if (this.campaignForm.invalid) return;
 
 		this.isLoading = true;
@@ -141,7 +143,56 @@ export class CampaignEditComponent implements OnInit {
 		}
 	}
 
-	cancel() {
+	public cancel(): void {
 		this.router.navigate(['/campaigns']);
+	}
+
+	public goBack(): void {
+		this.router.navigate(['/campaigns']);
+	}
+
+	public toggleSession(): void {
+		if (!this.currentCampaign || !this.campaignId) return;
+
+		this.isLoading = true;
+		const newActiveState = !this.currentCampaign.activeSession;
+
+		if (newActiveState) {
+			// Ativar sessão
+			this.campaignService.startSession(this.campaignId).subscribe({
+				next: (success: boolean) => {
+					this.isLoading = false;
+					if (success && this.currentCampaign) {
+						this.currentCampaign.activeSession = true;
+						this.dialogService.success('Sucesso', 'Sessão ativada com sucesso!');
+					} else {
+						this.dialogService.error('Erro', 'Erro ao ativar sessão. Tente novamente.');
+					}
+				},
+				error: (error) => {
+					this.isLoading = false;
+					console.error('Erro ao ativar sessão:', error);
+					this.dialogService.error('Erro', 'Erro ao ativar sessão. Tente novamente.');
+				}
+			});
+		} else {
+			// Pausar sessão
+			this.campaignService.endSession(this.campaignId).subscribe({
+				next: (success: boolean) => {
+					this.isLoading = false;
+					if (success && this.currentCampaign) {
+						this.currentCampaign.activeSession = false;
+						this.dialogService.success('Sucesso', 'Sessão pausada com sucesso!');
+					} else {
+						this.dialogService.error('Erro', 'Erro ao pausar sessão. Tente novamente.');
+					}
+				},
+				error: (error) => {
+					this.isLoading = false;
+					console.error('Erro ao pausar sessão:', error);
+					this.dialogService.error('Erro', 'Erro ao pausar sessão. Tente novamente.');
+				}
+			});
+		}
 	}
 }

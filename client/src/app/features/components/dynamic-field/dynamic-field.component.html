@@ -1,37 +1,37 @@
-<div class="dynamic-field" [class.field-disabled]="isDisabled">
-	<div class="field-header">
-		<label [for]="getFieldId()" class="field-label">
+<div class="dynamic-field" [class.dynamic-field--disabled]="isDisabled">
+	<div class="dynamic-field__header">
+		<label [for]="getFieldId()" class="dynamic-field__label">
 			{{ field.name }}
 		</label>
 
-		<button *ngIf="field.rollable?.enabled" type="button" class="roll-button" (click)="!previewMode && onRoll()"
-			[class.roll-button-disabled]="previewMode"
+		<button *ngIf="field.rollable?.enabled" type="button" class="dynamic-field__roll-button" (click)="!previewMode && onRoll()"
+			[class.dynamic-field__roll-button--disabled]="previewMode"
 			[title]="previewMode ? 'Dado não disponível na visualização' : 'Rolar dados para ' + field.name">
 			🎲
 		</button>
 	</div>
 
-	<div class="field-input">
+	<div class="dynamic-field__input">
 		<!-- Text Input -->
 		<input *ngIf="field.component === ComponentType.TEXT" type="text" [id]="getFieldId()" [(ngModel)]="currentValue"
-			[disabled]="isDisabled" (ngModelChange)="onValueChange($event)" class="form-control"
+			[disabled]="isDisabled" (ngModelChange)="onValueChange($event)" class="dynamic-field__control"
 			[placeholder]="'Digite ' + field.name">
 
 		<!-- Numeric Input -->
 		<input *ngIf="field.component === ComponentType.NUMERIC" type="number" [id]="getFieldId()"
 			[(ngModel)]="currentValue" [disabled]="isDisabled" (ngModelChange)="onValueChange($event)"
-			class="form-control" [placeholder]="'Digite ' + field.name">
+			class="dynamic-field__control" [placeholder]="'Digite ' + field.name">
 
 		<!-- Textarea -->
 		<textarea *ngIf="field.component === ComponentType.TEXTAREA" [id]="getFieldId()" [(ngModel)]="currentValue"
-			[disabled]="isDisabled" (ngModelChange)="onValueChange($event)" class="form-control textarea" rows="3"
+			[disabled]="isDisabled" (ngModelChange)="onValueChange($event)" class="dynamic-field__control dynamic-field__control--textarea" rows="3"
 			[placeholder]="'Digite ' + field.name">
     </textarea>
 
 		<!-- Select -->
 		<select *ngIf="field.component === ComponentType.SELECT && !isSelectPreviewMode" [id]="getFieldId()"
 			[(ngModel)]="currentValue" [disabled]="isDisabled" (ngModelChange)="onValueChange($event)"
-			class="form-control">
+			class="dynamic-field__control">
 			<option value="">Selecione...</option>
 			<option *ngFor="let option of field.options" [value]="option">
 				{{ option }}
@@ -40,29 +40,31 @@
 
 		<!-- Select Preview Mode -->
 		<select *ngIf="isSelectPreviewMode" [id]="getFieldId()" [(ngModel)]="currentValue"
-			class="form-control select-preview" title="Clique para ver opções">
-			<option value="">Ver opções disponíveis</option>
+			class="dynamic-field__control dynamic-field__control--preview"
+			title="Clique para ver opções"
+			placeholder="Ver opções disponíveis">
+			<option value="" disabled hidden>Ver opções disponíveis</option>
 			<option *ngFor="let option of field.options" [value]="option">
 				{{ option }}
 			</option>
 		</select>
 
 		<!-- Checkbox -->
-		<div *ngIf="field.component === ComponentType.CHECKBOX" class="checkbox-container">
+		<div *ngIf="field.component === ComponentType.CHECKBOX" class="dynamic-field__checkbox">
 			<input type="checkbox" [id]="getFieldId()" [(ngModel)]="currentValue" [disabled]="isDisabled"
-				(ngModelChange)="onValueChange($event)" class="checkbox-input">
-			<label [for]="getFieldId()" class="checkbox-label">
+				(ngModelChange)="onValueChange($event)" class="dynamic-field__checkbox-input">
+			<label [for]="getFieldId()" class="dynamic-field__checkbox-label">
 				{{ field.name }}
 			</label>
 		</div>
 
 		<!-- Radio Buttons -->
-		<div *ngIf="field.component === ComponentType.RADIO" class="radio-container">
-			<div *ngFor="let option of field.options; let i = index" class="radio-option">
+		<div *ngIf="field.component === ComponentType.RADIO" class="dynamic-field__radio-group">
+			<div *ngFor="let option of field.options; let i = index" class="dynamic-field__radio-option">
 				<input type="radio" [id]="getFieldId() + '-' + i" [name]="getFieldId()" [value]="option"
 					[(ngModel)]="currentValue" [disabled]="isDisabled" (ngModelChange)="onValueChange($event)"
-					class="radio-input">
-				<label [for]="getFieldId() + '-' + i" class="radio-label">
+					class="dynamic-field__radio-input">
+				<label [for]="getFieldId() + '-' + i" class="dynamic-field__radio-label">
 					{{ option }}
 				</label>
 			</div>
@@ -70,13 +72,13 @@
 	</div>
 
 	<!-- Field Info -->
-	<div class="field-info" *ngIf="field.rollable?.formula || lastRollResult">
-		<small class="formula-info" *ngIf="field.rollable?.formula">
+	<div class="dynamic-field__info" *ngIf="field.rollable?.formula || lastRollResult">
+		<small class="dynamic-field__formula" *ngIf="field.rollable?.formula">
 			Fórmula: {{ field.rollable?.formula }}
 		</small>
-		<div class="roll-result" *ngIf="lastRollResult">
-			<span class="roll-breakdown">{{ lastRollResult.breakdown }}</span>
-			<span class="roll-total"> = {{ lastRollResult.result }}</span>
+		<div class="dynamic-field__roll-result" *ngIf="lastRollResult">
+			<span class="dynamic-field__roll-breakdown">{{ lastRollResult.breakdown }}</span>
+			<span class="dynamic-field__roll-total"> = {{ lastRollResult.result }}</span>
 		</div>
 	</div>
 </div>

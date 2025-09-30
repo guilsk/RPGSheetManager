@@ -1,177 +1,193 @@
-.page-container {
+@use '../../../shared/styles/variables' as var;
+
+.campaigns-page {
 	max-width: 100%;
-}
 
-.page-header {
-	margin-bottom: 2rem;
-
-	h1 {
-		font-size: 2rem;
-		color: #1f2937;
-		margin-bottom: 0.5rem;
+	&__header {
+		margin-bottom: var.$space-2xl;
 	}
 
-	p {
-		color: #6b7280;
-		font-size: 1.1rem;
+	&__title {
+		font-size: var.$font-4xl;
+		color: var.$gray-800;
+		margin-bottom: var.$space-sm;
 	}
-}
 
-.page-content {
-	.actions {
-		margin-bottom: 2rem;
+	&__description {
+		color: var.$text-muted;
+		font-size: var.$font-lg;
+	}
+
+	&__actions {
+		margin-bottom: var.$space-2xl;
 		display: flex;
 		justify-content: flex-end;
 	}
-}
 
-.campaigns-section {
-	.section {
-		margin-bottom: 3rem;
+	&__button {
+		padding: var.$btn-padding;
+		border: none;
+		border-radius: var.$btn-radius;
+		cursor: pointer;
+		font-size: var.$font-sm;
+		font-weight: var.$font-medium;
+		transition: var.$transition-normal;
+		text-align: center;
 
-		h2 {
-			font-size: 1.5rem;
-			color: #1f2937;
-			margin-bottom: 1rem;
-			border-bottom: 2px solid #e5e7eb;
-			padding-bottom: 0.5rem;
-		}
+		&--primary {
+			background-color: var.$primary-color;
+			color: var.$text-inverse;
 
-		.search-section {
-			margin-bottom: 1.5rem;
-			max-width: 400px;
+			&:hover {
+				background-color: var.$primary-hover;
+			}
 		}
 	}
-}
 
-.campaigns-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-	gap: 1.5rem;
+	&__section {
+		margin-bottom: var.$space-3xl;
+	}
+
+	&__section-title {
+		font-size: var.$font-2xl;
+		color: var.$text-color;
+		margin-bottom: var.$space-md;
+		border-bottom: 2px solid var.$border-light;
+		padding-bottom: var.$space-sm;
+	}
+
+	&__search {
+		margin-bottom: var.$space-lg;
+		max-width: 400px;
+	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+		gap: var.$grid-gap;
+	}
 }
 
 .campaign-card {
-	background: white;
-	border: 1px solid #e5e7eb;
-	border-radius: 8px;
-	padding: 1.5rem;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-	transition: all 0.2s;
+	background: var.$card-bg;
+	border: 1px solid var.$border-color;
+	border-radius: var.$card-radius;
+	padding: var.$space-lg;
+	box-shadow: var.$card-shadow;
+	transition: var.$transition-normal;
 
 	&:hover {
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+		box-shadow: var.$card-shadow-hover;
 		transform: translateY(-2px);
 	}
 
-	&.master {
-		border-left: 4px solid #10b981;
+	&--master {
+		border-left: 4px solid var.$campaign-master;
 	}
 
-	&.player {
-		border-left: 4px solid #3b82f6;
+	&--player {
+		border-left: 4px solid var.$campaign-player;
 	}
 
-	.campaign-header {
+	&__header {
 		display: flex;
 		justify-content: space-between;
 		align-items: start;
-		margin-bottom: 1rem;
+		margin-bottom: var.$space-md;
+	}
 
-		h3 {
-			margin: 0;
-			color: #1f2937;
-			font-size: 1.25rem;
-			flex: 1;
+	&__title {
+		margin: 0;
+		color: var.$text-color;
+		font-size: var.$font-xl;
+		flex: 1;
+	}
+
+	&__badge {
+		padding: var.$space-xs var.$space-sm;
+		border-radius: 9999px;
+		font-size: var.$font-xs;
+		font-weight: var.$font-medium;
+
+		&--active {
+			background-color: var.$success-light;
+			color: var.$success-color;
+		}
+
+		&--inactive {
+			background-color: var.$bg-tertiary;
+			color: var.$text-muted;
 		}
 	}
 
-	.system {
-		color: #6b7280;
-		font-size: 0.875rem;
-		margin-bottom: 0.5rem;
-		font-weight: 500;
+	&__system {
+		color: var.$text-muted;
+		font-size: var.$font-sm;
+		margin-bottom: var.$space-sm;
+		font-weight: var.$font-medium;
 	}
 
-	.description {
-		color: #4b5563;
-		margin-bottom: 1rem;
-		line-height: 1.5;
+	&__description {
+		color: var.$gray-600;
+		margin-bottom: var.$space-md;
+		line-height: var.$line-normal;
 	}
 
-	.players-info {
-		color: #6b7280;
-		font-size: 0.875rem;
-		margin-bottom: 1.5rem;
+	&__info {
+		color: var.$text-muted;
+		font-size: var.$font-sm;
+		margin-bottom: var.$space-lg;
 	}
 
-	.card-actions {
+	&__actions {
 		display: flex;
-		gap: 0.75rem;
+		gap: var.$space-sm;
+	}
 
-		.btn {
-			flex: 1;
+	&__button {
+		padding: var.$btn-padding;
+		border: none;
+		border-radius: var.$btn-radius;
+		cursor: pointer;
+		font-size: var.$font-sm;
+		font-weight: var.$font-medium;
+		transition: var.$transition-normal;
+		text-align: center;
+		flex: 1;
+
+		&--primary {
+			background-color: var.$primary-color;
+			color: var.$text-inverse;
+
+			&:hover {
+				background-color: var.$primary-hover;
+			}
 		}
-	}
-}
 
-.badge {
-	padding: 0.25rem 0.5rem;
-	border-radius: 9999px;
-	font-size: 0.75rem;
-	font-weight: 500;
+		&--secondary {
+			background-color: var.$secondary-color;
+			color: var.$text-inverse;
 
-	&.badge-active {
-		background-color: #d1fae5;
-		color: #065f46;
-	}
-
-	&.badge-inactive {
-		background-color: #f3f4f6;
-		color: #6b7280;
-	}
-}
-
-.btn {
-	padding: 0.5rem 1rem;
-	border: none;
-	border-radius: 4px;
-	cursor: pointer;
-	font-size: 0.875rem;
-	font-weight: 500;
-	transition: all 0.2s;
-	text-align: center;
-
-	&.btn-primary {
-		background-color: #3b82f6;
-		color: white;
-
-		&:hover {
-			background-color: #2563eb;
+			&:hover {
+				background-color: var.$secondary-hover;
+			}
 		}
-	}
 
-	&.btn-secondary {
-		background-color: #6b7280;
-		color: white;
+		&--warning {
+			background-color: var.$warning-color;
+			color: var.$text-inverse;
 
-		&:hover {
-			background-color: #4b5563;
-		}
-	}
-
-	&.btn-warning {
-		background-color: #f59e0b;
-		color: white;
-
-		&:hover {
-			background-color: #d97706;
+			&:hover {
+				background-color: var.$warning-color;
+				opacity: 0.9;
+			}
 		}
 	}
 }
 
 .new-campaign-card {
-	border: 2px dashed #d1d5db;
-	background: #f9fafb;
+	border: 2px dashed var.$border-color;
+	background: var.$bg-secondary;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -179,28 +195,28 @@
 	min-height: 200px;
 
 	&:hover {
-		border-color: #3b82f6;
-		background: #eff6ff;
+		border-color: var.$primary-color;
+		background: var.$primary-light;
 	}
 
-	.new-campaign-content {
+	&__content {
 		text-align: center;
-		color: #6b7280;
+		color: var.$text-muted;
+	}
 
-		.new-campaign-icon {
-			font-size: 3rem;
-			margin-bottom: 0.5rem;
-			color: #9ca3af;
-		}
+	&__icon {
+		font-size: var.$font-4xl;
+		margin-bottom: var.$space-sm;
+		color: var.$gray-400;
+	}
 
-		h3 {
-			margin: 0 0 0.5rem;
-			color: #374151;
-		}
+	&__title {
+		margin: 0 0 var.$space-sm;
+		color: var.$gray-700;
+	}
 
-		p {
-			margin: 0;
-			font-size: 0.875rem;
-		}
+	&__description {
+		margin: 0;
+		font-size: var.$font-sm;
 	}
 }

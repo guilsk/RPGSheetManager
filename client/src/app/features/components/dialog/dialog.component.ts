@@ -55,18 +55,5 @@ export class DialogComponent implements OnInit {
 		document.body.style.overflow = 'auto';
 	}
 
-	getConfirmButtonClass(): string {
-		const baseClass = 'btn ';
-		switch (this.config.type) {
-			case 'error':
-			case 'warning':
-				return baseClass + 'btn-danger';
-			case 'success':
-				return baseClass + 'btn-success';
-			case 'confirm':
-				return baseClass + 'btn-primary';
-			default:
-				return baseClass + 'btn-primary';
-		}
-	}
+
 }

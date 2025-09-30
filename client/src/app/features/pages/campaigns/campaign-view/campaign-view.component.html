@@ -1,76 +1,76 @@
-<div class="page-container">
-	<div class="page-header">
-		<div class="header-content">
-			<div class="title-section">
-				<h1>{{ campaign?.title }}</h1>
-				<span class="badge" [class]="campaign?.activeSession ? 'badge-active' : 'badge-inactive'">
+<div class="campaign-view">
+	<div class="campaign-view__header">
+		<div class="campaign-view__header-content">
+			<div class="campaign-view__title-section">
+				<h1 class="campaign-view__title">{{ campaign?.title }}</h1>
+				<span class="campaign-view__badge" [class]="campaign?.activeSession ? 'campaign-view__badge--active' : 'campaign-view__badge--inactive'">
 					{{ campaign?.activeSession ? 'Em Sessão' : 'Pausada' }}
 				</span>
 			</div>
-			<div class="header-actions" *ngIf="!editMode">
-				<button class="btn btn-secondary" *ngIf="isOwner" (click)="toggleEditMode()">
+			<div class="campaign-view__header-actions" *ngIf="!editMode">
+				<button class="campaign-view__btn campaign-view__btn--secondary" *ngIf="isOwner" (click)="toggleEditMode()">
 					Editar
 				</button>
-				<button class="btn btn-primary" *ngIf="!campaign?.activeSession && isOwner" (click)="startSession()">
+				<button class="campaign-view__btn campaign-view__btn--primary" *ngIf="!campaign?.activeSession && isOwner" (click)="startSession()">
 					Iniciar Aventura
 				</button>
-				<button class="btn btn-warning" *ngIf="campaign?.activeSession && isOwner" (click)="endSession()">
+				<button class="campaign-view__btn campaign-view__btn--warning" *ngIf="campaign?.activeSession && isOwner" (click)="endSession()">
 					Encerrar Aventura
 				</button>
 			</div>
-			<div class="header-actions" *ngIf="editMode">
-				<button class="btn btn-secondary" (click)="cancelEdit()">Cancelar</button>
-				<button class="btn btn-primary" (click)="saveChanges()" [disabled]="isLoading">
+			<div class="campaign-view__header-actions" *ngIf="editMode">
+				<button class="campaign-view__btn campaign-view__btn--secondary" (click)="cancelEdit()">Cancelar</button>
+				<button class="campaign-view__btn campaign-view__btn--primary" (click)="saveChanges()" [disabled]="isLoading">
 					{{ isLoading ? 'Salvando...' : 'Salvar' }}
 				</button>
 			</div>
 		</div>
 	</div>
 
-	<div class="page-content" *ngIf="campaign">
+	<div class="campaign-view__content" *ngIf="campaign">
 		<!-- Modo Visualização -->
-		<div class="view-mode" *ngIf="!editMode">
-			<div class="campaign-details">
-				<div class="detail-card">
-					<h3>Informações da Campanha</h3>
-					<div class="info-grid">
-						<div class="info-item">
-							<span class="label">Sistema:</span>
-							<span class="value">{{ getSystemName(campaign.systemId) }}</span>
+		<div class="campaign-view__view-mode" *ngIf="!editMode">
+			<div class="campaign-view__campaign-details">
+				<div class="campaign-view__detail-card">
+					<h3 class="campaign-view__detail-card-title">Informações da Campanha</h3>
+					<div class="campaign-view__info-grid">
+						<div class="campaign-view__info-item">
+							<span class="campaign-view__info-label">Sistema:</span>
+							<span class="campaign-view__info-value">{{ getSystemName(campaign.systemId) }}</span>
 						</div>
-						<div class="info-item">
-							<span class="label">Mestre:</span>
-							<span class="value">{{ getMasterName(campaign.masterId) }}</span>
+						<div class="campaign-view__info-item">
+							<span class="campaign-view__info-label">Mestre:</span>
+							<span class="campaign-view__info-value">{{ getMasterName(campaign.masterId) }}</span>
 						</div>
-						<div class="info-item">
-							<span class="label">Jogadores:</span>
-							<span class="value">{{ campaign.playerIds.length || 0 }} participantes</span>
+						<div class="campaign-view__info-item">
+							<span class="campaign-view__info-label">Jogadores:</span>
+							<span class="campaign-view__info-value">{{ campaign.playerIds.length || 0 }} participantes</span>
 						</div>
-						<div class="info-item">
-							<span class="label">Status:</span>
-							<span class="value">{{ campaign.activeSession ? 'Aventura em andamento' : 'Aguardando próxima sessão' }}</span>
+						<div class="campaign-view__info-item">
+							<span class="campaign-view__info-label">Status:</span>
+							<span class="campaign-view__info-value">{{ campaign.activeSession ? 'Aventura em andamento' : 'Aguardando próxima sessão' }}</span>
 						</div>
 					</div>
 				</div>
 
-				<div class="detail-card" *ngIf="campaign.description">
-					<h3>História da Campanha</h3>
-					<p class="description">{{ campaign.description }}</p>
+				<div class="campaign-view__detail-card" *ngIf="campaign.description">
+					<h3 class="campaign-view__detail-card-title">História da Campanha</h3>
+					<p class="campaign-view__description">{{ campaign.description }}</p>
 				</div>
 
-				<div class="detail-card" *ngIf="campaign.characters?.length">
-					<h3>Personagens da Aventura</h3>
-					<div class="characters-list">
-						<div class="character-item" *ngFor="let character of campaign.characters">
+				<div class="campaign-view__detail-card" *ngIf="campaign.characters?.length">
+					<h3 class="campaign-view__detail-card-title">Personagens da Aventura</h3>
+					<div class="campaign-view__characters-list">
+						<div class="campaign-view__character-item" *ngFor="let character of campaign.characters">
 							<!-- TODO: Mostrar informações dos personagens -->
 							<p>Personagem ID: {{ character.characterId }}</p>
 						</div>
 					</div>
 				</div>
 
-				<div class="danger-zone" *ngIf="isOwner">
-					<h3>Zona de Perigo</h3>
-					<button class="btn btn-danger" (click)="deleteCampaign()">
+				<div class="campaign-view__danger-zone" *ngIf="isOwner">
+					<h3 class="campaign-view__danger-zone-title">Zona de Perigo</h3>
+					<button class="campaign-view__btn campaign-view__btn--danger" (click)="deleteCampaign()">
 						Encerrar Campanha Permanentemente
 					</button>
 				</div>
@@ -78,35 +78,35 @@
 		</div>
 
 		<!-- Modo Edição -->
-		<div class="edit-mode" *ngIf="editMode">
+		<div class="campaign-view__edit-mode" *ngIf="editMode">
 			<form [formGroup]="editForm" (ngSubmit)="saveChanges()">
-				<div class="form-group">
-					<label for="title">Nome da Campanha*</label>
-					<input id="title" type="text" formControlName="title" class="form-control"
-						[class.error]="editForm.get('title')?.invalid && editForm.get('title')?.touched">
-					<div class="error-message" *ngIf="editForm.get('title')?.invalid && editForm.get('title')?.touched">
+				<div class="campaign-view__form-group">
+					<label for="title" class="campaign-view__form-label">Nome da Campanha*</label>
+					<input id="title" type="text" formControlName="title" class="campaign-view__form-control"
+						[class.campaign-view__form-control--error]="editForm.get('title')?.invalid && editForm.get('title')?.touched">
+					<div class="campaign-view__error-message" *ngIf="editForm.get('title')?.invalid && editForm.get('title')?.touched">
 						Nome é obrigatório
 					</div>
 				</div>
 
-				<div class="form-group">
-					<label for="systemId">Sistema de RPG*</label>
-					<select id="systemId" formControlName="systemId" class="form-control"
-						[class.error]="editForm.get('systemId')?.invalid && editForm.get('systemId')?.touched">
+				<div class="campaign-view__form-group">
+					<label for="systemId" class="campaign-view__form-label">Sistema de RPG*</label>
+					<select id="systemId" formControlName="systemId" class="campaign-view__form-control"
+						[class.campaign-view__form-control--error]="editForm.get('systemId')?.invalid && editForm.get('systemId')?.touched">
 						<option value="">Selecione um sistema</option>
 						<option *ngFor="let system of systems" [value]="system.id">
 							{{ system.name }}
 						</option>
 					</select>
-					<div class="error-message"
+					<div class="campaign-view__error-message"
 						*ngIf="editForm.get('systemId')?.invalid && editForm.get('systemId')?.touched">
 						Sistema é obrigatório
 					</div>
 				</div>
 
-				<div class="form-group">
-					<label for="description">História da Campanha</label>
-					<textarea id="description" formControlName="description" class="form-control" rows="6"
+				<div class="campaign-view__form-group">
+					<label for="description" class="campaign-view__form-label">História da Campanha</label>
+					<textarea id="description" formControlName="description" class="campaign-view__form-control campaign-view__form-control--textarea" rows="6"
 						placeholder="Descreva a história, ambientação e objetivos da campanha...">
 					</textarea>
 				</div>
@@ -114,8 +114,8 @@
 		</div>
 	</div>
 
-	<div class="loading-state" *ngIf="!campaign && !isLoading">
+	<div class="campaign-view__loading-state" *ngIf="!campaign && !isLoading">
 		<p>Campanha não encontrada</p>
-		<button class="btn btn-primary" routerLink="/campaigns">Voltar às Campanhas</button>
+		<button class="campaign-view__btn campaign-view__btn--primary" routerLink="/campaigns">Voltar às Campanhas</button>
 	</div>
 </div>

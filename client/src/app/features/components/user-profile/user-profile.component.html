@@ -1,45 +1,45 @@
-<div class="profile-container">
-	<div class="profile-card">
-		<div class="profile-header">
-			<h2>Meu Perfil</h2>
-			<p>Gerencie suas informações pessoais</p>
+<div class="user-profile">
+	<div class="user-profile__card">
+		<div class="user-profile__header">
+			<h2 class="user-profile__title">Meu Perfil</h2>
+			<p class="user-profile__description">Gerencie suas informações pessoais</p>
 		</div>
 
-		<div class="loading-container" *ngIf="isLoading">
-			<div class="loading-spinner"></div>
-			<p>Carregando perfil...</p>
+		<div class="user-profile__loading" *ngIf="isLoading">
+			<div class="user-profile__spinner"></div>
+			<p class="user-profile__loading-text">Carregando perfil...</p>
 		</div>
 
-		<form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+		<form class="user-profile__form" [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
 			<!-- Nome de exibição -->
-			<div class="form-group">
-				<label for="displayName">Nome de Exibição *</label>
-				<input id="displayName" type="text" formControlName="displayName" class="form-control"
-					[class.invalid]="isFieldInvalid('displayName')" placeholder="Digite seu nome de exibição"
+			<div class="user-profile__field">
+				<label class="user-profile__label" for="displayName">Nome de Exibição *</label>
+				<input id="displayName" type="text" formControlName="displayName" class="user-profile__input"
+					[class.user-profile__input--invalid]="isFieldInvalid('displayName')" placeholder="Digite seu nome de exibição"
 					maxlength="50">
-				<div class="error-message" *ngIf="isFieldInvalid('displayName')">
+				<div class="user-profile__error" *ngIf="isFieldInvalid('displayName')">
 					{{ getFieldError('displayName') }}
 				</div>
 			</div>
 
 			<!-- Email (readonly) -->
-			<div class="form-group">
-				<label for="email">Email</label>
-				<input id="email" type="email" formControlName="email" class="form-control" readonly>
-				<small class="form-text">O email é gerenciado pelo seu provedor de autenticação e não pode ser alterado
+			<div class="user-profile__field">
+				<label class="user-profile__label" for="email">Email</label>
+				<input id="email" type="email" formControlName="email" class="user-profile__input user-profile__input--readonly" readonly>
+				<small class="user-profile__help-text">O email é gerenciado pelo seu provedor de autenticação e não pode ser alterado
 					aqui.</small>
 			</div>
 
 			<!-- Mensagens de feedback -->
-			<div class="feedback-messages">
-				<div class="error-message" *ngIf="error">{{ error }}</div>
-				<div class="success-message" *ngIf="success">{{ success }}</div>
+			<div class="user-profile__feedback">
+				<div class="user-profile__message user-profile__message--error" *ngIf="error">{{ error }}</div>
+				<div class="user-profile__message user-profile__message--success" *ngIf="success">{{ success }}</div>
 			</div>
 
 			<!-- Botões -->
-			<div class="form-actions">
-				<button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || isSubmitting">
-					<span *ngIf="isSubmitting" class="spinner"></span>
+			<div class="user-profile__actions">
+				<button type="submit" class="user-profile__button user-profile__button--primary" [disabled]="profileForm.invalid || isSubmitting">
+					<span *ngIf="isSubmitting" class="user-profile__spinner"></span>
 					{{ isSubmitting ? 'Salvando...' : 'Salvar Alterações' }}
 				</button>
 			</div>

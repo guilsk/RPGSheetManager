@@ -178,78 +178,102 @@ export class CharacterEditComponent implements OnInit {
 		}
 	}
 
-	private organizeDataByCategory() {
-		this.categorizedData = {};
-		this.categories = [];
+	private organizeDataByCategory(): void {
+		this.resetCategoryData();
 
-		if (!this.characterData || this.characterData.length === 0) {
+		if (!this.hasCharacterData()) {
 			return;
 		}
 
-		// Filtrar apenas campos visíveis
-		const visibleData = this.characterData.filter(data => data.visible !== false);
+		const visibleData = this.getVisibleCharacterData();
+		const uniqueCategories = this.extractUniqueCategories(visibleData);
+		const categoryOrder = this.determineCategoryOrder(uniqueCategories);
+		const sortedData = this.sortDataByCategory(visibleData, categoryOrder);
 
-		// Usar categoryOrder do sistema se disponível
-		let categoryOrder: string[] = [];
+		this.buildCategorizedData(sortedData, categoryOrder, uniqueCategories);
+	}
+
+	private resetCategoryData(): void {
+		this.categorizedData = {};
+		this.categories = [];
+	}
+
+	private hasCharacterData(): boolean {
+		return !!(this.characterData && this.characterData.length > 0);
+	}
+
+	private getVisibleCharacterData(): CharacterData[] {
+		return this.characterData.filter(data => data.visible !== false);
+	}
+
+	private extractUniqueCategories(data: CharacterData[]): Set<string> {
+		const categories = new Set<string>();
+		data.forEach(item => {
+			const category = item.category || 'Geral';
+			categories.add(category);
+		});
+		return categories;
+	}
+
+	private determineCategoryOrder(uniqueCategories: Set<string>): string[] {
 		if (this.currentSystem?.categoryOrder && this.currentSystem.categoryOrder.length > 0) {
-			categoryOrder = this.currentSystem.categoryOrder;
-		} else {
-			const uniqueCategories = new Set<string>();
-			visibleData.forEach(data => {
-				uniqueCategories.add(data.category || 'Geral');
-			});
-			categoryOrder = Array.from(uniqueCategories).sort();
-		}
+			// Filtrar apenas as categorias que realmente existem nos dados
+			const systemOrder = this.currentSystem.categoryOrder.filter(category =>
+				uniqueCategories.has(category)
+			);
 
-		// Ordenar dados por categoria (usando categoryOrder) e depois por order dentro da categoria
-		const sortedData = [...visibleData].sort((a, b) => {
+			// Adicionar categorias que existem nos dados mas não estão no categoryOrder
+			const remainingCategories = Array.from(uniqueCategories).filter(category =>
+				!this.currentSystem!.categoryOrder!.includes(category)
+			);
+
+			return [...systemOrder, ...remainingCategories.sort()];
+		}
+		return Array.from(uniqueCategories).sort();
+	}
+
+	private sortDataByCategory(data: CharacterData[], categoryOrder: string[]): CharacterData[] {
+		return [...data].sort((a, b) => {
 			const categoryA = a.category || 'Geral';
 			const categoryB = b.category || 'Geral';
 
 			if (categoryA !== categoryB) {
-				const indexA = categoryOrder.indexOf(categoryA);
-				const indexB = categoryOrder.indexOf(categoryB);
-
-				if (indexA === -1 && indexB === -1) {
-					return categoryA.localeCompare(categoryB);
-				}
-				if (indexA === -1) return 1;
-				if (indexB === -1) return -1;
-
-				return indexA - indexB;
+				return this.compareCategoriesByOrder(categoryA, categoryB, categoryOrder);
 			}
 
-			// Depois por order dentro da categoria
 			return (a.order || 0) - (b.order || 0);
 		});
+	}
 
-		// Organizar por categoria seguindo a ordem definida
+	private compareCategoriesByOrder(categoryA: string, categoryB: string, categoryOrder: string[]): number {
+		const indexA = categoryOrder.indexOf(categoryA);
+		const indexB = categoryOrder.indexOf(categoryB);
+
+		if (indexA === -1 && indexB === -1) {
+			return categoryA.localeCompare(categoryB);
+		}
+		if (indexA === -1) return 1;
+		if (indexB === -1) return -1;
+
+		return indexA - indexB;
+	}
+
+	private buildCategorizedData(sortedData: CharacterData[], categoryOrder: string[], uniqueCategories: Set<string>): void {
+		this.addOrderedCategories(sortedData, categoryOrder);
+	}
+
+	private addOrderedCategories(sortedData: CharacterData[], categoryOrder: string[]): void {
 		categoryOrder.forEach(category => {
-			const categoryData = sortedData.filter(data => (data.category || 'Geral') === category);
+			const categoryData = this.getDataForCategory(sortedData, category);
 			if (categoryData.length > 0) {
 				this.categorizedData[category] = categoryData;
 				this.categories.push(category);
 			}
 		});
+	}
 
-		// Adicionar categorias que não estão no categoryOrder mas existem nos dados
-		const remainingData = sortedData.filter(data => {
-			const category = data.category || 'Geral';
-			return !this.categories.includes(category);
-		});
-
-		if (remainingData.length > 0) {
-			const remainingCategories = new Set<string>();
-			remainingData.forEach(data => {
-				remainingCategories.add(data.category || 'Geral');
-			});
-
-			Array.from(remainingCategories).sort().forEach(category => {
-				const categoryData = remainingData.filter(data => (data.category || 'Geral') === category);
-				this.categorizedData[category] = categoryData;
-				this.categories.push(category);
-			});
-		}
+	private getDataForCategory(data: CharacterData[], category: string): CharacterData[] {
+		return data.filter(item => (item.category || 'Geral') === category);
 	}
 
 	public onFieldValueChange(fieldName: string, value: any) {

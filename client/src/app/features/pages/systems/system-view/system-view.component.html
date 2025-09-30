@@ -1,56 +1,56 @@
-<div class="system-view-container">
-	<div class="page-header">
-		<button class="btn btn-secondary back-button" (click)="goBack()">
+<div class="system-view">
+	<div class="system-view__header">
+		<button class="system-view__btn system-view__btn--secondary system-view__back-button" (click)="goBack()">
 			← Voltar aos Sistemas
 		</button>
 
-		<div class="system-info" *ngIf="system">
-			<h1>{{ system.name }}</h1>
-			<p class="system-description">{{ system.description }}</p>
+		<div class="system-view__info" *ngIf="system">
+			<h1 class="system-view__title">{{ system.name }}</h1>
+			<p class="system-view__description">{{ system.description }}</p>
 
-			<div class="system-meta">
-				<div class="meta-item">
-					<span class="label">Criado por:</span>
-					<span class="value">{{ getOwnerDisplayName() }}</span>
+			<div class="system-view__meta">
+				<div class="system-view__meta-item">
+					<span class="system-view__meta-label">Criado por:</span>
+					<span class="system-view__meta-value">{{ getOwnerDisplayName() }}</span>
 				</div>
-				<div class="meta-item">
-					<span class="label">Data de Criação:</span>
-					<span class="value">{{ system.createdAt | date:'dd/MM/yyyy' }}</span>
+				<div class="system-view__meta-item">
+					<span class="system-view__meta-label">Data de Criação:</span>
+					<span class="system-view__meta-value">{{ system.createdAt | date:'dd/MM/yyyy' }}</span>
 				</div>
-				<div class="meta-item">
-					<span class="label">Total de Campos:</span>
-					<span class="value">{{ getSystemFieldsCount() }}</span>
+				<div class="system-view__meta-item">
+					<span class="system-view__meta-label">Total de Campos:</span>
+					<span class="system-view__meta-value">{{ getSystemFieldsCount() }}</span>
 				</div>
-				<div class="meta-item">
-					<span class="label">Categorias:</span>
-					<span class="value">{{ getSystemCategoriesCount() }}</span>
+				<div class="system-view__meta-item">
+					<span class="system-view__meta-label">Categorias:</span>
+					<span class="system-view__meta-value">{{ getSystemCategoriesCount() }}</span>
 				</div>
 			</div>
 		</div>
 	</div>
 
 	<!-- Loading -->
-	<div class="loading-container" *ngIf="loading">
-		<div class="loading-content">
-			<div class="loading-spinner">⏳</div>
+	<div class="system-view__loading-container" *ngIf="loading">
+		<div class="system-view__loading-content">
+			<div class="system-view__loading-spinner">⏳</div>
 			<p>Carregando sistema...</p>
 		</div>
 	</div>
 
 	<!-- Template Preview -->
-	<div class="system-template" *ngIf="categories.length > 0 && !loading">
-		<div class="template-header">
-			<h2>Template do Sistema</h2>
-			<p>Visualização dos campos que serão criados para personagens deste sistema.</p>
+	<div class="system-view__template" *ngIf="categories.length > 0 && !loading">
+		<div class="system-view__template-header">
+			<h2 class="system-view__template-title">Template do Sistema</h2>
+			<p class="system-view__template-description">Visualização dos campos que serão criados para personagens deste sistema.</p>
 		</div>
 
 		<!-- Categorias de dados -->
-		<div class="category-section" *ngFor="let category of categories">
-			<h3>{{ category }}</h3>
+		<div class="system-view__category-section" *ngFor="let category of categories">
+			<h3 class="system-view__category-title">{{ category }}</h3>
 
-			<div class="fields-grid">
-				<div class="field-container" *ngFor="let field of categorizedData[category]"
-					[class.field-hidden]="!field.visible">
+			<div class="system-view__fields-grid">
+				<div class="system-view__field-container" *ngFor="let field of categorizedData[category]"
+					[class.system-view__field-container--hidden]="!field.visible">
 
 					<app-dynamic-field [field]="field" [disabled]="!isSelectField(field)" [previewMode]="true"
 						[allFieldValues]="getAllFieldValues()">
@@ -61,18 +61,18 @@
 	</div>
 
 	<!-- Empty State -->
-	<div class="empty-state" *ngIf="categories.length === 0 && !loading && system">
-		<div class="empty-icon">📋</div>
-		<h3>Sistema sem Template</h3>
-		<p>Este sistema não possui um template definido.</p>
+	<div class="system-view__empty-state" *ngIf="categories.length === 0 && !loading && system">
+		<div class="system-view__empty-icon">📋</div>
+		<h3 class="system-view__empty-title">Sistema sem Template</h3>
+		<p class="system-view__empty-description">Este sistema não possui um template definido.</p>
 	</div>
 
 	<!-- Sistema não encontrado -->
-	<div class="empty-state" *ngIf="!system && !loading">
-		<div class="empty-icon">❌</div>
-		<h3>Sistema não encontrado</h3>
-		<p>O sistema solicitado não existe ou foi removido.</p>
-		<button class="btn btn-secondary" (click)="goBack()">
+	<div class="system-view__empty-state" *ngIf="!system && !loading">
+		<div class="system-view__empty-icon">❌</div>
+		<h3 class="system-view__empty-title">Sistema não encontrado</h3>
+		<p class="system-view__empty-description">O sistema solicitado não existe ou foi removido.</p>
+		<button class="system-view__btn system-view__btn--secondary" (click)="goBack()">
 			← Voltar aos Sistemas
 		</button>
 	</div>

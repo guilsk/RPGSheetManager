@@ -136,6 +136,8 @@ export type SearchConfig<T> = {
 
 #### ✅ Estrutura BEM:
 ```scss
+@import './shared/styles/variables' as var;
+
 // Block
 .search-bar {
   position: relative;
@@ -145,15 +147,15 @@ export type SearchConfig<T> = {
   &__input {
     width: 100%;
     padding: 12px 16px;
-    border: 2px solid var(--border-color);
+    border: 2px solid var.$border-color;
 
     // Modifier
     &--focused {
-      border-color: var(--primary-color);
+      border-color: var.$primary-color;
     }
 
     &--error {
-      border-color: var(--danger-color);
+      border-color: var.$danger-color;
     }
   }
 
@@ -171,7 +173,7 @@ export type SearchConfig<T> = {
     cursor: pointer;
 
     &--highlighted {
-      background: var(--primary-color);
+      background: var.$primary-color;
       color: white;
     }
   }
