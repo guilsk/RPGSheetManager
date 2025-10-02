@@ -1,0 +1,92 @@
+<div class="campaign-create">
+	<div class="campaign-create__header">
+		<div class="campaign-create__header-actions">
+			<button class="campaign-create__back-button" (click)="goBack()">
+				← Voltar às Campanhas
+			</button>
+		</div>
+
+		<h1 class="campaign-create__header-title">Nova Campanha</h1>
+		<p class="campaign-create__header-description">Crie uma nova aventura épica para seus jogadores</p>
+	</div>
+
+	<div class="campaign-create__form-container">
+		<form [formGroup]="campaignForm" (ngSubmit)="saveCampaign()">
+
+			<div class="campaign-create__form-group">
+				<label class="campaign-create__form-group-label" for="title">Nome da Campanha*</label>
+				<input
+					id="title"
+					type="text"
+					formControlName="title"
+					class="campaign-create__form-group-control"
+					placeholder="Ex: A Ascensão dos Dragões"
+					[class.campaign-create__form-group-control--error]="campaignForm.get('title')?.invalid && campaignForm.get('title')?.touched">
+				<div class="campaign-create__form-group-error" *ngIf="campaignForm.get('title')?.invalid && campaignForm.get('title')?.touched">
+					Nome é obrigatório
+				</div>
+			</div>
+
+			<div class="campaign-create__form-group">
+				<label class="campaign-create__form-group-label" for="systemId">Sistema de RPG*</label>
+				<select
+					id="systemId"
+					formControlName="systemId"
+					class="campaign-create__form-group-control"
+					[class.campaign-create__form-group-control--error]="campaignForm.get('systemId')?.invalid && campaignForm.get('systemId')?.touched">
+					<option value="" disabled hidden>
+						{{ loadingSystems ? 'Carregando sistemas...' : 'Selecione um sistema de RPG' }}
+					</option>
+					<option *ngFor="let system of systems" [value]="system.id">
+						{{ system.name }}
+					</option>
+				</select>
+				<div class="campaign-create__form-group-error" *ngIf="campaignForm.get('systemId')?.invalid && campaignForm.get('systemId')?.touched">
+					Sistema é obrigatório
+				</div>
+				<div class="campaign-create__form-group-help" *ngIf="systems.length === 0 && !loadingSystems">
+					<small>Nenhum sistema encontrado. Você pode ser o primeiro a cadastrar um sistema na aba 'Sistemas'</small>
+				</div>
+			</div>
+
+			<div class="campaign-create__form-group">
+				<label class="campaign-create__form-group-label" for="description">Descrição da Campanha</label>
+				<textarea
+					id="description"
+					formControlName="description"
+					class="campaign-create__form-group-control campaign-create__form-group-control--textarea"
+					rows="4"
+					placeholder="Descreva a história, ambientação e objetivos da campanha...">
+				</textarea>
+			</div>
+
+			<div class="campaign-create__form-group">
+				<label class="campaign-create__form-group-label">Convidar Jogadores</label>
+				<app-multi-select-search
+					[items]="users"
+					[config]="userSearchConfig"
+					[valueProperty]="'authId'"
+					formControlName="invitedPlayerIds"
+					placeholder="Buscar e selecionar jogadores para convidar..."
+					noResultsText="Nenhum jogador encontrado">
+				</app-multi-select-search>
+				<div class="campaign-create__form-group-help">
+					<small>Selecione os jogadores que você deseja convidar para participar desta campanha. Eles poderão aceitar ou recusar o convite.</small>
+				</div>
+			</div>
+
+			<div class="campaign-create__actions">
+				<button type="button" class="campaign-create__button campaign-create__button--secondary" (click)="cancel()">
+					Cancelar
+				</button>
+
+				<button
+					type="submit"
+					class="campaign-create__button campaign-create__button--primary"
+					[disabled]="campaignForm.invalid || isLoading">
+					{{ isLoading ? 'Salvando...' : 'Criar Campanha' }}
+				</button>
+			</div>
+		</form>
+	</div>
+</div>

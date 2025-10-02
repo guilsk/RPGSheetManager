@@ -1,6 +1,6 @@
 @use '../../../../shared/styles/variables' as var;
 
-.campaign-edit {
+.campaign-create {
     max-width: var.$page-max-width;
     margin: 0 auto;
     padding: var.$content-padding;
@@ -49,7 +49,7 @@
             padding: var.$input-padding;
             border: 2px solid var.$input-border;
             border-radius: var.$input-radius;
-            font-size: var.$font-base;
+            font-size: var.$font-md;
             background: var.$input-bg;
             color: var.$text-color;
             transition: var.$transition-normal;
@@ -226,7 +226,7 @@
 }
 
 // Botão de voltar específico para o topo da página
-.campaign-edit__back-button {
+.campaign-create__back-button {
     display: inline-flex;
     align-items: center;
     gap: var.$space-xs;

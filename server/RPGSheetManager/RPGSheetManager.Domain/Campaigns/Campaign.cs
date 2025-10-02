@@ -16,6 +16,8 @@ namespace RPGSheetManager.Domain.Campaigns {
         public required string MasterId { get; set; }
         [BsonElement("playerIds")]
         public List<string>? PlayerIds { get; set; } = new();
+        [BsonElement("invitedPlayerIds")]
+        public List<string>? InvitedPlayerIds { get; set; } = new();
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         [BsonElement("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -49,14 +49,14 @@ export class CampaignsComponent implements OnInit {
 		caseSensitive: false
 	};
 
-	ngOnInit() {
+	public ngOnInit(): void {
 		const currentUser = this.currentUserService.getCurrentUser();
 		this.currentUserId = currentUser?.authId || '';
 		this.loadSystems();
 		this.loadCampaigns();
 	}
 
-	loadSystems() {
+	private loadSystems(): void {
 		this.systemService.getSavedSystems().subscribe(systems => {
 			this.systems = systems.reduce((acc, system) => {
 				if (system.id && system.name) {
@@ -67,7 +67,7 @@ export class CampaignsComponent implements OnInit {
 		});
 	}
 
-	loadCampaigns() {
+	private loadCampaigns(): void {
 		// Carregar campanhas como mestre
 		this.campaignService.getCampaignsByMaster(this.currentUserId).subscribe((campaigns: Campaign[]) => {
 			this.myCampaigns = campaigns;
@@ -81,31 +81,31 @@ export class CampaignsComponent implements OnInit {
 		});
 	}
 
-	onMySearchResults(filteredCampaigns: Campaign[]) {
+	public onMySearchResults(filteredCampaigns: Campaign[]): void {
 		this.filteredMyCampaigns = filteredCampaigns;
 	}
 
-	onPlayerSearchResults(filteredCampaigns: Campaign[]) {
+	public onPlayerSearchResults(filteredCampaigns: Campaign[]): void {
 		this.filteredPlayerCampaigns = filteredCampaigns;
 	}
 
-	getSystemName(systemId?: string): string {
+	public getSystemName(systemId?: string): string {
 		return systemId ? this.systems[systemId] || 'Sistema Desconhecido' : 'Sem Sistema';
 	}
 
-	getMasterName(masterId?: string): string {
+	public getMasterName(masterId?: string): string {
 		return masterId ? this.users[masterId] || 'Mestre Desconhecido' : 'Sem Mestre';
 	}
 
-	createCampaign() {
-		this.router.navigate(['/campaigns/edit/new']);
+	public createCampaign(): void {
+		this.router.navigate(['/campaigns/new']);
 	}
 
-	viewCampaign(campaign: Campaign) {
+	public viewCampaign(campaign: Campaign): void {
 		this.router.navigate(['/campaigns/view', campaign.id]);
 	}
 
-	async startSession(campaign: Campaign) {
+	public async startSession(campaign: Campaign): Promise<void> {
 		if (!campaign.id) return;
 
 		const confirmed = await this.dialogService.showConfirmation(
@@ -126,7 +126,7 @@ export class CampaignsComponent implements OnInit {
 		});
 	}
 
-	async endSession(campaign: Campaign) {
+	public async endSession(campaign: Campaign): Promise<void> {
 		if (!campaign.id) return;
 
 		const confirmed = await this.dialogService.showConfirmation(
@@ -147,7 +147,7 @@ export class CampaignsComponent implements OnInit {
 		});
 	}
 
-	joinSession(campaign: Campaign) {
+	public joinSession(campaign: Campaign): void {
 		// TODO: Implementar funcionalidade de entrar na sessão
 		this.router.navigate(['/campaigns/session', campaign.id]);
 	}

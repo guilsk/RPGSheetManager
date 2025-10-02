@@ -1,0 +1,61 @@
+<div class="multi-select-search">
+	<!-- Tags dos itens selecionados -->
+	<div class="multi-select-search__selected-items" *ngIf="selectedItems.length > 0">
+		<div class="multi-select-search__tag" *ngFor="let selectedItem of selectedItems; trackBy: trackBySelected; let i = index">
+			<span class="multi-select-search__tag-text">{{ selectedItem.displayText }}</span>
+			<button class="multi-select-search__tag-remove" type="button" (click)="removeItem(i)" title="Remover">
+				<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<line x1="18" y1="6" x2="6" y2="18"></line>
+					<line x1="6" y1="6" x2="18" y2="18"></line>
+				</svg>
+			</button>
+		</div>
+		<button class="multi-select-search__clear-all" type="button" (click)="clearAll()" title="Limpar todos">
+			Limpar todos
+		</button>
+	</div>
+
+	<!-- Campo de busca -->
+	<div class="multi-select-search__wrapper">
+		<input
+			type="text"
+			class="multi-select-search__input"
+			[placeholder]="placeholder"
+			[(ngModel)]="searchTerm"
+			(input)="onSearchInput($event)"
+			(focus)="onFocus()"
+			(blur)="onBlur()"
+			(keydown)="onKeyDown($event)" />
+
+		<div class="multi-select-search__icon" *ngIf="!searchTerm">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<circle cx="11" cy="11" r="8"></circle>
+				<path d="m21 21-4.35-4.35"></path>
+			</svg>
+		</div>
+
+		<button class="multi-select-search__clear-search" *ngIf="searchTerm" (click)="searchTerm = ''" type="button" title="Limpar busca">
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<line x1="18" y1="6" x2="6" y2="18"></line>
+				<line x1="6" y1="6" x2="18" y2="18"></line>
+			</svg>
+		</button>
+	</div>
+
+	<!-- Resultados da busca -->
+	<div class="multi-select-search__results"
+		*ngIf="showResults && (searchResultsData.length > 0 || (searchTerm && searchResultsData.length === 0))">
+
+		<div class="multi-select-search__item"
+			*ngFor="let result of searchResultsData; trackBy: trackByFn; let i = index"
+			[class.multi-select-search__item--highlighted]="i === selectedIndex"
+			(click)="selectResult(result)"
+			(mouseenter)="selectedIndex = i">
+			<span [innerHTML]="result.highlightedText"></span>
+		</div>
+
+		<div class="multi-select-search__no-results" *ngIf="searchTerm && searchResultsData.length === 0">
+			{{ noResultsText }}
+		</div>
+	</div>
+</div>

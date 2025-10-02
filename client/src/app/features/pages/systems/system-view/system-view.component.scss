@@ -58,7 +58,7 @@
 	}
 
 	&__meta-value {
-		font-size: var.$font-base;
+		font-size: var.$font-md;
 		font-weight: var.$font-semibold;
 		color: var.$text-color;
 	}
@@ -158,7 +158,7 @@
 
 	&__empty-description {
 		margin: 0;
-		font-size: var.$font-base;
+		font-size: var.$font-md;
 	}
 
 	&__btn {

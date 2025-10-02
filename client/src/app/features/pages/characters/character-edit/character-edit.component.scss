@@ -63,7 +63,7 @@
 		padding: var.$input-padding;
 		border: 2px solid var.$input-border;
 		border-radius: var.$input-radius;
-		font-size: var.$font-base;
+		font-size: var.$font-md;
 		transition: var.$transition-slow;
 		background: var.$input-bg;
 
@@ -181,7 +181,7 @@
 		padding: var.$btn-padding-lg;
 		border: none;
 		border-radius: var.$btn-radius;
-		font-size: var.$font-base;
+		font-size: var.$font-md;
 		font-weight: var.$font-semibold;
 		cursor: pointer;
 		transition: var.$transition-slow;

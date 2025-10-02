@@ -165,7 +165,7 @@
 
 	&__info-value {
 		color: var.$text-color;
-		font-size: var.$font-base;
+		font-size: var.$font-md;
 		font-weight: var.$font-medium;
 	}
 
@@ -173,7 +173,7 @@
 		line-height: var.$line-relaxed;
 		color: var.$text-color;
 		margin: 0;
-		font-size: var.$font-base;
+		font-size: var.$font-md;
 		padding: 22px;
 		background: var.$bg-secondary;
 		border-radius: var.$card-radius;
@@ -203,6 +203,230 @@
 		p {
 			margin: 0;
 			font-weight: var.$font-medium;
+		}
+	}
+
+	// Seção de jogadores ativos
+	&__players-section {
+		display: flex;
+		flex-direction: column;
+		gap: var.$space-md;
+	}
+
+	&__player-card {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: var.$space-lg;
+		background: var.$bg-primary;
+		border: 2px solid var.$border-light;
+		border-radius: var.$card-radius;
+		transition: all 0.2s ease;
+
+		&:hover {
+			border-color: var.$primary-color;
+			box-shadow: 0 4px 12px rgba(74, 58, 255, 0.1);
+		}
+	}
+
+	&__player-info {
+		display: flex;
+		align-items: center;
+		gap: var.$space-md;
+		flex: 1;
+	}
+
+	&__player-avatar {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 50px;
+		height: 50px;
+		background: linear-gradient(135deg, var.$primary-color, var.$primary-hover);
+		border-radius: 50%;
+		color: var.$text-inverse;
+
+		svg {
+			width: 24px;
+			height: 24px;
+		}
+	}
+
+	&__player-details {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	&__player-name {
+		font-size: var.$font-md;
+		font-weight: var.$font-semibold;
+		color: var.$text-color;
+		margin: 0;
+	}
+
+	&__player-email {
+		font-size: var.$font-sm;
+		color: var.$text-muted;
+		margin: 0;
+	}
+
+	&__player-status {
+		display: inline-flex;
+		align-items: center;
+		padding: 2px var.$space-xs;
+		border-radius: var.$btn-radius;
+		font-size: var.$font-xs;
+		font-weight: var.$font-medium;
+
+		&--active {
+			background-color: var.$success-light;
+			color: var.$success-color;
+		}
+
+		&--pending {
+			background-color: var.$warning-light;
+			color: var.$warning-color;
+		}
+	}
+
+	&__player-remove-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		background: transparent;
+		border: 1px solid var.$border-light;
+		border-radius: 50%;
+		color: var.$text-muted;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		flex-shrink: 0;
+
+		&:hover {
+			background: var.$danger-light;
+			border-color: var.$danger-color;
+			color: var.$danger-color;
+			transform: scale(1.05);
+		}
+
+		&:active {
+			transform: scale(0.95);
+		}
+
+		&--small {
+			width: 24px;
+			height: 24px;
+			border-width: 1px;
+
+			svg {
+				width: 12px;
+				height: 12px;
+			}
+		}
+
+		svg {
+			width: 16px;
+			height: 16px;
+		}
+	}
+
+	&__player-character {
+		display: flex;
+		align-items: center;
+		min-width: 200px;
+		justify-content: flex-end;
+	}
+
+	&__character-placeholder {
+		display: flex;
+		align-items: center;
+		gap: var.$space-xs;
+		padding: var.$space-sm var.$space-md;
+		background: var.$bg-secondary;
+		border-radius: var.$btn-radius;
+		color: var.$text-muted;
+		font-size: var.$font-sm;
+		border: 1px dashed var.$border-color;
+
+		svg {
+			width: 20px;
+			height: 20px;
+		}
+	}
+
+	&__character-info {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 2px;
+
+		h5 {
+			font-size: var.$font-sm;
+			font-weight: var.$font-semibold;
+			color: var.$text-color;
+			margin: 0;
+		}
+
+		p {
+			font-size: var.$font-xs;
+			color: var.$text-muted;
+			margin: 0;
+		}
+	}
+
+	// Seção de jogadores convidados
+	&__invited-players-section {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var.$space-sm;
+	}
+
+	&__invited-player-item {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: var.$space-sm var.$space-md;
+		background: var.$bg-secondary;
+		border: 1px solid var.$border-light;
+		border-radius: var.$btn-radius;
+		transition: all 0.2s ease;
+
+		&:hover {
+			border-color: var.$primary-color;
+			transform: translateY(-1px);
+		}
+
+		.campaign-view__player-info {
+			gap: var.$space-sm;
+			flex: 1;
+		}
+	}
+
+	&__player-avatar--small {
+		width: 32px;
+		height: 32px;
+
+		svg {
+			width: 16px;
+			height: 16px;
+		}
+	}
+
+	&__player-name-small {
+		font-size: var.$font-sm;
+		font-weight: var.$font-medium;
+		color: var.$text-color;
+	}
+
+	&__form-group-help {
+		margin-top: var.$space-sm;
+
+		small {
+			color: var.$text-muted;
+			font-size: var.$font-xs;
+			line-height: var.$line-normal;
 		}
 	}
 
@@ -280,6 +504,68 @@
 		p {
 			margin: 0 0 var.$space-lg;
 			font-size: 1.1rem;
+		}
+	}
+}
+
+// Responsividade para seção de jogadores
+@media (max-width: 768px) {
+	.campaign-view {
+		&__player-card {
+			flex-direction: row;
+			align-items: center;
+			gap: var.$space-md;
+			padding: var.$space-md;
+		}
+
+		&__player-info {
+			flex: 1;
+		}
+
+		&__player-remove-btn {
+			width: 28px;
+			height: 28px;
+
+			svg {
+				width: 14px;
+				height: 14px;
+			}
+		}
+
+		&__player-character {
+			width: 100%;
+			min-width: auto;
+			justify-content: flex-start;
+		}
+
+		&__character-placeholder {
+			width: 100%;
+			justify-content: center;
+		}
+
+		&__character-info {
+			width: 100%;
+			align-items: flex-start;
+		}
+
+		&__invited-players-section {
+			flex-direction: column;
+			align-items: stretch;
+		}
+
+		&__invited-player-item {
+			width: 100%;
+			justify-content: space-between;
+		}
+
+		&__player-remove-btn--small {
+			width: 20px;
+			height: 20px;
+
+			svg {
+				width: 10px;
+				height: 10px;
+			}
 		}
 	}
 }

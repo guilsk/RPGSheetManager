@@ -137,7 +137,7 @@
 // Responsividade
 @media (max-width: 768px) {
 	.search-bar__input {
-		font-size: var.$font-base; // Evita zoom no iOS
+		font-size: var.$font-md; // Evita zoom no iOS
 	}
 
 	.search-bar__results {

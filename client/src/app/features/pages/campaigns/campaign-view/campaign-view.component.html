@@ -43,10 +43,6 @@
 							<span class="campaign-view__info-value">{{ getMasterName(campaign.masterId) }}</span>
 						</div>
 						<div class="campaign-view__info-item">
-							<span class="campaign-view__info-label">Jogadores:</span>
-							<span class="campaign-view__info-value">{{ campaign.playerIds.length || 0 }} participantes</span>
-						</div>
-						<div class="campaign-view__info-item">
 							<span class="campaign-view__info-label">Status:</span>
 							<span class="campaign-view__info-value">{{ campaign.activeSession ? 'Aventura em andamento' : 'Aguardando próxima sessão' }}</span>
 						</div>
@@ -56,6 +52,47 @@
 				<div class="campaign-view__detail-card" *ngIf="campaign.description">
 					<h3 class="campaign-view__detail-card-title">História da Campanha</h3>
 					<p class="campaign-view__description">{{ campaign.description }}</p>
+				</div>
+
+				<div class="campaign-view__detail-card" *ngIf="activePlayers.length > 0">
+					<h3 class="campaign-view__detail-card-title">Jogadores da Campanha</h3>
+					<div class="campaign-view__players-section">
+						<div class="campaign-view__player-card" *ngFor="let player of activePlayers; trackBy: trackByPlayer">
+							<div class="campaign-view__player-info">
+								<div class="campaign-view__player-avatar">
+									<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+										<circle cx="12" cy="7" r="4"></circle>
+									</svg>
+								</div>
+								<div class="campaign-view__player-details">
+									<h4 class="campaign-view__player-name">{{ player.displayName }}</h4>
+									<p class="campaign-view__player-email">{{ player.email }}</p>
+									<span class="campaign-view__player-status campaign-view__player-status--active">Ativo</span>
+								</div>
+							</div>
+
+							<div class="campaign-view__player-character">
+								<div class="campaign-view__character-placeholder" *ngIf="!playerCharacters[player.authId!]">
+									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+										<circle cx="8.5" cy="7" r="4"></circle>
+										<line x1="20" y1="8" x2="20" y2="14"></line>
+										<line x1="23" y1="11" x2="17" y2="11"></line>
+									</svg>
+									<span>Nenhum personagem</span>
+								</div>
+
+								<!-- Futuro: área para mostrar personagem quando implementado -->
+								<div class="campaign-view__character-info" *ngIf="playerCharacters[player.authId!]">
+									<h5>{{ playerCharacters[player.authId!].name }}</h5>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="campaign-view__form-group-help">
+						<small>Jogadores que aceitaram o convite e estão participando da campanha.</small>
+					</div>
 				</div>
 
 				<div class="campaign-view__detail-card" *ngIf="campaign.characters?.length">
@@ -109,6 +146,91 @@
 					<textarea id="description" formControlName="description" class="campaign-view__form-control campaign-view__form-control--textarea" rows="6"
 						placeholder="Descreva a história, ambientação e objetivos da campanha...">
 					</textarea>
+				</div>
+
+				<!-- Seção de Jogadores Ativos (no modo edição) -->
+				<div class="campaign-view__form-group" *ngIf="activePlayers.length > 0">
+					<label class="campaign-view__form-label">Jogadores Ativos na Campanha</label>
+					<div class="campaign-view__players-section">
+						<div class="campaign-view__player-card" *ngFor="let player of activePlayers; trackBy: trackByPlayer">
+							<div class="campaign-view__player-info">
+								<div class="campaign-view__player-avatar">
+									<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+										<circle cx="12" cy="7" r="4"></circle>
+									</svg>
+								</div>
+								<div class="campaign-view__player-details">
+									<h4 class="campaign-view__player-name">{{ player.displayName }}</h4>
+									<p class="campaign-view__player-email">{{ player.email }}</p>
+									<span class="campaign-view__player-status campaign-view__player-status--active">Ativo</span>
+								</div>
+							</div>
+							<button
+								type="button"
+								class="campaign-view__player-remove-btn"
+								(click)="removePlayer(player)"
+								title="Remover jogador da campanha">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<line x1="18" y1="6" x2="6" y2="18"></line>
+									<line x1="6" y1="6" x2="18" y2="18"></line>
+								</svg>
+							</button>
+						</div>
+					</div>
+					<div class="campaign-view__form-group-help">
+						<small>Jogadores que aceitaram o convite e estão participando da campanha.</small>
+					</div>
+				</div>
+
+				<!-- Seção de Jogadores Convidados -->
+				<div class="campaign-view__form-group">
+					<label class="campaign-view__form-label">Jogadores Convidados</label>
+					<div class="campaign-view__invited-players-section">
+						<div class="campaign-view__invited-player-item" *ngFor="let player of invitedPlayers">
+							<div class="campaign-view__player-info">
+								<div class="campaign-view__player-avatar campaign-view__player-avatar--small">
+									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+										<circle cx="12" cy="7" r="4"></circle>
+									</svg>
+								</div>
+								<div class="campaign-view__player-details">
+									<span class="campaign-view__player-name-small">{{ player.displayName }}</span>
+									<span class="campaign-view__player-status campaign-view__player-status--pending">Aguardando</span>
+								</div>
+							</div>
+							<button
+								type="button"
+								class="campaign-view__player-remove-btn campaign-view__player-remove-btn--small"
+								(click)="removeInvite(player)"
+								title="Cancelar convite">
+								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<line x1="18" y1="6" x2="6" y2="18"></line>
+									<line x1="6" y1="6" x2="18" y2="18"></line>
+								</svg>
+							</button>
+						</div>
+					</div>
+					<div class="campaign-view__form-group-help">
+						<small>Jogadores convidados que ainda não aceitaram o convite.</small>
+					</div>
+				</div>
+
+				<!-- Seção para Convidar Mais Jogadores -->
+				<div class="campaign-view__form-group">
+					<label class="campaign-view__form-label">Convidar Mais Jogadores</label>
+					<app-multi-select-search
+						[items]="users"
+						[config]="userSearchConfig"
+						[valueProperty]="'authId'"
+						formControlName="invitedPlayerIds"
+						placeholder="Buscar e selecionar jogadores para convidar..."
+						noResultsText="Nenhum jogador encontrado">
+					</app-multi-select-search>
+					<div class="campaign-view__form-group-help">
+						<small>Selecione os jogadores que você deseja convidar para participar desta campanha.</small>
+					</div>
 				</div>
 			</form>
 		</div>

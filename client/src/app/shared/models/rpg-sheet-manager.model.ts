@@ -58,6 +58,7 @@ export interface Campaign {
 	systemId: string;
 	masterId: string;
 	playerIds: string[];
+	invitedPlayerIds?: string[];
 	characters: CampaignCharacter[];
 	diceHistory: DiceRoll[];
 	activeSession: boolean;

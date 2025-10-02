@@ -49,9 +49,15 @@ export const routes: Routes = [
 		canActivate: [authGuard]
 	},
 	{
+		path: 'campaigns/new',
+		loadComponent: () => import('./features/pages/campaigns/campaign-create/campaign-create.component')
+			.then(m => m.CampaignCreateComponent),
+		canActivate: [authGuard]
+	},
+	{
 		path: 'campaigns/edit/:id',
-		loadComponent: () => import('./features/pages/campaigns/campaign-edit/campaign-edit.component')
-			.then(m => m.CampaignEditComponent),
+		loadComponent: () => import('./features/pages/campaigns/campaign-view/campaign-view.component')
+			.then(m => m.CampaignViewComponent),
 		canActivate: [authGuard]
 	},
 	{

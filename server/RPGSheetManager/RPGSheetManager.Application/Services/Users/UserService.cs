@@ -12,5 +12,7 @@ namespace RPGSheetManager.Application.Services.Users {
         public async Task UpdateProfileAsync(User user) => await _userRepository.UpdateProfileAsync(user);
         public async Task<bool> AddSavedSystemAsync(string authId, string systemId) => await _userRepository.AddSavedSystemAsync(authId, systemId);
         public async Task<bool> RemoveSavedSystemAsync(string authId, string systemId) => await _userRepository.RemoveSavedSystemAsync(authId, systemId);
+        public async Task<List<User>> GetAllUsersAsync() => await _userRepository.GetAllAsync();
+        public async Task<List<User>> SearchUsersAsync(string searchTerm) => await _userRepository.SearchAsync(searchTerm);
     }
 }

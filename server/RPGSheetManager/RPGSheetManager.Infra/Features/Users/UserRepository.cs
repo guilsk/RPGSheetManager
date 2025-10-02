@@ -38,5 +38,17 @@ namespace RPGSheetManager.Infra.Features.Users {
                 .Set(u => u.Email, user.Email);
             await _collection.UpdateOneAsync(filter, update);
         }
+
+        public async Task<List<User>> GetAllAsync() {
+            return await _collection.Find(_ => true).ToListAsync();
+        }
+
+        public async Task<List<User>> SearchAsync(string searchTerm) {
+            var filter = Builders<User>.Filter.Or(
+                Builders<User>.Filter.Regex(u => u.DisplayName, new MongoDB.Bson.BsonRegularExpression(searchTerm, "i")),
+                Builders<User>.Filter.Regex(u => u.Email, new MongoDB.Bson.BsonRegularExpression(searchTerm, "i"))
+            );
+            return await _collection.Find(filter).ToListAsync();
+        }
     }
 }

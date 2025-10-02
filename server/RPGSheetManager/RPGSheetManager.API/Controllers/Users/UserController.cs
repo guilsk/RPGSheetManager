@@ -50,5 +50,21 @@ namespace RPGSheetManager.API.Controllers.Users {
             await _service.UpdateProfileAsync(user);
             return Ok(user);
         }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllUsers() {
+            var users = await _service.GetAllUsersAsync();
+            return Ok(users);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchUsers([FromQuery] string search) {
+            if (string.IsNullOrEmpty(search)) {
+                return BadRequest("Search term is required.");
+            }
+
+            var users = await _service.SearchUsersAsync(search);
+            return Ok(users);
+        }
     }
 }
