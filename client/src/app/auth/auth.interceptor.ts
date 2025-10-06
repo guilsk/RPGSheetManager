@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 import { mergeMap, catchError } from 'rxjs';
 import { of, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (
 	req: HttpRequest<unknown>,
@@ -11,8 +12,8 @@ export const authInterceptor: HttpInterceptorFn = (
 	const auth = inject(AuthService);
 
 	// Verificar se a URL precisa de autenticação
-	const needsAuth = req.url.includes('localhost:7111/api');
-	
+	const needsAuth = req.url.includes(environment.apiUrl.replace('https://', '').replace('http://', ''));
+
 	if (!needsAuth) {
 		return next(req);
 	}
@@ -37,7 +38,7 @@ export const authInterceptor: HttpInterceptorFn = (
 			if (authError.status) {
 				return throwError(() => authError);
 			}
-			
+
 			// Se é um erro interno de obtenção do token, retorna erro de auth
 			return throwError(() => new HttpErrorResponse({
 				error: 'Falha na autenticação - não foi possível obter token',

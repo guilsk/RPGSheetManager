@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Campaign } from '../models/rpg-sheet-manager.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class CampaignService {
 	private http = inject(HttpClient);
-	private apiUrl = 'https://localhost:7111/api/campaigns';
+	private apiUrl = `${environment.apiUrl}/campaigns`;
 
 	getAllCampaigns(): Observable<Campaign[]> {
 		return this.http.get<Campaign[]>(this.apiUrl).pipe(

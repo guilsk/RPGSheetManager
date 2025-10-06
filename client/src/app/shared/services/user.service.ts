@@ -2,12 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { User } from '../models/rpg-sheet-manager.model';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class UserService {
-	private apiUrl = 'https://localhost:7111/api/user';
+	private apiUrl = `${environment.apiUrl}/user`;
 	private http = inject(HttpClient);
 
 	constructor() { }

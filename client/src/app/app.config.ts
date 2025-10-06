@@ -4,6 +4,7 @@ import { routes } from './app.routes';
 import { provideAuth0 } from '@auth0/auth0-angular';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './auth/auth.interceptor';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
 	providers: [
@@ -11,11 +12,11 @@ export const appConfig: ApplicationConfig = {
 		provideRouter(routes),
 		provideHttpClient(withInterceptors([authInterceptor])),
 		provideAuth0({
-			domain: 'dev-j4yhsqhd3jiqhal4.us.auth0.com',
-			clientId: 'VYpgkGhW4JmH4980SiGBvWS891jqk55t',
+			domain: environment.auth0.domain,
+			clientId: environment.auth0.clientId,
 			authorizationParams: {
-				redirect_uri: `${window.location.origin}/callback`,
-				audience: 'https://rpg-sheetmanager/'
+				redirect_uri: environment.auth0.redirectUri,
+				audience: environment.auth0.audience
 			},
 			useRefreshTokens: true,
 			cacheLocation: 'localstorage',
@@ -23,9 +24,9 @@ export const appConfig: ApplicationConfig = {
 			httpInterceptor: {
 				allowedList: [
 					{
-						uri: 'https://localhost:7111/api/*',
+						uri: `${environment.apiUrl}/*`,
 						tokenOptions: {
-							authorizationParams: { audience: 'https://rpg-sheetmanager/' }
+							authorizationParams: { audience: environment.auth0.audience }
 						}
 					}
 				]

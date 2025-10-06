@@ -4,12 +4,13 @@ import { RpgSystem } from '../models/rpg-sheet-manager.model';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '@auth0/auth0-angular';
 import { UserService } from './user.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class SystemService {
-	private apiUrl = 'https://localhost:7111/api/system';
+	private apiUrl = `${environment.apiUrl}/system`;
 
 	constructor(
 		private http: HttpClient,

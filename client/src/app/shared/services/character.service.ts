@@ -3,12 +3,13 @@ import { Observable, BehaviorSubject, map, tap, catchError, of, switchMap, take 
 import { HttpClient } from '@angular/common/http';
 import { AuthService, User } from '@auth0/auth0-angular';
 import { Character, CharacterData } from '../models/rpg-sheet-manager.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class CharacterService {
-	private apiUrl = 'https://localhost:7111/api/character';
+	private apiUrl = `${environment.apiUrl}/character`;
 	private charactersSubject = new BehaviorSubject<Character[]>([]);
 	public characters$ = this.charactersSubject.asObservable();
 
