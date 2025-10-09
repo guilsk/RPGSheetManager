@@ -40,7 +40,7 @@ export class CharacterService {
 			switchMap(user => {
 				const characterWithUser = {
 					...character,
-					userId: user?.sub || ''
+					userId: user?.sub
 				};
 
 				const characterToCreate = this.prepareCharacterForApi(characterWithUser);

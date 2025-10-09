@@ -44,18 +44,6 @@ export class DiceService {
 		}
 	}
 
-	public getCommonFormulas(): { name: string, formula: string }[] {
-		return [
-			{ name: 'D20', formula: '1d20' },
-			{ name: 'D20 + Atributo', formula: '1d20 + {Força}' },
-			{ name: 'Dano Espada', formula: '1d8' },
-			{ name: 'Dano Machado Grande', formula: '1d12' },
-			{ name: 'Dano Fireball', formula: '8d6' },
-			{ name: 'Atributo Call of Cthulhu', formula: '1d100' },
-			{ name: 'Vida D&D', formula: '1d8 + {Constituição}' }
-		];
-	}
-
 	private parseAndRoll(formula: string): { total: number, rolls: number[], modifier: number, breakdown: string } {
 		const parts: string[] = [];
 		const rolls: number[] = [];

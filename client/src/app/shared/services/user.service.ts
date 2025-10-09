@@ -25,12 +25,6 @@ export class UserService {
 		return this.http.put<User>(`${this.apiUrl}/profile`, user);
 	}
 
-	public getCurrentUserId(): string {
-		// Evitando dependência circular, vamos implementar diferente
-		// Vamos usar o AuthService diretamente no component onde precisar
-		return 'user-mock-id'; // Temporário - usar CurrentUserService nos components
-	}
-
 	public getAllUsers(): Observable<User[]> {
 		return this.http.get<User[]>(`${this.apiUrl}/all`);
 	}
