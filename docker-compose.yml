@@ -45,8 +45,3 @@ services:
 networks:
   rpg-network:
     driver: bridge
-
-# Para desenvolvimento, você pode criar um arquivo .env na raiz com:
-# MONGO_CONNECTION_STRING=mongodb+srv://seu-usuario:senha@cluster.mongodb.net/
-# AUTH0_DOMAIN=dev-j4yhsqhd3jiqhal4.us.auth0.com
-# AUTH0_AUDIENCE=https://rpg-sheetmanager/
