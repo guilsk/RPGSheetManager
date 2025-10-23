@@ -3,11 +3,14 @@
 
 export const environment = {
   production: true,
-  apiUrl: 'https://sua-api-producao.com/api', // URL da sua API em produção
+  // URL da API em produção (Render ou outro provedor)
+  apiUrl: 'https://rpg-sheet-api.onrender.com/api',
+  
   auth0: {
-    domain: 'dev-j4yhsqhd3jiqhal4.us.auth0.com', // Pode ser o mesmo ou diferente para produção
-    clientId: 'VYpgkGhW4JmH4980SiGBvWS891jqk55t', // Pode ser diferente para produção
+    domain: 'dev-j4yhsqhd3jiqhal4.us.auth0.com',
+    clientId: 'VYpgkGhW4JmH4980SiGBvWS891jqk55t',
     audience: 'https://rpg-sheetmanager/',
-    redirectUri: 'https://seu-site-producao.com/callback'
+    // URL de callback em produção
+    redirectUri: 'https://rpg-sheet-frontend.onrender.com/callback'
   }
 };

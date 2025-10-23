@@ -1,0 +1,52 @@
+# Docker Compose para desenvolvimento
+
+services:
+  # API Backend
+  rpg-api:
+    build:
+      context: ./server/RPGSheetManager
+      dockerfile: Dockerfile
+    container_name: rpg-sheet-api
+    ports:
+      - "5555:8080"  # HTTP - mudando para 5555 para evitar conflito
+      # - "5556:8081"  # HTTPS desabilitado por enquanto
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      # Sobrescrever configurações via variáveis de ambiente
+      - AllowedCors__0=http://localhost:4200
+      - AllowedCors__1=https://localhost:4200
+      - AllowedCors__2=https://rpg-sheetmanager.com
+      # MongoDB
+      - MongoDb__ConnectionString=${MONGO_CONNECTION_STRING}
+      - MongoDb__DatabaseName=${MONGO_DATABASE_NAME}
+      # Auth0
+      - Auth0__Domain=${AUTH0_DOMAIN}
+      - Auth0__ClientId=${AUTH0_CLIENT_ID}
+      - Auth0__Audience=${AUTH0_AUDIENCE}
+    networks:
+      - rpg-network
+    restart: unless-stopped
+
+  # Frontend Angular (opcional - pode rodar separado também)
+  rpg-frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: rpg-sheet-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - rpg-api
+    networks:
+      - rpg-network
+    restart: unless-stopped
+
+networks:
+  rpg-network:
+    driver: bridge
+
+# Para desenvolvimento, você pode criar um arquivo .env na raiz com:
+# MONGO_CONNECTION_STRING=mongodb+srv://seu-usuario:senha@cluster.mongodb.net/
+# AUTH0_DOMAIN=dev-j4yhsqhd3jiqhal4.us.auth0.com
+# AUTH0_AUDIENCE=https://rpg-sheetmanager/
