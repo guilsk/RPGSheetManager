@@ -1,0 +1,78 @@
+<div class="invites-page">
+	<div class="invites-page__header">
+		<h1 class="invites-page__title">Convites de Campanha</h1>
+		<p class="invites-page__description">Gerencie seus convites para participar de aventuras épicas.</p>
+	</div>
+
+	<div class="invites-page__content">
+		<!-- Loading State -->
+		<div class="invites-page__loading" *ngIf="isLoading">
+			<div class="loading-spinner"></div>
+			<p>Carregando convites...</p>
+		</div>
+
+		<!-- Empty State -->
+		<div class="invites-page__empty-state" *ngIf="!isLoading && invites.length === 0">
+			<div class="invites-page__empty-icon">
+				<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+					<circle cx="8.5" cy="7" r="4"></circle>
+					<line x1="20" y1="8" x2="20" y2="14"></line>
+					<line x1="23" y1="11" x2="17" y2="11"></line>
+				</svg>
+			</div>
+			<h2 class="invites-page__empty-title">Nenhum convite pendente</h2>
+			<p class="invites-page__empty-description">Você não tem convites de campanha no momento.</p>
+			<button class="invites-page__button invites-page__button--primary" (click)="goToCampaigns()">
+				Ver Campanhas
+			</button>
+		</div>
+
+		<!-- Invites List -->
+		<div class="invites-page__grid" *ngIf="!isLoading && invites.length > 0">
+			<div class="invite-card" *ngFor="let campaign of invites">
+				<div class="invite-card__header">
+					<h3 class="invite-card__title">{{ campaign.title }}</h3>
+					<span class="invite-card__badge">Convite Pendente</span>
+				</div>
+
+				<div class="invite-card__info">
+					<div class="invite-card__detail">
+						<span class="invite-card__label">Sistema:</span>
+						<span class="invite-card__value">{{ getSystemName(campaign.systemId) }}</span>
+					</div>
+					<div class="invite-card__detail" *ngIf="campaign.description">
+						<span class="invite-card__label">Descrição:</span>
+						<span class="invite-card__value">{{ campaign.description }}</span>
+					</div>
+					<div class="invite-card__detail">
+						<span class="invite-card__label">Status:</span>
+						<span class="invite-card__value">{{ campaign.activeSession ? 'Aventura em andamento' : 'Aguardando próxima sessão' }}</span>
+					</div>
+					<div class="invite-card__detail">
+						<span class="invite-card__label">Jogadores:</span>
+						<span class="invite-card__value">{{ campaign.playerIds.length || 0 }} ativos</span>
+					</div>
+				</div>
+
+				<div class="invite-card__actions">
+					<button class="invite-card__button invite-card__button--secondary" (click)="viewCampaign(campaign)">
+						Ver Detalhes
+					</button>
+					<button class="invite-card__button invite-card__button--success" (click)="acceptInvite(campaign)">
+						Aceitar
+					</button>
+					<button class="invite-card__button invite-card__button--danger" (click)="declineInvite(campaign)">
+						Recusar
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="invites-page__actions" *ngIf="!isLoading">
+			<button class="invites-page__button invites-page__button--secondary" (click)="goToCampaigns()">
+				Voltar às Campanhas
+			</button>
+		</div>
+	</div>
+</div>

@@ -70,5 +70,41 @@ namespace RPGSheetManager.Infra.Features.Campaigns {
             var update = Builders<Campaign>.Update.Push(c => c.DiceHistory, roll);
             await _collection.UpdateOneAsync(filter, update);
         }
+
+        public async Task<List<Campaign>> GetInvitesByPlayerIdAsync(string playerId) {
+            return await _collection.Find(c => c.InvitedPlayerIds.Contains(playerId)).ToListAsync();
+        }
+
+        public async Task<bool> AcceptInviteAsync(string campaignId, string playerId) {
+            var campaign = await GetByIdAsync(campaignId);
+            if (campaign?.InvitedPlayerIds?.Contains(playerId) != true) {
+                return false;
+            }
+
+            if (campaign.PlayerIds?.Contains(playerId) == true) {
+                return false;
+            }
+
+            var filter = Builders<Campaign>.Filter.Eq(c => c.Id, campaignId);
+            var update = Builders<Campaign>.Update
+                .Pull(c => c.InvitedPlayerIds, playerId)
+                .AddToSet(c => c.PlayerIds, playerId);
+
+            var result = await _collection.UpdateOneAsync(filter, update);
+            return result.ModifiedCount > 0;
+        }
+
+        public async Task<bool> DeclineInviteAsync(string campaignId, string playerId) {
+            var campaign = await GetByIdAsync(campaignId);
+            if (campaign?.InvitedPlayerIds?.Contains(playerId) != true) {
+                return false;
+            }
+
+            var filter = Builders<Campaign>.Filter.Eq(c => c.Id, campaignId);
+            var update = Builders<Campaign>.Update.Pull(c => c.InvitedPlayerIds, playerId);
+
+            var result = await _collection.UpdateOneAsync(filter, update);
+            return result.ModifiedCount > 0;
+        }
     }
 }

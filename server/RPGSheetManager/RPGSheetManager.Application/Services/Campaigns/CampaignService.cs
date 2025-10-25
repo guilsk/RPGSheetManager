@@ -55,5 +55,17 @@ namespace RPGSheetManager.Application.Services.Campaigns {
         public async Task EndSessionAsync(string campaignId) {
             await _repository.EndSessionAsync(campaignId);
         }
+
+        public async Task<List<Campaign>> GetInvitesByPlayerIdAsync(string playerId) {
+            return await _repository.GetInvitesByPlayerIdAsync(playerId);
+        }
+
+        public async Task<bool> AcceptInviteAsync(string campaignId, string playerId) {
+            return await _repository.AcceptInviteAsync(campaignId, playerId);
+        }
+
+        public async Task<bool> DeclineInviteAsync(string campaignId, string playerId) {
+            return await _repository.DeclineInviteAsync(campaignId, playerId);
+        }
     }
 }

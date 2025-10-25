@@ -11,6 +11,16 @@
 				<a class="app-nav__link" routerLink="/campaigns" routerLinkActive="app-nav__link--active">Campanhas</a>
 			</nav>
 
+			<div class="app-notifications" *ngIf="auth.isAuthenticated$ | async">
+				<button class="app-notifications__button" (click)="goToInvites()" [title]="'Convites de campanha' + (invitesCount > 0 ? ' (' + invitesCount + ')' : '')">
+					<svg class="app-notifications__icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+						<path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+					</svg>
+					<span class="app-notifications__badge" *ngIf="invitesCount > 0">{{ invitesCount }}</span>
+				</button>
+			</div>
+
 			<div class="app-header__auth">
 				<ng-container *ngIf="auth.isAuthenticated$ | async; else loginSection">
 					<div class="app-user">

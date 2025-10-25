@@ -12,5 +12,8 @@
         Task StartSessionAsync(string campaignId);
         Task EndSessionAsync(string campaignId);
         Task SaveRollHistoryAsync(string campaignId, DiceRoll roll);
+        Task<List<Campaign>> GetInvitesByPlayerIdAsync(string playerId);
+        Task<bool> AcceptInviteAsync(string campaignId, string playerId);
+        Task<bool> DeclineInviteAsync(string campaignId, string playerId);
     }
 }

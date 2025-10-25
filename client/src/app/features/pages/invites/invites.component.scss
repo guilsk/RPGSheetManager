@@ -1,0 +1,247 @@
+@use '../../../shared/styles/variables' as var;
+
+.invites-page {
+	max-width: 100%;
+
+	&__header {
+		margin-bottom: var.$space-2xl;
+	}
+
+	&__title {
+		font-size: var.$font-4xl;
+		color: var.$gray-800;
+		margin-bottom: var.$space-sm;
+	}
+
+	&__description {
+		color: var.$text-muted;
+		font-size: var.$font-lg;
+	}
+
+	&__content {
+		margin-bottom: var.$space-2xl;
+	}
+
+	&__loading {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var.$space-md;
+		padding: var.$space-3xl;
+		color: var.$text-muted;
+	}
+
+	&__empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var.$space-lg;
+		padding: var.$space-3xl;
+		text-align: center;
+	}
+
+	&__empty-icon {
+		color: var.$gray-400;
+	}
+
+	&__empty-title {
+		font-size: var.$font-2xl;
+		color: var.$gray-600;
+		margin: 0;
+	}
+
+	&__empty-description {
+		color: var.$text-muted;
+		font-size: var.$font-lg;
+		max-width: 400px;
+		margin: 0;
+	}
+
+	&__grid {
+		display: grid;
+		gap: var.$space-lg;
+		grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+	}
+
+	&__actions {
+		display: flex;
+		justify-content: center;
+		gap: var.$space-md;
+	}
+
+	&__button {
+		padding: var.$btn-padding;
+		border: none;
+		border-radius: var.$btn-radius;
+		cursor: pointer;
+		font-size: var.$font-sm;
+		font-weight: var.$font-medium;
+		transition: var.$transition-normal;
+		text-align: center;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		gap: var.$space-sm;
+
+		&--primary {
+			background-color: var.$primary-color;
+			color: var.$text-inverse;
+
+			&:hover {
+				background-color: var.$primary-hover;
+			}
+		}
+
+		&--secondary {
+			background-color: var.$gray-100;
+			color: var.$gray-700;
+
+			&:hover {
+				background-color: var.$gray-200;
+			}
+		}
+	}
+}
+
+.invite-card {
+	background: var.$card-bg;
+	border-radius: var.$card-radius;
+	padding: var.$space-lg;
+	box-shadow: var.$card-shadow;
+	border: 1px solid var.$border-color;
+	transition: var.$transition-normal;
+
+	&:hover {
+		box-shadow: var.$card-shadow-hover;
+	}
+
+	&__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: var.$space-md;
+		gap: var.$space-md;
+	}
+
+	&__title {
+		font-size: var.$font-xl;
+		color: var.$gray-800;
+		margin: 0;
+		flex: 1;
+	}
+
+	&__badge {
+		background-color: var.$warning-light;
+		color: var.$warning-color;
+		padding: var.$space-xs var.$space-sm;
+		border-radius: var.$btn-radius;
+		font-size: var.$font-xs;
+		font-weight: var.$font-medium;
+		white-space: nowrap;
+	}
+
+	&__info {
+		margin-bottom: var.$space-lg;
+	}
+
+	&__detail {
+		display: flex;
+		margin-bottom: var.$space-sm;
+		gap: var.$space-sm;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__label {
+		font-weight: var.$font-medium;
+		color: var.$gray-600;
+		min-width: 80px;
+		flex-shrink: 0;
+	}
+
+	&__value {
+		color: var.$gray-800;
+		flex: 1;
+	}
+
+	&__actions {
+		display: flex;
+		gap: var.$space-sm;
+		flex-wrap: wrap;
+	}
+
+	&__button {
+		padding: var.$space-sm var.$space-md;
+		border: none;
+		border-radius: var.$btn-radius;
+		cursor: pointer;
+		font-size: var.$font-sm;
+		font-weight: var.$font-medium;
+		transition: var.$transition-normal;
+		text-align: center;
+		flex: 1;
+		min-width: 80px;
+
+		&--secondary {
+			background-color: var.$gray-100;
+			color: var.$gray-700;
+
+			&:hover {
+				background-color: var.$gray-200;
+			}
+		}
+
+		&--success {
+			background-color: var.$success-color;
+			color: var.$text-inverse;
+
+			&:hover {
+				background-color: #0d9e6d;
+			}
+		}
+
+		&--danger {
+			background-color: var.$danger-color;
+			color: var.$text-inverse;
+
+			&:hover {
+				background-color: #dc2626;
+			}
+		}
+	}
+}
+
+.loading-spinner {
+	width: 32px;
+	height: 32px;
+	border: 3px solid var.$gray-200;
+	border-top: 3px solid var.$primary-color;
+	border-radius: 50%;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+// Responsivo
+@media (max-width: 768px) {
+	.invites-page {
+		&__grid {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.invite-card {
+		&__actions {
+			flex-direction: column;
+		}
+
+		&__button {
+			flex: none;
+		}
+	}
+}

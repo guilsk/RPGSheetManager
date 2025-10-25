@@ -86,5 +86,23 @@ namespace RPGSheetManager.API.Controllers.Campaigns {
             await _service.EndSessionAsync(campaignId);
             return Ok();
         }
+
+        [HttpGet("invites/{playerId}")]
+        public async Task<IActionResult> GetInvitesByPlayerId(string playerId) {
+            var campaigns = await _service.GetInvitesByPlayerIdAsync(playerId);
+            return Ok(campaigns);
+        }
+
+        [HttpPost("{campaignId}/invites/{playerId}/accept")]
+        public async Task<IActionResult> AcceptInvite(string campaignId, string playerId) {
+            var success = await _service.AcceptInviteAsync(campaignId, playerId);
+            return success ? Ok() : BadRequest("Convite não encontrado ou já aceito");
+        }
+
+        [HttpPost("{campaignId}/invites/{playerId}/decline")]
+        public async Task<IActionResult> DeclineInvite(string campaignId, string playerId) {
+            var success = await _service.DeclineInviteAsync(campaignId, playerId);
+            return success ? Ok() : BadRequest("Convite não encontrado");
+        }
     }
 }

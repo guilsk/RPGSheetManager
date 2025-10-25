@@ -96,4 +96,33 @@ export class CampaignService {
 			})
 		);
 	}
+
+	getInvitesByPlayerId(playerId: string): Observable<Campaign[]> {
+		return this.http.get<Campaign[]>(`${this.apiUrl}/invites/${playerId}`).pipe(
+			catchError(error => {
+				console.error('Error loading invites:', error);
+				return of([]);
+			})
+		);
+	}
+
+	acceptInvite(campaignId: string, playerId: string): Observable<boolean> {
+		return this.http.post(`${this.apiUrl}/${campaignId}/invites/${playerId}/accept`, {}).pipe(
+			map(() => true),
+			catchError(error => {
+				console.error('Error accepting invite:', error);
+				return of(false);
+			})
+		);
+	}
+
+	declineInvite(campaignId: string, playerId: string): Observable<boolean> {
+		return this.http.post(`${this.apiUrl}/${campaignId}/invites/${playerId}/decline`, {}).pipe(
+			map(() => true),
+			catchError(error => {
+				console.error('Error declining invite:', error);
+				return of(false);
+			})
+		);
+	}
 }
