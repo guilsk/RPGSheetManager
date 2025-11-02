@@ -354,4 +354,242 @@ export class SystemsComponent implements OnInit {
 	onSearchResults(filteredSystems: RpgSystem[]) {
 		this.filteredSystems = filteredSystems;
 	}
+
+	downloadExampleSystem() {
+		const oldQuestSystem = {
+			"name": "Old Quest",
+			"description": "Sistema de RPG Old Quest com mecânicas clássicas.",
+			"template": [
+				{
+					"name": "Idade",
+					"value": "",
+					"component": "numeric",
+					"category": "Informações Básicas",
+					"order": 3,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": false,
+					"visible": true,
+					"rollable": null,
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "Raça",
+					"value": "",
+					"component": "text",
+					"category": "Informações Básicas",
+					"order": 4,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": false,
+					"visible": true,
+					"rollable": null,
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "Adjetivos",
+					"value": "",
+					"component": "textarea",
+					"category": "Informações Básicas",
+					"order": 5,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": false,
+					"visible": true,
+					"rollable": null,
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "Nível",
+					"value": "0",
+					"component": "numeric",
+					"category": "Informações Básicas",
+					"order": 6,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": false,
+					"visible": true,
+					"rollable": null,
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "XP",
+					"value": "0",
+					"component": "numeric",
+					"category": "Informações Básicas",
+					"order": 7,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": true,
+					"visible": true,
+					"rollable": null,
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "Ataque de Perto",
+					"value": "0",
+					"component": "numeric",
+					"category": "Atributos",
+					"order": 1,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": false,
+					"visible": true,
+					"rollable": {
+						"enabled": true,
+						"formula": "1d6 + {Ataque de Perto}"
+					},
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "Ataque de Longe",
+					"value": "0",
+					"component": "numeric",
+					"category": "Atributos",
+					"order": 2,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": false,
+					"visible": true,
+					"rollable": {
+						"enabled": true,
+						"formula": "1d6 + {Ataque de Longe}"
+					},
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "Defesa",
+					"value": "0",
+					"component": "numeric",
+					"category": "Atributos",
+					"order": 3,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": false,
+					"visible": true,
+					"rollable": {
+						"enabled": true,
+						"formula": "1d6 + {Defesa}"
+					},
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "Magia",
+					"value": "0",
+					"component": "numeric",
+					"category": "Atributos",
+					"order": 4,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": false,
+					"visible": true,
+					"rollable": {
+						"enabled": true,
+						"formula": "1d6 + {Magia}"
+					},
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "Vida",
+					"value": "0",
+					"component": "numeric",
+					"category": "Atributos",
+					"order": 5,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": true,
+					"visible": true,
+					"rollable": null,
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "Equipamento",
+					"value": "",
+					"component": "textarea",
+					"category": "Equipamentos",
+					"order": 1,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": false,
+					"visible": true,
+					"rollable": null,
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "Tesouros",
+					"value": "",
+					"component": "textarea",
+					"category": "Equipamentos",
+					"order": 2,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": false,
+					"visible": true,
+					"rollable": null,
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "Itens Consumíveis",
+					"value": "",
+					"component": "textarea",
+					"category": "Equipamentos",
+					"order": 3,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": true,
+					"visible": true,
+					"rollable": null,
+					"expression": null,
+					"options": null
+				},
+				{
+					"name": "Feitiços",
+					"value": "",
+					"component": "textarea",
+					"category": "Equipamentos",
+					"order": 4,
+					"editable": true,
+					"edited": false,
+					"sessionEditable": false,
+					"visible": true,
+					"rollable": null,
+					"expression": null,
+					"options": null
+				}
+			],
+			"categoryOrder": [
+				"Informações Básicas",
+				"Atributos",
+				"Equipamentos"
+			]
+		};
+
+		// Criar arquivo para download
+		const dataStr = JSON.stringify(oldQuestSystem, null, 2);
+		const dataBlob = new Blob([dataStr], { type: 'application/json' });
+		const url = URL.createObjectURL(dataBlob);
+
+		// Criar link de download
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = 'old-quest-system.json';
+		link.click();
+
+		// Limpar URL
+		URL.revokeObjectURL(url);
+
+		this.dialogService.success('Download Concluído', 'O arquivo do sistema Old Quest foi baixado com sucesso!');
+	}
 }

@@ -33,12 +33,19 @@
 			</div>
 		</div>
 
-		<div class="systems-page__search">
-			<app-search-bar
-				[items]="systems"
-				[config]="searchConfig"
-				(searchResultsEmit)="onSearchResults($event)">
-			</app-search-bar>
+		<div class="systems-page__search-row">
+			<div class="systems-page__search">
+				<app-search-bar
+					[items]="systems"
+					[config]="searchConfig"
+					(searchResultsEmit)="onSearchResults($event)">
+				</app-search-bar>
+			</div>
+			<div class="systems-page__actions">
+				<button class="systems-page__download-button" (click)="downloadExampleSystem()">
+					📥 Baixar Sistema de Exemplo
+				</button>
+			</div>
 		</div>
 
 		<!-- Systems Grid -->

@@ -133,5 +133,23 @@ namespace RPGSheetManager.API.Controllers.Campaigns {
             var campaignCharacter = await _service.GetCampaignCharacterAsync(campaignId, characterId);
             return campaignCharacter is null ? NotFound() : Ok(campaignCharacter);
         }
+
+        [HttpDelete("{campaignId}/players/{playerId}")]
+        public async Task<IActionResult> RemovePlayerFromCampaign(string campaignId, string playerId) {
+            var success = await _service.RemovePlayerFromCampaignAsync(campaignId, playerId);
+            return success ? Ok() : BadRequest("Não foi possível remover o jogador da campanha");
+        }
+
+        [HttpPost("initialize-example")]
+        public async Task<IActionResult> InitializeExampleCampaign() {
+            var campaignId = await _service.InitializeExampleCampaignAsync();
+            return Ok(new { campaignId });
+        }
+
+        [HttpPost("invite-to-example")]
+        public async Task<IActionResult> InviteToExampleCampaign([FromQuery] string playerId) {
+            var success = await _service.InviteToExampleCampaignAsync(playerId);
+            return success ? Ok() : BadRequest("Não foi possível enviar convite para campanha de exemplo");
+        }
     }
 }

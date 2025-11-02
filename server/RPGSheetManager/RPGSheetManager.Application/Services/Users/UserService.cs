@@ -8,6 +8,7 @@ namespace RPGSheetManager.Application.Services.Users {
         }
 
         public async Task<User?> GetUserByAuthIdAsync(string authId) => await _userRepository.GetByAuthIdAsync(authId);
+        public async Task<bool> IsNewUserAsync(string authId) => await _userRepository.GetByAuthIdAsync(authId) == null;
         public async Task AddOrUpdateUserAsync(User user) => await _userRepository.AddOrUpdateAsync(user);
         public async Task UpdateProfileAsync(User user) => await _userRepository.UpdateProfileAsync(user);
         public async Task<bool> AddSavedSystemAsync(string authId, string systemId) => await _userRepository.AddSavedSystemAsync(authId, systemId);

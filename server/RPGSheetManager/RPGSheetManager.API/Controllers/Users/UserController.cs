@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RPGSheetManager.Application.Services.Users;
+using RPGSheetManager.Application.Services.Campaigns;
 using RPGSheetManager.Domain.Users;
 
 namespace RPGSheetManager.API.Controllers.Users {
@@ -9,9 +10,11 @@ namespace RPGSheetManager.API.Controllers.Users {
     [Route("api/[controller]")]
     public class UserController : ControllerBase {
         private readonly UserService _service;
+        private readonly CampaignService _campaignService;
 
-        public UserController(UserService service) {
+        public UserController(UserService service, CampaignService campaignService) {
             _service = service;
+            _campaignService = campaignService;
         }
 
         [HttpGet("{authId}")]
@@ -26,7 +29,19 @@ namespace RPGSheetManager.API.Controllers.Users {
             if (user == null || string.IsNullOrEmpty(user.AuthId)) {
                 return BadRequest("Invalid user data.");
             }
+
+            var isNewUser = await _service.IsNewUserAsync(user.AuthId);
             await _service.AddOrUpdateUserAsync(user);
+
+            // Para novos usuários, configura o ambiente inicial
+            if (isNewUser) {
+                // Convida para campanha de exemplo
+                await _campaignService.InviteToExampleCampaignAsync(user.AuthId);
+                
+                // Adiciona o sistema Old Quest aos sistemas salvos
+                await _campaignService.AddOldQuestSystemToUserAsync(user.AuthId);
+            }
+
             return Ok(user);
         }
 

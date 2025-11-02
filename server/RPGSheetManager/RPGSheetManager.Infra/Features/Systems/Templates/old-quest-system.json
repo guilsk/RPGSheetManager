@@ -1,8 +1,6 @@
 {
 	"name": "Old Quest",
-	"description": "Sistema de RPG Old Quest com mecânicas clássicas de atributos, defesa, magia e vida representados por círculos preenchíveis.",
-	"ownerId": "system-admin",
-	"createdAt": "2025-09-17T00:00:00Z",
+	"description": "Sistema de RPG Old Quest com mecânicas clássicas.",
 	"template": [
 		{
 			"name": "Idade",
@@ -11,7 +9,12 @@
 			"category": "Informações Básicas",
 			"order": 3,
 			"editable": true,
-			"visible": true
+			"edited": false,
+			"sessionEditable": false,
+			"visible": true,
+			"rollable": null,
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "Raça",
@@ -20,7 +23,12 @@
 			"category": "Informações Básicas",
 			"order": 4,
 			"editable": true,
-			"visible": true
+			"edited": false,
+			"sessionEditable": false,
+			"visible": true,
+			"rollable": null,
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "Adjetivos",
@@ -29,7 +37,12 @@
 			"category": "Informações Básicas",
 			"order": 5,
 			"editable": true,
-			"visible": true
+			"edited": false,
+			"sessionEditable": false,
+			"visible": true,
+			"rollable": null,
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "Nível",
@@ -38,7 +51,12 @@
 			"category": "Informações Básicas",
 			"order": 6,
 			"editable": true,
-			"visible": true
+			"edited": false,
+			"sessionEditable": false,
+			"visible": true,
+			"rollable": null,
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "XP",
@@ -47,7 +65,12 @@
 			"category": "Informações Básicas",
 			"order": 7,
 			"editable": true,
-			"visible": true
+			"edited": false,
+			"sessionEditable": true,
+			"visible": true,
+			"rollable": null,
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "Ataque de Perto",
@@ -56,11 +79,15 @@
 			"category": "Atributos",
 			"order": 1,
 			"editable": true,
+			"edited": false,
+			"sessionEditable": false,
 			"visible": true,
 			"rollable": {
 				"enabled": true,
 				"formula": "1d6 + {Ataque de Perto}"
-			}
+			},
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "Ataque de Longe",
@@ -69,11 +96,15 @@
 			"category": "Atributos",
 			"order": 2,
 			"editable": true,
+			"edited": false,
+			"sessionEditable": false,
 			"visible": true,
 			"rollable": {
 				"enabled": true,
 				"formula": "1d6 + {Ataque de Longe}"
-			}
+			},
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "Defesa",
@@ -82,11 +113,15 @@
 			"category": "Atributos",
 			"order": 3,
 			"editable": true,
+			"edited": false,
+			"sessionEditable": false,
 			"visible": true,
 			"rollable": {
 				"enabled": true,
 				"formula": "1d6 + {Defesa}"
-			}
+			},
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "Magia",
@@ -95,11 +130,15 @@
 			"category": "Atributos",
 			"order": 4,
 			"editable": true,
+			"edited": false,
+			"sessionEditable": false,
 			"visible": true,
 			"rollable": {
 				"enabled": true,
 				"formula": "1d6 + {Magia}"
-			}
+			},
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "Vida",
@@ -108,7 +147,12 @@
 			"category": "Atributos",
 			"order": 5,
 			"editable": true,
-			"visible": true
+			"edited": false,
+			"sessionEditable": true,
+			"visible": true,
+			"rollable": null,
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "Equipamento",
@@ -117,7 +161,12 @@
 			"category": "Equipamentos",
 			"order": 1,
 			"editable": true,
-			"visible": true
+			"edited": false,
+			"sessionEditable": false,
+			"visible": true,
+			"rollable": null,
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "Tesouros",
@@ -126,7 +175,12 @@
 			"category": "Equipamentos",
 			"order": 2,
 			"editable": true,
-			"visible": true
+			"edited": false,
+			"sessionEditable": false,
+			"visible": true,
+			"rollable": null,
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "Itens Consumíveis",
@@ -135,7 +189,12 @@
 			"category": "Equipamentos",
 			"order": 3,
 			"editable": true,
-			"visible": true
+			"edited": false,
+			"sessionEditable": true,
+			"visible": true,
+			"rollable": null,
+			"expression": null,
+			"options": null
 		},
 		{
 			"name": "Feitiços",
@@ -144,7 +203,12 @@
 			"category": "Equipamentos",
 			"order": 4,
 			"editable": true,
-			"visible": true
+			"edited": false,
+			"sessionEditable": false,
+			"visible": true,
+			"rollable": null,
+			"expression": null,
+			"options": null
 		}
 	],
 	"categoryOrder": [

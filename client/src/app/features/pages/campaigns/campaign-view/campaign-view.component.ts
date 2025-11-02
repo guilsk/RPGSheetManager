@@ -599,4 +599,32 @@ export class CampaignViewComponent implements OnInit {
 		);
 		return classField?.value || null;
 	}
+
+	public isPlayerInCampaign(): boolean {
+		if (!this.campaign) return false;
+		return this.campaign.playerIds?.includes(this.currentUserId) || false;
+	}
+
+	public async leaveCampaign(): Promise<void> {
+		if (!this.campaign?.id || !this.currentUserId) return;
+
+		const confirmed = await this.dialogService.showDeleteConfirmation(
+			'Sair da Campanha',
+			`Tem certeza que deseja sair da campanha "${this.campaign.title}"?\n\nSeu personagem será removido da campanha e você perderá acesso a todas as informações da campanha.`,
+			'Sair da Campanha'
+		);
+
+		if (confirmed) {
+			this.campaignService.removePlayerFromCampaign(this.campaign.id, this.currentUserId).subscribe({
+				next: () => {
+					this.dialogService.success('Sucesso', `Você saiu da campanha "${this.campaign?.title}".`);
+					this.router.navigate(['/campaigns']);
+				},
+				error: (error) => {
+					console.error('Erro ao sair da campanha:', error);
+					this.dialogService.error('Erro', 'Não foi possível sair da campanha. Tente novamente.');
+				}
+			});
+		}
+	}
 }

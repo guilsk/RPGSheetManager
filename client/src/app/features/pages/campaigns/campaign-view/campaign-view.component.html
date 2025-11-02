@@ -129,10 +129,19 @@
 					</div>
 				</div>
 
+				<!-- Zona de Perigo para Mestre -->
 				<div class="campaign-view__danger-zone" *ngIf="isOwner">
 					<h3 class="campaign-view__danger-zone-title">Zona de Perigo</h3>
 					<button class="campaign-view__btn campaign-view__btn--danger" (click)="deleteCampaign()">
 						Encerrar Campanha Permanentemente
+					</button>
+				</div>
+
+				<!-- Ações para Jogador -->
+				<div class="campaign-view__player-actions" *ngIf="!isOwner && isPlayerInCampaign()">
+					<h3 class="campaign-view__player-actions-title">Ações do Jogador</h3>
+					<button class="campaign-view__btn campaign-view__btn--danger" (click)="leaveCampaign()">
+						Sair da Campanha
 					</button>
 				</div>
 			</div>

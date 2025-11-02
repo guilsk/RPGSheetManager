@@ -1,12 +1,15 @@
 ﻿using MongoDB.Driver;
 using RPGSheetManager.Domain.Campaigns;
+using RPGSheetManager.Domain.Systems;
 
 namespace RPGSheetManager.Infra.Features.Campaigns {
     public class CampaignRepository : ICampaignRepository {
         private readonly IMongoCollection<Campaign> _collection;
+        private readonly IMongoCollection<RPGSystem> _systemsCollection;
 
         public CampaignRepository(IMongoDatabase database) {
             _collection = database.GetCollection<Campaign>("Campaigns");
+            _systemsCollection = database.GetCollection<RPGSystem>("Systems");
         }
 
         public async Task<List<Campaign>> GetAllAsync() {
@@ -186,12 +189,145 @@ namespace RPGSheetManager.Infra.Features.Campaigns {
                 Builders<CampaignCharacter>.Filter.Eq(cc => cc.CharacterId, characterId));
 
             var result = await _collection.UpdateOneAsync(filter, update);
+
+            // Se saiu da campanha de exemplo, re-convida automaticamente
+            if (result.ModifiedCount > 0 && campaign.Title == "Campanha de Exemplo") {
+                await InviteToExampleCampaignAsync(playerId);
+            }
+
             return result.ModifiedCount > 0;
         }
 
         public async Task<CampaignCharacter?> GetCampaignCharacterAsync(string campaignId, string characterId) {
             var campaign = await GetByIdAsync(campaignId);
             return campaign?.Characters?.FirstOrDefault(c => c.CharacterId == characterId);
+        }
+
+        public async Task<string> InitializeExampleCampaignAsync() {
+            // Verifica se já existe campanha de exemplo
+            var existingCampaign = await _collection.Find(c => c.Title == "Campanha de Exemplo").FirstOrDefaultAsync();
+            if (existingCampaign != null) {
+                return existingCampaign.Id!;
+            }
+
+            // Busca o sistema Old Quest dinamicamente
+            var oldQuestSystem = await _systemsCollection.Find(s => s.Name == "Old Quest").FirstOrDefaultAsync();
+            var systemId = oldQuestSystem?.Id ?? "sistema-nao-encontrado";
+
+            // Cria nova campanha de exemplo
+            var exampleCampaign = new Campaign {
+                Title = "Campanha de Exemplo",
+                Description = "Essa campanha é um exemplo para novos usuários.\nEla está sempre ativa e um novo convite será enviado caso saia dela.\nSinta-se à vontade para testar seu personagem aqui.",
+                SystemId = systemId,
+                MasterId = "google-oauth2|118018728312752596497",
+                PlayerIds = new List<string>(),
+                InvitedPlayerIds = new List<string>(),
+                CreatedAt = DateTime.UtcNow,
+                ActiveSession = true,
+                Characters = new List<CampaignCharacter>(),
+                DiceHistory = new List<DiceRoll>()
+            };
+
+            await _collection.InsertOneAsync(exampleCampaign);
+            return exampleCampaign.Id!;
+        }
+
+        public async Task<bool> InviteToExampleCampaignAsync(string playerId) {
+            var exampleCampaign = await _collection.Find(c => c.Title == "Campanha de Exemplo").FirstOrDefaultAsync();
+            if (exampleCampaign == null) {
+                // Se não existe, cria
+                await InitializeExampleCampaignAsync();
+                exampleCampaign = await _collection.Find(c => c.Title == "Campanha de Exemplo").FirstOrDefaultAsync();
+            }
+
+            if (exampleCampaign == null) return false;
+
+            // Verifica se já está convidado ou já faz parte
+            if (exampleCampaign.InvitedPlayerIds?.Contains(playerId) == true ||
+                exampleCampaign.PlayerIds?.Contains(playerId) == true) {
+                return true; // Já convidado/participando
+            }
+
+            // Adiciona convite
+            var filter = Builders<Campaign>.Filter.Eq(c => c.Id, exampleCampaign.Id);
+            var update = Builders<Campaign>.Update.Push(c => c.InvitedPlayerIds, playerId);
+            var result = await _collection.UpdateOneAsync(filter, update);
+
+            return result.ModifiedCount > 0;
+        }
+
+        public async Task<bool> RemovePlayerFromCampaignAsync(string campaignId, string playerId) {
+            var campaign = await GetByIdAsync(campaignId);
+            if (campaign == null) {
+                return false;
+            }
+
+            // Remove o jogador da lista de jogadores ativos
+            var removeFromPlayers = false;
+            if (campaign.PlayerIds?.Contains(playerId) == true) {
+                removeFromPlayers = true;
+            }
+
+            // Remove também dos convidados se ainda estiver lá
+            var removeFromInvited = false;
+            if (campaign.InvitedPlayerIds?.Contains(playerId) == true) {
+                removeFromInvited = true;
+            }
+
+            if (!removeFromPlayers && !removeFromInvited) {
+                return false; // Jogador não está na campanha
+            }
+
+            var filter = Builders<Campaign>.Filter.Eq(c => c.Id, campaignId);
+            var updates = new List<UpdateDefinition<Campaign>>();
+
+            if (removeFromPlayers) {
+                updates.Add(Builders<Campaign>.Update.Pull(c => c.PlayerIds, playerId));
+                // Remove também todos os personagens deste jogador da campanha
+                updates.Add(Builders<Campaign>.Update.PullFilter(c => c.Characters,
+                    Builders<CampaignCharacter>.Filter.Eq(cc => cc.PlayerId, playerId)));
+            }
+
+            if (removeFromInvited) {
+                updates.Add(Builders<Campaign>.Update.Pull(c => c.InvitedPlayerIds, playerId));
+            }
+
+            var combinedUpdate = Builders<Campaign>.Update.Combine(updates);
+            var result = await _collection.UpdateOneAsync(filter, combinedUpdate);
+
+            // Se saiu da campanha de exemplo, re-convida automaticamente
+            if (result.ModifiedCount > 0 && campaign.Title == "Campanha de Exemplo") {
+                await InviteToExampleCampaignAsync(playerId);
+            }
+
+            return result.ModifiedCount > 0;
+        }
+
+        public async Task<bool> AddOldQuestSystemToUserAsync(string playerId) {
+            // Busca o sistema Old Quest
+            var oldQuestSystem = await _systemsCollection.Find(s => s.Name == "Old Quest").FirstOrDefaultAsync();
+            if (oldQuestSystem?.Id == null) {
+                return false; // Sistema não encontrado
+            }
+
+            // Busca o usuário
+            var usersCollection = _systemsCollection.Database.GetCollection<Domain.Users.User>("Users");
+            var user = await usersCollection.Find(u => u.AuthId == playerId).FirstOrDefaultAsync();
+            if (user == null) {
+                return false; // Usuário não encontrado
+            }
+
+            // Verifica se já tem o sistema salvo
+            if (user.SavedSystemIds?.Contains(oldQuestSystem.Id) == true) {
+                return true; // Já tem o sistema salvo
+            }
+
+            // Adiciona o sistema aos salvos do usuário
+            var filter = Builders<Domain.Users.User>.Filter.Eq(u => u.AuthId, playerId);
+            var update = Builders<Domain.Users.User>.Update.AddToSet(u => u.SavedSystemIds, oldQuestSystem.Id);
+            var result = await usersCollection.UpdateOneAsync(filter, update);
+
+            return result.ModifiedCount > 0;
         }
     }
 }

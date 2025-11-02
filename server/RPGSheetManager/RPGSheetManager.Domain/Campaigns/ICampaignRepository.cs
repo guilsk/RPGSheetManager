@@ -19,5 +19,9 @@
         Task<bool> AssociateCharacterAsync(string campaignId, string characterId, string playerId);
         Task<bool> DisassociateCharacterAsync(string campaignId, string characterId, string playerId);
         Task<CampaignCharacter?> GetCampaignCharacterAsync(string campaignId, string characterId);
+        Task<string> InitializeExampleCampaignAsync();
+        Task<bool> InviteToExampleCampaignAsync(string playerId);
+        Task<bool> AddOldQuestSystemToUserAsync(string playerId);
+        Task<bool> RemovePlayerFromCampaignAsync(string campaignId, string playerId);
     }
 }

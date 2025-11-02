@@ -83,5 +83,21 @@ namespace RPGSheetManager.Application.Services.Campaigns {
         public async Task<CampaignCharacter?> GetCampaignCharacterAsync(string campaignId, string characterId) {
             return await _repository.GetCampaignCharacterAsync(campaignId, characterId);
         }
+
+        public async Task<string> InitializeExampleCampaignAsync() {
+            return await _repository.InitializeExampleCampaignAsync();
+        }
+
+        public async Task<bool> InviteToExampleCampaignAsync(string playerId) {
+            return await _repository.InviteToExampleCampaignAsync(playerId);
+        }
+
+        public async Task<bool> AddOldQuestSystemToUserAsync(string playerId) {
+            return await _repository.AddOldQuestSystemToUserAsync(playerId);
+        }
+
+        public async Task<bool> RemovePlayerFromCampaignAsync(string campaignId, string playerId) {
+            return await _repository.RemovePlayerFromCampaignAsync(campaignId, playerId);
+        }
     }
 }

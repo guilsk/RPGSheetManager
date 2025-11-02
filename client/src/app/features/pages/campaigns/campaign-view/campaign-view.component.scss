@@ -498,6 +498,21 @@
 		font-size: 1.1rem;
 	}
 
+	&__player-actions {
+		background: var.$card-bg;
+		padding: 25px;
+		border-radius: var.$card-radius-large;
+		box-shadow: var.$card-shadow;
+		border: 2px solid var.$warning-color;
+		margin-top: var.$space-lg;
+	}
+
+	&__player-actions-title {
+		margin: 0 0 15px;
+		color: var.$warning-color;
+		font-size: 1.1rem;
+	}
+
 	&__edit-mode {
 		background: var.$card-bg;
 		padding: var.$space-xl;

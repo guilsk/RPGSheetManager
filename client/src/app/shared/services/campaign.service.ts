@@ -126,6 +126,16 @@ export class CampaignService {
 		);
 	}
 
+	removePlayerFromCampaign(campaignId: string, playerId: string): Observable<boolean> {
+		return this.http.delete(`${this.apiUrl}/${campaignId}/players/${playerId}`).pipe(
+			map(() => true),
+			catchError(error => {
+				console.error('Error removing player from campaign:', error);
+				return of(false);
+			})
+		);
+	}
+
 	associateCharacter(campaignId: string, characterId: string, playerId: string): Observable<boolean> {
 		const url = `${this.apiUrl}/${campaignId}/characters/${characterId}/associate?playerId=${playerId}`;
 

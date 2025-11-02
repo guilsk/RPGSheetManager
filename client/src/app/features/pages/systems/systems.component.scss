@@ -16,14 +16,46 @@
 	&__description {
 		color: var.$text-muted;
 		font-size: var.$font-lg;
+		margin-bottom: var.$space-lg;
+	}
+
+	&__actions {
+		flex-shrink: 0;
+	}
+
+	&__download-button {
+		padding: var.$btn-padding-sm;
+		border: none;
+		border-radius: var.$btn-radius;
+		cursor: pointer;
+		font-size: var.$font-sm;
+		font-weight: var.$font-medium;
+		transition: var.$transition-normal;
+		text-align: center;
+		background-color: var.$success-color;
+		color: var.$white;
+		white-space: nowrap;
+
+		&:hover {
+			background-color: var.$success-color;
+			opacity: 0.9;
+			transform: translateY(-1px);
+		}
 	}
 
 	&__upload {
 		margin-bottom: var.$space-2xl;
 	}
 
-	&__search {
+	&__search-row {
+		display: flex;
+		gap: var.$space-lg;
+		align-items: flex-start;
 		margin-bottom: var.$space-2xl;
+	}
+
+	&__search {
+		flex: 1;
 		max-width: 500px;
 	}
 
