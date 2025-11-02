@@ -1,0 +1,111 @@
+<!-- Modal com Overlay -->
+<div class="character-edit-overlay" (click)="onBackdropClick($event)" *ngIf="isVisible" [style.display]="isVisible ? 'flex' : 'none'">
+	<div class="character-edit-modal">
+		<!-- Header -->
+		<div class="character-edit-header">
+			<div class="character-header-info">
+				<div class="character-avatar">
+					{{ (character?.name || 'U').charAt(0).toUpperCase() }}
+				</div>
+				<div class="character-title-section">
+					<h2 class="character-name">Editar: {{ character?.name || 'Personagem' }}</h2>
+					<div class="character-badges">
+						<span class="character-badge character-badge--session">
+							<i class="fas fa-edit"></i> Edição de Sessão
+						</span>
+						<span class="character-badge character-badge--warning" *ngIf="!campaignActive">
+							<i class="fas fa-exclamation-triangle"></i> Sessão Inativa
+						</span>
+					</div>
+				</div>
+			</div>
+			<button class="close-button" (click)="close()" title="Fechar">
+				<i class="fas fa-times"></i>
+			</button>
+		</div>
+
+		<!-- Content -->
+		<div class="character-edit-content">
+			<!-- Permission Warning -->
+			<div class="permission-warning" *ngIf="!canEdit">
+				<div class="warning-icon">
+					<i class="fas fa-lock"></i>
+				</div>
+				<div class="warning-message">
+					<h3>Sem permissão para editar</h3>
+					<p *ngIf="!campaignActive">A sessão precisa estar ativa para editar personagens.</p>
+					<p *ngIf="campaignActive && currentUserId !== ownerId">Você só pode editar seus próprios personagens.</p>
+				</div>
+			</div>
+
+			<!-- Loading State -->
+			<div class="loading-state" *ngIf="!character">
+				<i class="fas fa-spinner fa-spin"></i>
+				<span>Carregando personagem...</span>
+			</div>
+
+			<!-- Character Data -->
+			<div class="character-sections" *ngIf="character && editableFields.length > 0 && canEdit">
+				<div class="edit-info-banner">
+					<i class="fas fa-info-circle"></i>
+					<span>Apenas campos marcados como editáveis durante a sessão estão disponíveis.</span>
+				</div>
+
+				<!-- Para cada categoria -->
+				<div
+					class="character-section"
+					*ngFor="let category of getAvailableCategories()"
+					[attr.data-category]="category">
+
+					<h3 class="section-title">
+						{{ category || 'Informações Gerais' }}
+					</h3>
+
+					<div class="fields-grid">
+						<div
+							class="field-item"
+							*ngFor="let field of getFieldsByCategory(category)">
+
+							<app-dynamic-field
+								*ngIf="field.name"
+								[field]="getFieldWithValue(field)"
+								[disabled]="!canEdit"
+								[allFieldValues]="allFieldValues"
+								(valueChange)="onFieldValueChange(field.name, $event)">
+							</app-dynamic-field>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Empty State -->
+			<div class="empty-state" *ngIf="character && editableFields.length === 0 && canEdit">
+				<div class="empty-icon">
+					<i class="fas fa-clipboard-list"></i>
+				</div>
+				<div class="empty-message">Nenhum campo editável</div>
+				<div class="empty-description">Este personagem não possui campos editáveis durante a sessão.</div>
+			</div>
+		</div>
+
+		<!-- Footer -->
+		<div class="character-edit-footer">
+			<div class="footer-info">
+				<small class="edit-info" *ngIf="canEdit">
+					<i class="fas fa-save"></i>
+					As alterações serão aplicadas apenas nesta campanha
+				</small>
+			</div>
+			<div class="footer-actions">
+				<button class="btn btn-secondary" (click)="close()" [disabled]="isSaving">
+					Cancelar
+				</button>
+				<button class="btn btn-primary" (click)="save()" [disabled]="!canEdit || isSaving">
+					<i class="fas fa-spinner fa-spin" *ngIf="isSaving"></i>
+					<i class="fas fa-save" *ngIf="!isSaving"></i>
+					{{ isSaving ? 'Salvando...' : 'Salvar Alterações' }}
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

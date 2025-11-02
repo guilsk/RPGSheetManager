@@ -44,6 +44,10 @@ namespace RPGSheetManager.Application.Services.Campaigns {
             await _repository.UpdateCharacterDataAsync(campaignId, characterId, data);
         }
 
+        public async Task<bool> UpdateCharacterDataWithValidationAsync(string campaignId, string characterId, string playerId, List<DynamicField> data) {
+            return await _repository.UpdateCharacterDataWithValidationAsync(campaignId, characterId, playerId, data);
+        }
+
         public async Task SaveRollHistoryAsync(string campaignId, DiceRoll roll) {
             await _repository.SaveRollHistoryAsync(campaignId, roll);
         }
@@ -66,6 +70,18 @@ namespace RPGSheetManager.Application.Services.Campaigns {
 
         public async Task<bool> DeclineInviteAsync(string campaignId, string playerId) {
             return await _repository.DeclineInviteAsync(campaignId, playerId);
+        }
+
+        public async Task<bool> AssociateCharacterAsync(string campaignId, string characterId, string playerId) {
+            return await _repository.AssociateCharacterAsync(campaignId, characterId, playerId);
+        }
+
+        public async Task<bool> DisassociateCharacterAsync(string campaignId, string characterId, string playerId) {
+            return await _repository.DisassociateCharacterAsync(campaignId, characterId, playerId);
+        }
+
+        public async Task<CampaignCharacter?> GetCampaignCharacterAsync(string campaignId, string characterId) {
+            return await _repository.GetCampaignCharacterAsync(campaignId, characterId);
         }
     }
 }

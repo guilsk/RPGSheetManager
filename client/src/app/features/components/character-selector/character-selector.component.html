@@ -1,0 +1,87 @@
+<!-- Modal com Overlay -->
+<div class="character-selector-overlay" (click)="onBackdropClick($event)" *ngIf="isVisible" [style.display]="isVisible ? 'flex' : 'none'">
+	<div class="character-selector-modal">
+		<div class="character-selector-header">
+			<h2>Selecionar Personagem</h2>
+			<button class="close-button" (click)="close()">
+				<i class="fas fa-times"></i>
+			</button>
+		</div>
+
+		<div class="character-selector-content">
+			<div class="search-section">
+				<app-search-bar
+					[items]="availableCharacters"
+					[config]="searchConfig"
+					(searchResultsEmit)="onSearchResults($event)"
+					class="search-bar">
+				</app-search-bar>
+			</div>
+
+			<!-- Loading State -->
+			<div class="loading" *ngIf="isLoading">
+				<i class="fas fa-spinner fa-spin"></i>
+				<span>Carregando personagens...</span>
+			</div>
+
+			<!-- Characters List -->
+			<div *ngIf="!isLoading">
+				<!-- Empty State -->
+				<div class="empty-state" *ngIf="filteredCharacters.length === 0 && availableCharacters.length === 0">
+					<div class="empty-icon">
+						<i class="fas fa-user-plus"></i>
+					</div>
+					<div class="empty-message">Nenhum personagem encontrado</div>
+					<div class="empty-description">Você ainda não possui personagens deste sistema.</div>
+				</div>
+
+				<!-- No Search Results -->
+				<div class="empty-state" *ngIf="filteredCharacters.length === 0 && availableCharacters.length > 0">
+					<div class="empty-icon">
+						<i class="fas fa-search"></i>
+					</div>
+					<div class="empty-message">Nenhum personagem encontrado</div>
+					<div class="empty-description">Não encontramos personagens com este termo de busca.</div>
+				</div>
+
+				<!-- Characters Grid -->
+				<div class="characters-grid" *ngIf="filteredCharacters.length > 0">
+					<div
+						class="character-card"
+						*ngFor="let character of filteredCharacters"
+						(click)="selectCharacter(character)">
+
+						<div class="character-header">
+							<div class="character-avatar">
+								{{ (character.name || 'U').charAt(0).toUpperCase() }}
+							</div>
+							<div class="character-info">
+								<h3 class="character-name">{{ character.name }}</h3>
+								<p class="character-system">Sistema</p>
+							</div>
+						</div>
+
+						<div class="character-details">
+							<div class="character-level" *ngIf="getCharacterLevel(character)">
+								Nível: <span class="level-value">{{ getCharacterLevel(character) }}</span>
+							</div>
+							<div class="character-class" *ngIf="getCharacterClass(character)">
+								Classe: <span class="class-value">{{ getCharacterClass(character) }}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="character-selector-actions">
+			<button class="btn btn-secondary" (click)="close()">
+				Cancelar
+			</button>
+			<button class="btn btn-primary" (click)="createNewCharacter()">
+				<i class="fas fa-plus"></i>
+				Novo Personagem
+			</button>
+		</div>
+	</div>
+</div>

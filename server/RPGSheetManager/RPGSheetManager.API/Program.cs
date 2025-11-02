@@ -15,7 +15,10 @@ namespace RPGSheetManager.API {
             builder.Services.AddJwtAuthentication(builder.Configuration);
             builder.Services.AddSwaggerDocumentation();
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options => {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+                });
             builder.Services.AddOpenApi();
 
             #region MongoDB Settings

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RPGSheetManager.Application.Services.Campaigns;
 using RPGSheetManager.Domain.Campaigns;
+using System.Text.Json;
 
 namespace RPGSheetManager.API.Controllers.Campaigns {
     [ApiController]
@@ -69,6 +70,16 @@ namespace RPGSheetManager.API.Controllers.Campaigns {
             return NoContent();
         }
 
+        [HttpPut("{campaignId}/characters/{characterId}/session-data")]
+        public async Task<IActionResult> UpdateCharacterSessionData(string campaignId, string characterId, [FromQuery] string playerId, [FromBody] List<DynamicField> data) {
+            if (data == null) {
+                return BadRequest("Dados não fornecidos.");
+            }
+
+            var success = await _service.UpdateCharacterDataWithValidationAsync(campaignId, characterId, playerId, data);
+            return success ? NoContent() : BadRequest("Não foi possível atualizar os dados. Verifique se você é o dono do personagem.");
+        }
+
         [HttpPost("{campaignId}/roll")]
         public async Task<IActionResult> SaveRoll(string campaignId, DiceRoll roll) {
             await _service.SaveRollHistoryAsync(campaignId, roll);
@@ -103,6 +114,24 @@ namespace RPGSheetManager.API.Controllers.Campaigns {
         public async Task<IActionResult> DeclineInvite(string campaignId, string playerId) {
             var success = await _service.DeclineInviteAsync(campaignId, playerId);
             return success ? Ok() : BadRequest("Convite não encontrado");
+        }
+
+        [HttpPost("{campaignId}/characters/{characterId}/associate")]
+        public async Task<IActionResult> AssociateCharacter(string campaignId, string characterId, [FromQuery] string playerId) {
+            var success = await _service.AssociateCharacterAsync(campaignId, characterId, playerId);
+            return success ? Ok() : BadRequest("Não foi possível associar o personagem");
+        }
+
+        [HttpDelete("{campaignId}/characters/{characterId}")]
+        public async Task<IActionResult> DisassociateCharacter(string campaignId, string characterId, [FromQuery] string playerId) {
+            var success = await _service.DisassociateCharacterAsync(campaignId, characterId, playerId);
+            return success ? Ok() : BadRequest("Não foi possível desassociar o personagem");
+        }
+
+        [HttpGet("{campaignId}/characters/{characterId}/campaign-data")]
+        public async Task<IActionResult> GetCampaignCharacterData(string campaignId, string characterId) {
+            var campaignCharacter = await _service.GetCampaignCharacterAsync(campaignId, characterId);
+            return campaignCharacter is null ? NotFound() : Ok(campaignCharacter);
         }
     }
 }

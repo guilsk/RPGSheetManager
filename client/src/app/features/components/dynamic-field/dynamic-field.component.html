@@ -72,10 +72,7 @@
 	</div>
 
 	<!-- Field Info -->
-	<div class="dynamic-field__info" *ngIf="field.rollable?.formula || lastRollResult">
-		<small class="dynamic-field__formula" *ngIf="field.rollable?.formula">
-			Fórmula: {{ field.rollable?.formula }}
-		</small>
+	<div class="dynamic-field__info" *ngIf="lastRollResult">
 		<div class="dynamic-field__roll-result" *ngIf="lastRollResult">
 			<span class="dynamic-field__roll-breakdown">{{ lastRollResult.breakdown }}</span>
 			<span class="dynamic-field__roll-total"> = {{ lastRollResult.result }}</span>

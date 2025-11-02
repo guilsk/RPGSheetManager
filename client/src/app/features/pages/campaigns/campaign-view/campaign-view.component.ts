@@ -2,19 +2,23 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { Campaign, RpgSystem, User } from '../../../../shared/models/rpg-sheet-manager.model';
+import { Campaign, RpgSystem, User, Character, DynamicField } from '../../../../shared/models/rpg-sheet-manager.model';
 import { SearchBarConfig } from '../../../../shared/models/search-bar.model';
 import { CampaignService } from '../../../../shared/services/campaign.service';
 import { SystemService } from '../../../../shared/services/system.service';
 import { UserService } from '../../../../shared/services/user.service';
 import { DialogService } from '../../../../shared/services/dialog.service';
 import { CurrentUserService } from '../../../../shared/services/current-user.service';
+import { CharacterService } from '../../../../shared/services/character.service';
 import { MultiSelectSearchComponent } from '../../../components/multi-select-search/multi-select-search.component';
+import { CharacterSelectorComponent } from '../../../components/character-selector/character-selector.component';
+import { CharacterViewModalComponent } from '../../../components/character-view-modal/character-view-modal.component';
+import { CharacterEditModalComponent } from '../../../components/character-edit-modal/character-edit-modal.component';
 
 @Component({
 	selector: 'app-campaign-view',
 	standalone: true,
-	imports: [CommonModule, ReactiveFormsModule, RouterModule, MultiSelectSearchComponent],
+	imports: [CommonModule, ReactiveFormsModule, RouterModule, MultiSelectSearchComponent, CharacterSelectorComponent, CharacterViewModalComponent, CharacterEditModalComponent],
 	templateUrl: './campaign-view.component.html',
 	styleUrl: './campaign-view.component.scss'
 })
@@ -27,6 +31,7 @@ export class CampaignViewComponent implements OnInit {
 	private userService = inject(UserService);
 	private dialogService = inject(DialogService);
 	private currentUserService = inject(CurrentUserService);
+	private characterService = inject(CharacterService);
 
 	campaign: Campaign | null = null;
 	systems: RpgSystem[] = [];
@@ -42,6 +47,22 @@ export class CampaignViewComponent implements OnInit {
 	users: User[] = [];
 	userSearchConfig!: any;
 	loadingUsers = false;
+
+	// Character Management
+	showCharacterSelector = false;
+	campaignCharacters: { [playerId: string]: Character } = {};
+	selectedPlayerForCharacter = '';
+
+	// Character View Modal
+	showCharacterViewModal = false;
+	selectedCharacterToView: Character | null = null;
+	selectedCharacterCampaignData: DynamicField[] = [];
+
+	// Character Edit Modal
+	showCharacterEditModal = false;
+	selectedCharacterToEdit: Character | null = null;
+	selectedCharacterEditCampaignData: DynamicField[] = [];
+	selectedCharacterOwnerId = '';
 
 	public ngOnInit(): void {
 		this.campaignId = this.route.snapshot.paramMap.get('id');
@@ -140,6 +161,9 @@ export class CampaignViewComponent implements OnInit {
 				// Carregar jogadores ativos e convidados
 				this.loadActivePlayers();
 				this.loadInvitedPlayers();
+
+				// Carregar personagens da campanha
+				this.loadCampaignCharacters();
 
 				// Recarregar usuários disponíveis para aplicar filtros corretos
 				this.loadUsers();
@@ -390,5 +414,189 @@ export class CampaignViewComponent implements OnInit {
 				this.dialogService.error('Erro', 'Erro ao cancelar convite. Tente novamente.');
 			}
 		});
+	}
+
+	// Character Management Methods
+	private loadCampaignCharacters(): void {
+		if (!this.campaign?.characters) return;
+
+		// Para cada personagem da campanha, buscar os dados completos
+		this.campaign.characters.forEach(campaignChar => {
+			if (campaignChar.characterId && campaignChar.playerId) {
+				this.characterService.getCharacterById(campaignChar.characterId).subscribe({
+					next: (character: Character | undefined) => {
+						if (character) {
+							this.campaignCharacters[campaignChar.playerId] = character;
+						}
+					},
+					error: (error: any) => {
+						console.error('Error loading character:', campaignChar.characterId, error);
+					}
+				});
+			}
+		});
+	}
+
+	public openCharacterSelector(playerId: string): void {
+		this.selectedPlayerForCharacter = playerId;
+		this.showCharacterSelector = true;
+	}
+
+	public closeCharacterSelector(): void {
+		this.showCharacterSelector = false;
+		this.selectedPlayerForCharacter = '';
+	}
+
+	public closeCharacterViewModal(): void {
+		this.showCharacterViewModal = false;
+		this.selectedCharacterToView = null;
+		this.selectedCharacterCampaignData = [];
+	}
+
+	public closeCharacterEditModal(): void {
+		this.showCharacterEditModal = false;
+		this.selectedCharacterToEdit = null;
+		this.selectedCharacterEditCampaignData = [];
+		this.selectedCharacterOwnerId = '';
+	}
+
+	public onCharacterSelected(character: Character): void {
+		if (!this.campaign?.id || !this.selectedPlayerForCharacter) {
+			return;
+		}
+
+		this.campaignService.associateCharacter(this.campaign.id, character.id!, this.selectedPlayerForCharacter).subscribe({
+			next: (response) => {
+				this.campaignCharacters[this.selectedPlayerForCharacter] = character;
+				this.dialogService.success('Sucesso', `Personagem ${character.name} foi associado à campanha!`);
+				this.closeCharacterSelector();
+				// Recarregar a campanha para atualizar a lista de personagens
+				this.loadCampaign();
+			},
+			error: (error) => {
+				this.dialogService.error('Erro', 'Não foi possível associar o personagem à campanha.');
+			}
+		});
+	}
+
+	public viewCharacter(character: Character): void {
+		if (!this.campaign?.id || !character.id) return;
+
+		// Buscar dados da campanha para este personagem
+		this.campaignService.getCampaignCharacterData(this.campaign.id, character.id).subscribe({
+			next: (campaignData) => {
+				this.selectedCharacterToView = character;
+				this.selectedCharacterCampaignData = campaignData?.dynamicData || [];
+				this.showCharacterViewModal = true;
+			},
+			error: (error) => {
+				console.error('Error loading campaign character data:', error);
+				// Mostrar modal mesmo sem dados de campanha
+				this.selectedCharacterToView = character;
+				this.selectedCharacterCampaignData = [];
+				this.showCharacterViewModal = true;
+			}
+		});
+	}
+
+	public editCharacter(character: Character): void {
+		// Não usar navegação - abrir modal de edição
+		if (!this.campaign?.id || !character.id) return;
+
+		// Buscar dados da campanha para este personagem
+		this.campaignService.getCampaignCharacterData(this.campaign.id, character.id).subscribe({
+			next: (campaignData) => {
+				// Buscar o dono do personagem no campaign.characters
+				const campaignChar = this.campaign?.characters?.find(cc => cc.characterId === character.id);
+
+				this.selectedCharacterToEdit = character;
+				this.selectedCharacterEditCampaignData = campaignData?.dynamicData || [];
+				this.selectedCharacterOwnerId = campaignChar?.playerId || '';
+				this.showCharacterEditModal = true;
+			},
+			error: (error) => {
+				console.error('Error loading campaign character data:', error);
+				// Mostrar modal mesmo sem dados de campanha
+				const campaignChar = this.campaign?.characters?.find(cc => cc.characterId === character.id);
+
+				this.selectedCharacterToEdit = character;
+				this.selectedCharacterEditCampaignData = [];
+				this.selectedCharacterOwnerId = campaignChar?.playerId || '';
+				this.showCharacterEditModal = true;
+			}
+		});
+	}
+
+	public onCharacterDataSaved(dynamicData: DynamicField[]): void {
+		// Recarregar dados do personagem após salvar
+		if (this.selectedCharacterToEdit?.id && this.campaign?.id) {
+			this.campaignService.getCampaignCharacterData(this.campaign.id, this.selectedCharacterToEdit.id).subscribe({
+				next: (campaignData) => {
+					// Atualizar os dados de campanha localmente se necessário
+					this.selectedCharacterEditCampaignData = campaignData?.dynamicData || [];
+
+					// Recarregar a campanha completa para refletir mudanças
+					this.loadCampaign();
+				},
+				error: (error) => {
+					console.error('Error reloading campaign character data:', error);
+				}
+			});
+		}
+	}
+
+	public async removeCharacter(playerId: string): Promise<void> {
+		const character = this.campaignCharacters[playerId];
+		if (!character || !this.campaign?.id) return;
+
+		const confirmed = await this.dialogService.showDeleteConfirmation(
+			'Remover Personagem',
+			`Tem certeza que deseja remover o personagem ${character.name} desta campanha?`
+		);
+
+		if (confirmed) {
+			this.campaignService.disassociateCharacter(this.campaign.id, character.id!, playerId).subscribe({
+				next: () => {
+					delete this.campaignCharacters[playerId];
+					this.dialogService.success('Sucesso', `Personagem ${character.name} foi removido da campanha.`);
+				},
+				error: (error) => {
+					console.error('Erro ao remover personagem:', error);
+					this.dialogService.error('Erro', 'Não foi possível remover o personagem da campanha.');
+				}
+			});
+		}
+	}
+
+	public canManageCharacter(playerId: string): boolean {
+		// Apenas jogadores podem gerenciar seus próprios personagens
+		// Mestres NÃO podem associar personagens para jogadores
+		return playerId === this.currentUserId;
+	}
+
+	public canEditCharacter(playerId: string): boolean {
+		// Apenas jogadores podem editar seus próprios personagens (não o mestre)
+		return !this.isOwner && playerId === this.currentUserId;
+	}
+
+	public getCharacterLevel(character: Character): string | null {
+		// Procura por campo que pode representar nível
+		const levelField = character.data?.find(field =>
+			field.name?.toLowerCase().includes('nivel') ||
+			field.name?.toLowerCase().includes('level') ||
+			field.name?.toLowerCase().includes('lvl')
+		);
+		return levelField?.value || null;
+	}
+
+	public getCharacterClass(character: Character): string | null {
+		// Procura por campo que pode representar classe
+		const classField = character.data?.find(field =>
+			field.name?.toLowerCase().includes('classe') ||
+			field.name?.toLowerCase().includes('class') ||
+			field.name?.toLowerCase().includes('profissao') ||
+			field.name?.toLowerCase().includes('profession')
+		);
+		return classField?.value || null;
 	}
 }

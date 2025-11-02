@@ -55,15 +55,12 @@
 				</div>
 
 				<div class="campaign-view__detail-card" *ngIf="activePlayers.length > 0">
-					<h3 class="campaign-view__detail-card-title">Jogadores da Campanha</h3>
+					<h3 class="campaign-view__detail-card-title">Personagens da Campanha</h3>
 					<div class="campaign-view__players-section">
 						<div class="campaign-view__player-card" *ngFor="let player of activePlayers; trackBy: trackByPlayer">
 							<div class="campaign-view__player-info">
 								<div class="campaign-view__player-avatar">
-									<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-										<circle cx="12" cy="7" r="4"></circle>
-									</svg>
+									<i class="fas fa-user"></i>
 								</div>
 								<div class="campaign-view__player-details">
 									<h4 class="campaign-view__player-name">{{ player.displayName }}</h4>
@@ -72,35 +69,62 @@
 								</div>
 							</div>
 
-							<div class="campaign-view__player-character">
-								<div class="campaign-view__character-placeholder" *ngIf="!playerCharacters[player.authId!]">
-									<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-										<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-										<circle cx="8.5" cy="7" r="4"></circle>
-										<line x1="20" y1="8" x2="20" y2="14"></line>
-										<line x1="23" y1="11" x2="17" y2="11"></line>
-									</svg>
-									<span>Nenhum personagem</span>
+							<div class="campaign-view__character-section">
+								<!-- Sem personagem associado -->
+								<div class="campaign-view__no-character" *ngIf="!campaignCharacters[player.authId!]">
+									<div class="campaign-view__character-placeholder">
+										<i class="fas fa-user-plus"></i>
+										<span>Nenhum personagem</span>
+									</div>
+									<button
+										class="campaign-view__btn campaign-view__btn--character"
+										*ngIf="canManageCharacter(player.authId!)"
+										(click)="openCharacterSelector(player.authId!)">
+										<i class="fas fa-plus"></i>
+										Associar Personagem
+									</button>
 								</div>
 
-								<!-- Futuro: área para mostrar personagem quando implementado -->
-								<div class="campaign-view__character-info" *ngIf="playerCharacters[player.authId!]">
-									<h5>{{ playerCharacters[player.authId!].name }}</h5>
+								<!-- Com personagem associado -->
+								<div class="campaign-view__character-card" *ngIf="campaignCharacters[player.authId!]">
+									<div class="campaign-view__character-info">
+										<div class="campaign-view__character-avatar">
+											<i class="fas fa-dragon"></i>
+										</div>
+										<div class="campaign-view__character-details">
+											<h5>{{ campaignCharacters[player.authId!].name }}</h5>
+											<span class="campaign-view__character-level" *ngIf="getCharacterLevel(campaignCharacters[player.authId!])">
+												Nível {{ getCharacterLevel(campaignCharacters[player.authId!]) }}
+											</span>
+											<span class="campaign-view__character-class" *ngIf="getCharacterClass(campaignCharacters[player.authId!])">
+												{{ getCharacterClass(campaignCharacters[player.authId!]) }}
+											</span>
+										</div>
+									</div>
+									<div class="campaign-view__character-actions">
+										<button
+											class="campaign-view__btn campaign-view__btn--icon"
+											(click)="viewCharacter(campaignCharacters[player.authId!])"
+											title="Visualizar personagem">
+											<i class="fas fa-eye"></i>
+										</button>
+										<button
+											class="campaign-view__btn campaign-view__btn--icon"
+											*ngIf="canEditCharacter(player.authId!)"
+											(click)="editCharacter(campaignCharacters[player.authId!])"
+											title="Editar personagem">
+											<i class="fas fa-edit"></i>
+										</button>
+										<button
+											class="campaign-view__btn campaign-view__btn--icon campaign-view__btn--danger"
+											*ngIf="canManageCharacter(player.authId!)"
+											(click)="removeCharacter(player.authId!)"
+											title="Remover personagem">
+											<i class="fas fa-times"></i>
+										</button>
+									</div>
 								</div>
 							</div>
-						</div>
-					</div>
-					<div class="campaign-view__form-group-help">
-						<small>Jogadores que aceitaram o convite e estão participando da campanha.</small>
-					</div>
-				</div>
-
-				<div class="campaign-view__detail-card" *ngIf="campaign.characters?.length">
-					<h3 class="campaign-view__detail-card-title">Personagens da Aventura</h3>
-					<div class="campaign-view__characters-list">
-						<div class="campaign-view__character-item" *ngFor="let character of campaign.characters">
-							<!-- TODO: Mostrar informações dos personagens -->
-							<p>Personagem ID: {{ character.characterId }}</p>
 						</div>
 					</div>
 				</div>
@@ -241,3 +265,32 @@
 		<button class="campaign-view__btn campaign-view__btn--primary" routerLink="/campaigns">Voltar às Campanhas</button>
 	</div>
 </div>
+
+<!-- Character Selector Modal -->
+<app-character-selector
+	[isVisible]="showCharacterSelector"
+	[systemId]="campaign?.systemId || ''"
+	(characterSelected)="onCharacterSelected($event)"
+	(closed)="closeCharacterSelector()">
+</app-character-selector>
+
+<!-- Character View Modal -->
+<app-character-view-modal
+	[isVisible]="showCharacterViewModal"
+	[character]="selectedCharacterToView"
+	[campaignData]="selectedCharacterCampaignData"
+	(closed)="closeCharacterViewModal()">
+</app-character-view-modal>
+
+<!-- Character Edit Modal -->
+<app-character-edit-modal
+	[isVisible]="showCharacterEditModal"
+	[character]="selectedCharacterToEdit"
+	[campaignId]="campaign?.id || ''"
+	[campaignData]="selectedCharacterEditCampaignData"
+	[campaignActive]="campaign?.activeSession || false"
+	[currentUserId]="currentUserId"
+	[ownerId]="selectedCharacterOwnerId"
+	(closed)="closeCharacterEditModal()"
+	(saved)="onCharacterDataSaved($event)">
+</app-character-edit-modal>

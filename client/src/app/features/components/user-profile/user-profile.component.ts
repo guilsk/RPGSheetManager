@@ -78,8 +78,7 @@ export class UserProfileComponent implements OnInit {
 				displayName: this.profileForm.get('displayName')?.value
 			};
 
-			console.log('Sending user update:', updatedUser);
-			console.log('AuthId:', updatedUser.authId);
+
 
 			this.userService.updateProfile(updatedUser).subscribe({
 				next: (user) => {

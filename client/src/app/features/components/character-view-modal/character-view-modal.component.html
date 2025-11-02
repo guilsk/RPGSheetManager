@@ -1,0 +1,101 @@
+<!-- Modal com Overlay -->
+<div class="character-view-overlay" (click)="onBackdropClick($event)" *ngIf="isVisible" [style.display]="isVisible ? 'flex' : 'none'">
+	<div class="character-view-modal">
+		<!-- Header -->
+		<div class="character-view-header">
+			<div class="character-header-info">
+				<div class="character-avatar">
+					{{ (character?.name || 'U').charAt(0).toUpperCase() }}
+				</div>
+				<div class="character-title-section">
+					<h2 class="character-name">{{ character?.name || 'Personagem' }}</h2>
+					<div class="character-badges">
+						<span class="character-badge character-badge--level" *ngIf="getCharacterLevel()">
+							Nível {{ getCharacterLevel() }}
+						</span>
+						<span class="character-badge character-badge--class" *ngIf="getCharacterClass()">
+							{{ getCharacterClass() }}
+						</span>
+					</div>
+				</div>
+			</div>
+			<button class="close-button" (click)="close()" title="Fechar">
+				<i class="fas fa-times"></i>
+			</button>
+		</div>
+
+		<!-- Content -->
+		<div class="character-view-content">
+			<!-- Loading State -->
+			<div class="loading-state" *ngIf="!character">
+				<i class="fas fa-spinner fa-spin"></i>
+				<span>Carregando personagem...</span>
+			</div>
+
+			<!-- Character Data -->
+			<div class="character-sections" *ngIf="character && displayData.length > 0">
+				<!-- Para cada categoria -->
+				<div
+					class="character-section"
+					*ngFor="let category of getAvailableCategories()"
+					[attr.data-category]="category">
+
+					<h3 class="section-title">
+						{{ category || 'Informações Gerais' }}
+					</h3>
+
+					<div class="fields-grid">
+						<div
+							class="field-item"
+							*ngFor="let field of getFieldsByCategory(category)">
+
+							<div class="field-header">
+								<label class="field-label">{{ field.name }}</label>
+							</div>
+
+							<div class="field-content">
+								<!-- Texto simples -->
+								<div class="field-value" *ngIf="!field.rollable">
+									{{ field.value || '-' }}
+								</div>
+
+								<!-- Campo rolável -->
+								<div class="field-rollable" *ngIf="field.rollable">
+									<button class="rollable-button" (click)="rollDice(field)" title="Clique para rolar">
+										<div class="rollable-value">
+											{{ field.value || '0' }}
+										</div>
+										<i class="fas fa-dice-d20"></i>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Empty State -->
+			<div class="empty-state" *ngIf="character && displayData.length === 0">
+				<div class="empty-icon">
+					<i class="fas fa-user-slash"></i>
+				</div>
+				<div class="empty-message">Nenhum dado encontrado</div>
+				<div class="empty-description">Este personagem não possui dados cadastrados.</div>
+			</div>
+		</div>
+
+		<!-- Footer -->
+		<div class="character-view-footer">
+			<div class="footer-info">
+				<small class="creation-info" *ngIf="character?.createdAt">
+					Criado em {{ character?.createdAt | date:'dd/MM/yyyy' }}
+				</small>
+			</div>
+			<div class="footer-actions">
+				<button class="btn btn-secondary" (click)="close()">
+					Fechar
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

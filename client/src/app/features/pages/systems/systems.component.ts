@@ -123,11 +123,8 @@ export class SystemsComponent implements OnInit {
 	saveSystem(system: RpgSystem) {
 		if (!system.id) return;
 
-		console.log('Tentando salvar sistema:', system.id);
-
 		// Verificar se o usuário está autenticado primeiro
 		this.auth.isAuthenticated$.subscribe(isAuth => {
-			console.log('Usuário autenticado:', isAuth);
 			if (!isAuth) {
 				this.dialogService.error('Erro de Autenticação', 'Você precisa estar logado para salvar sistemas.');
 				return;
@@ -136,12 +133,8 @@ export class SystemsComponent implements OnInit {
 			// Verificar se conseguimos obter o token
 			this.auth.getAccessTokenSilently().subscribe({
 				next: (token) => {
-					console.log('Token obtido:', token ? 'Token presente' : 'Token ausente');
-					console.log('Chamando API para salvar sistema...');
-
 					this.systemService.saveSystem(system.id!).subscribe({
 						next: (success) => {
-							console.log('Resposta da API:', success);
 							if (success) {
 								// Atualizar localmente
 								if (!this.currentUser) {

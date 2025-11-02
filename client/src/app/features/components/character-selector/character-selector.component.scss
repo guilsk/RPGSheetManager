@@ -1,0 +1,216 @@
+@use '../../../shared/styles/variables.scss' as vars;
+
+.character-selector-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: vars.$z-modal;
+}
+
+.character-selector-modal {
+  background: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 90%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.character-selector-header {
+  padding: 24px;
+  border-bottom: 1px solid vars.$border-color;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: vars.$primary-color;
+  color: white;
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .close-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+.character-selector-content {
+  padding: 24px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.search-section {
+  margin-bottom: 24px;
+
+  .search-bar {
+    width: 100%;
+  }
+}
+
+.characters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.character-card {
+  border: 1px solid vars.$border-color;
+  border-radius: 8px;
+  padding: 16px;
+  background: vars.$card-bg;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: vars.$primary-color;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .character-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .character-avatar {
+      width: 48px;
+      height: 48px;
+      background: vars.$secondary-color;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .character-info {
+      flex: 1;
+
+      .character-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: vars.$text-color;
+        margin: 0 0 4px 0;
+      }
+
+      .character-system {
+        font-size: 0.9rem;
+        color: vars.$text-muted;
+        margin: 0;
+      }
+    }
+  }
+
+  .character-details {
+    .character-level {
+      font-size: 0.9rem;
+      color: vars.$text-muted;
+      margin: 4px 0;
+
+      .level-value {
+        color: vars.$primary-color;
+        font-weight: 600;
+      }
+    }
+
+    .character-class {
+      font-size: 0.9rem;
+      color: vars.$text-muted;
+      margin: 4px 0;
+
+      .class-value {
+        color: vars.$info-color;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: vars.$text-muted;
+
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.6;
+  }
+
+  .empty-message {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+
+  .empty-description {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+}
+
+.character-selector-actions {
+  padding: 24px;
+  border-top: 1px solid vars.$border-color;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  background: vars.$bg-secondary;
+
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+
+    &.btn-secondary {
+      background: vars.$gray-300;
+      color: vars.$text-color;
+
+      &:hover {
+        background: vars.$gray-400;
+      }
+    }
+
+    &.btn-primary {
+      background: vars.$primary-color;
+      color: white;
+
+      &:hover {
+        background: vars.$primary-hover;
+      }
+
+      &:disabled {
+        background: vars.$gray-300;
+        color: vars.$text-muted;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

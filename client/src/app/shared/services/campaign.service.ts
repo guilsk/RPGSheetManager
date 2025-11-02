@@ -125,4 +125,45 @@ export class CampaignService {
 			})
 		);
 	}
+
+	associateCharacter(campaignId: string, characterId: string, playerId: string): Observable<boolean> {
+		const url = `${this.apiUrl}/${campaignId}/characters/${characterId}/associate?playerId=${playerId}`;
+
+		return this.http.post(url, {}).pipe(
+			map(() => true),
+			catchError(error => {
+				console.error('Error associating character:', error);
+				return of(false);
+			})
+		);
+	}
+
+	disassociateCharacter(campaignId: string, characterId: string, playerId: string): Observable<boolean> {
+		return this.http.delete(`${this.apiUrl}/${campaignId}/characters/${characterId}?playerId=${playerId}`).pipe(
+			map(() => true),
+			catchError(error => {
+				console.error('Error disassociating character:', error);
+				return of(false);
+			})
+		);
+	}
+
+	getCampaignCharacterData(campaignId: string, characterId: string): Observable<any> {
+		return this.http.get(`${this.apiUrl}/${campaignId}/characters/${characterId}/campaign-data`).pipe(
+			catchError(error => {
+				console.error('Error loading campaign character data:', error);
+				return of(null);
+			})
+		);
+	}
+
+	saveCampaignCharacterData(campaignId: string, characterId: string, playerId: string, dynamicData: any[]): Observable<boolean> {
+		return this.http.put(`${this.apiUrl}/${campaignId}/characters/${characterId}/session-data?playerId=${playerId}`, dynamicData).pipe(
+			map(() => true),
+			catchError(error => {
+				console.error('Error saving campaign character data:', error);
+				return of(false);
+			})
+		);
+	}
 }

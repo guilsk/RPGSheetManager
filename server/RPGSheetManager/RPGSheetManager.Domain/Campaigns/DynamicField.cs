@@ -7,6 +7,6 @@ namespace RPGSheetManager.Domain.Campaigns {
         [BsonElement("value")]
         public required string Value { get; set; }
         [BsonElement("edited")]
-        public bool Edited { get; set; } = false;
+        public bool Edited { get; set; } = true;
     }
 }
