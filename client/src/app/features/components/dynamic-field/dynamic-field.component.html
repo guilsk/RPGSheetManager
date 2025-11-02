@@ -32,7 +32,7 @@
 		<select *ngIf="field.component === ComponentType.SELECT && !isSelectPreviewMode" [id]="getFieldId()"
 			[(ngModel)]="currentValue" [disabled]="isDisabled" (ngModelChange)="onValueChange($event)"
 			class="dynamic-field__control">
-			<option value="">Selecione...</option>
+			<option value="" disabled hidden>Selecione...</option>
 			<option *ngFor="let option of field.options" [value]="option">
 				{{ option }}
 			</option>

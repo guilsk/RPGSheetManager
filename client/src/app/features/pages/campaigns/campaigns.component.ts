@@ -146,9 +146,4 @@ export class CampaignsComponent implements OnInit {
 			}
 		});
 	}
-
-	public joinSession(campaign: Campaign): void {
-		// TODO: Implementar funcionalidade de entrar na sessão
-		this.router.navigate(['/campaigns/session', campaign.id]);
-	}
 }
