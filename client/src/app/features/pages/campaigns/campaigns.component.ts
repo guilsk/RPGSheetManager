@@ -94,7 +94,25 @@ export class CampaignsComponent implements OnInit {
 	}
 
 	public getMasterName(masterId?: string): string {
-		return masterId ? this.users[masterId] || 'Mestre Desconhecido' : 'Sem Mestre';
+		if (!masterId) return 'Sem Mestre';
+		if (masterId === this.currentUserId) return 'Você';
+		if (masterId === 'system-admin') return 'Sistema';
+
+		// Tenta buscar no cache primeiro
+		const cachedName = this.users[masterId];
+		if (cachedName) return cachedName;
+
+		// Se não encontrou, busca dinamicamente e atualiza o cache
+		this.userService.getUserByAuthId(masterId).subscribe({
+			next: (user) => {
+				this.users[masterId] = user?.displayName || user?.email || 'Mestre';
+			},
+			error: () => {
+				this.users[masterId] = 'Mestre Desconhecido';
+			}
+		});
+
+		return 'Carregando...';
 	}
 
 	public createCampaign(): void {

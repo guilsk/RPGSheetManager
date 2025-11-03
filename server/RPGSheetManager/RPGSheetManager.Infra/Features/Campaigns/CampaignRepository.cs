@@ -214,12 +214,14 @@ namespace RPGSheetManager.Infra.Features.Campaigns {
             var oldQuestSystem = await _systemsCollection.Find(s => s.Name == "Old Quest").FirstOrDefaultAsync();
             var systemId = oldQuestSystem?.Id ?? "sistema-nao-encontrado";
 
+            var masterId = "google-oauth2|100187283712752596497"; // ID do admin
+
             // Cria nova campanha de exemplo
             var exampleCampaign = new Campaign {
                 Title = "Campanha de Exemplo",
                 Description = "Essa campanha é um exemplo para novos usuários.\nEla está sempre ativa e um novo convite será enviado caso saia dela.\nSinta-se à vontade para testar seu personagem aqui.",
                 SystemId = systemId,
-                MasterId = "google-oauth2|118018728312752596497",
+                MasterId = masterId,
                 PlayerIds = new List<string>(),
                 InvitedPlayerIds = new List<string>(),
                 CreatedAt = DateTime.UtcNow,

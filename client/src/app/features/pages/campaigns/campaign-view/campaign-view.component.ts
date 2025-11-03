@@ -47,6 +47,7 @@ export class CampaignViewComponent implements OnInit {
 	users: User[] = [];
 	userSearchConfig!: any;
 	loadingUsers = false;
+	masterName: string = 'Carregando...';
 
 	// Character Management
 	showCharacterSelector = false;
@@ -181,8 +182,30 @@ export class CampaignViewComponent implements OnInit {
 	}
 
 	public getMasterName(masterId?: string): string {
-		// TODO: Implementar busca de nome do mestre
-		return masterId === this.currentUserId ? 'Você' : 'Mestre';
+		if (!masterId) return 'Sem Mestre';
+		if (masterId === this.currentUserId) return 'Você';
+		if (masterId === 'system-admin') return 'Sistema';
+
+		// Busca o nome do mestre na lista de usuários já carregados
+		const masterUser = this.users.find(user => user.authId === masterId);
+		if (masterUser) {
+			return masterUser.displayName || masterUser.email || 'Mestre';
+		}
+
+		// Se não encontrou, busca dinamicamente
+		this.loadMasterName(masterId);
+		return this.masterName;
+	}
+
+	private loadMasterName(masterId: string): void {
+		this.userService.getUserByAuthId(masterId).subscribe({
+			next: (user) => {
+				this.masterName = user?.displayName || user?.email || 'Mestre';
+			},
+			error: () => {
+				this.masterName = 'Mestre Desconhecido';
+			}
+		});
 	}
 
 	private loadActivePlayers(): void {

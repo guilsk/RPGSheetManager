@@ -37,7 +37,7 @@ namespace RPGSheetManager.API.Controllers.Users {
             if (isNewUser) {
                 // Convida para campanha de exemplo
                 await _campaignService.InviteToExampleCampaignAsync(user.AuthId);
-                
+
                 // Adiciona o sistema Old Quest aos sistemas salvos
                 await _campaignService.AddOldQuestSystemToUserAsync(user.AuthId);
             }
