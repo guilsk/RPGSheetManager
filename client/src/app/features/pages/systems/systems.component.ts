@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RpgSystem, User } from '../../../shared/models/rpg-sheet-manager.model';
@@ -6,7 +6,8 @@ import { SystemService } from '../../../shared/services/system.service';
 import { UserService } from '../../../shared/services/user.service';
 import { AuthService } from '@auth0/auth0-angular';
 import { DialogService } from '../../../shared/services/dialog.service';
-import { forkJoin, map, switchMap } from 'rxjs';
+import { forkJoin, map, switchMap, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
 import { SearchBarConfig } from '../../../shared/models/search-bar.model';
 
@@ -17,17 +18,22 @@ import { SearchBarConfig } from '../../../shared/models/search-bar.model';
 	templateUrl: './systems.component.html',
 	styleUrl: './systems.component.scss'
 })
-export class SystemsComponent implements OnInit {
+export class SystemsComponent implements OnInit, OnDestroy {
 	private systemService = inject(SystemService);
 	private userService = inject(UserService);
 	private auth = inject(AuthService);
 	private dialogService = inject(DialogService);
+	private destroy$ = new Subject<void>();
 
 	systems: RpgSystem[] = [];
 	filteredSystems: RpgSystem[] = [];
 	currentUser: User | null = null;
 	currentUserId: string | null = null;
 	ownerNames: { [key: string]: string } = {}; // Cache para nomes dos usuários
+	
+	// Loading states para melhor UX
+	isLoadingSystems = true;
+	isLoadingAction = false;
 
 	searchConfig: SearchBarConfig<RpgSystem> = {
 		placeholder: 'Buscar sistemas de RPG...',
@@ -47,6 +53,11 @@ export class SystemsComponent implements OnInit {
 		this.loadSystems();
 	}
 
+	ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	private loadCurrentUser() {
 		this.auth.user$.pipe(
 			switchMap(authUser => {
@@ -55,43 +66,58 @@ export class SystemsComponent implements OnInit {
 					return [null];
 				}
 				return this.userService.getUserByAuthId(authUser.sub);
-			})
+			}),
+			takeUntil(this.destroy$)
 		).subscribe(user => {
 			this.currentUser = user;
 		});
 	}
 
 	private loadSystems() {
-		this.systemService.getSystems().subscribe((systems: RpgSystem[]) => {
-			const nonObsoleteSystems = systems.filter(system => !system.obsolete);
+		this.isLoadingSystems = true;
+		this.systemService.getSystems()
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((systems: RpgSystem[]) => {
+				const nonObsoleteSystems = systems.filter(system => !system.obsolete);
 
-			this.systemService.getSavedSystems().subscribe((savedSystems: RpgSystem[]) => {
-				const obsoleteSavedSystems = savedSystems.filter(system => system.obsolete);
+				this.systemService.getSavedSystems()
+					.pipe(takeUntil(this.destroy$))
+					.subscribe((savedSystems: RpgSystem[]) => {
+						const obsoleteSavedSystems = savedSystems.filter(system => system.obsolete);
 
-				this.systems = [...nonObsoleteSystems, ...obsoleteSavedSystems];
-				this.filteredSystems = [...this.systems];
+						this.systems = [...nonObsoleteSystems, ...obsoleteSavedSystems];
+						this.filteredSystems = [...this.systems];
+						this.isLoadingSystems = false;
 
-				// Carregar nomes dos donos
-				this.systems.forEach(system => {
-					if (system.ownerId && system.ownerId !== 'system-admin') {
-						this.loadOwnerName(system.ownerId);
-					}
-				});
+						// Carregar nomes dos donos
+						this.systems.forEach(system => {
+							if (system.ownerId && system.ownerId !== 'system-admin') {
+								this.loadOwnerName(system.ownerId);
+							}
+						});
+					}, error => {
+						console.error('Erro ao carregar sistemas salvos:', error);
+						this.isLoadingSystems = false;
+					});
+			}, error => {
+				console.error('Erro ao carregar sistemas disponíveis:', error);
+				this.isLoadingSystems = false;
 			});
-		});
 	}
 
 	private loadOwnerName(ownerId: string) {
 		if (this.ownerNames[ownerId]) return; // Já foi carregado
 
-		this.userService.getUserByAuthId(ownerId).subscribe({
-			next: (user) => {
-				this.ownerNames[ownerId] = user.displayName || 'Usuário desconhecido';
-			},
-			error: () => {
-				this.ownerNames[ownerId] = 'Usuário desconhecido';
-			}
-		});
+		this.userService.getUserByAuthId(ownerId)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (user) => {
+					this.ownerNames[ownerId] = user.displayName || 'Usuário desconhecido';
+				},
+				error: () => {
+					this.ownerNames[ownerId] = 'Usuário desconhecido';
+				}
+			});
 	}
 
 	getOwnerDisplayName(ownerId: string): string {
@@ -124,16 +150,22 @@ export class SystemsComponent implements OnInit {
 		if (!system.id) return;
 
 		// Verificar se o usuário está autenticado primeiro
-		this.auth.isAuthenticated$.subscribe(isAuth => {
-			if (!isAuth) {
-				this.dialogService.error('Erro de Autenticação', 'Você precisa estar logado para salvar sistemas.');
-				return;
-			}
+		this.auth.isAuthenticated$
+			.pipe(takeUntil(this.destroy$))
+			.subscribe(isAuth => {
+				if (!isAuth) {
+					this.dialogService.error('Erro de Autenticação', 'Você precisa estar logado para salvar sistemas.');
+					return;
+				}
 
-			// Verificar se conseguimos obter o token
-			this.auth.getAccessTokenSilently().subscribe({
-				next: (token) => {
-					this.systemService.saveSystem(system.id!).subscribe({
+				// Verificar se conseguimos obter o token
+				this.auth.getAccessTokenSilently()
+					.pipe(takeUntil(this.destroy$))
+					.subscribe({
+						next: (token) => {
+							this.systemService.saveSystem(system.id!)
+								.pipe(takeUntil(this.destroy$))
+								.subscribe({
 						next: (success) => {
 							if (success) {
 								// Atualizar localmente
@@ -168,7 +200,9 @@ export class SystemsComponent implements OnInit {
 	unsaveSystem(system: RpgSystem) {
 		if (!system.id) return;
 
-		this.systemService.unsaveSystem(system.id).subscribe({
+		this.systemService.unsaveSystem(system.id)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
 			next: (success) => {
 				if (success) {
 					// Atualizar localmente
@@ -197,7 +231,9 @@ export class SystemsComponent implements OnInit {
 
 		if (!confirmed) return;
 
-		this.systemService.markSystemAsObsolete(system.id).subscribe({
+		this.systemService.markSystemAsObsolete(system.id)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
 			next: (success) => {
 				if (success) {
 					this.systems = this.systems.filter(s => s.id !== system.id);
@@ -226,10 +262,12 @@ export class SystemsComponent implements OnInit {
 
 		if (!confirmed) return;
 
-		this.systemService.unsaveSystem(system.id).subscribe({
-			next: (success) => {
-				if (success) {
-					// Atualizar localmente
+		this.systemService.unsaveSystem(system.id)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (success) => {
+					if (success) {
+						// Atualizar localmente
 					if (this.currentUser?.savedSystemIds) {
 						this.currentUser.savedSystemIds = this.currentUser.savedSystemIds.filter(id => id !== system.id);
 					}
@@ -305,7 +343,9 @@ export class SystemsComponent implements OnInit {
 	private uploadSystem(systemData: any) {
 		console.log('Dados do sistema antes do upload:', systemData);
 
-		this.systemService.uploadSystem(systemData).subscribe({
+		this.systemService.uploadSystem(systemData)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
 			next: (newSystem: RpgSystem) => {
 				this.systems.unshift(newSystem);
 

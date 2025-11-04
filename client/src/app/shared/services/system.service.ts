@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of, catchError, map, switchMap } from 'rxjs';
+import { Observable, of, catchError, map, switchMap, shareReplay, BehaviorSubject } from 'rxjs';
 import { RpgSystem } from '../models/rpg-sheet-manager.model';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '@auth0/auth0-angular';
@@ -11,6 +11,13 @@ import { environment } from '../../../environments/environment';
 })
 export class SystemService {
 	private apiUrl = `${environment.apiUrl}/system`;
+	
+	// Cache para melhorar performance
+	private systemsCache$ = new BehaviorSubject<RpgSystem[] | null>(null);
+	private savedSystemsCache$ = new BehaviorSubject<RpgSystem[] | null>(null);
+	private cacheExpiry = 5 * 60 * 1000; // 5 minutos
+	private lastSystemsFetch = 0;
+	private lastSavedSystemsFetch = 0;
 
 	constructor(
 		private http: HttpClient,
@@ -19,7 +26,28 @@ export class SystemService {
 	) { }
 
 	public getSystems(): Observable<RpgSystem[]> {
-		return this.http.get<RpgSystem[]>(this.apiUrl);
+		const now = Date.now();
+		const cached = this.systemsCache$.value;
+		
+		// Retornar cache se válido
+		if (cached && (now - this.lastSystemsFetch) < this.cacheExpiry) {
+			return of(cached);
+		}
+		
+		// Buscar novos dados
+		return this.http.get<RpgSystem[]>(this.apiUrl).pipe(
+			map(systems => {
+				this.systemsCache$.next(systems);
+				this.lastSystemsFetch = now;
+				return systems;
+			}),
+			catchError(error => {
+				console.error('Erro ao buscar sistemas:', error);
+				// Retornar cache antigo se houver erro
+				return cached ? of(cached) : of([]);
+			}),
+			shareReplay(1)
+		);
 	}
 
 	public getMySystems(): Observable<RpgSystem[]> {
@@ -27,7 +55,28 @@ export class SystemService {
 	}
 
 	public getSavedSystems(): Observable<RpgSystem[]> {
-		return this.http.get<RpgSystem[]>(`${this.apiUrl}/saved-systems`);
+		const now = Date.now();
+		const cached = this.savedSystemsCache$.value;
+		
+		// Retornar cache se válido
+		if (cached && (now - this.lastSavedSystemsFetch) < this.cacheExpiry) {
+			return of(cached);
+		}
+		
+		// Buscar novos dados
+		return this.http.get<RpgSystem[]>(`${this.apiUrl}/saved-systems`).pipe(
+			map(systems => {
+				this.savedSystemsCache$.next(systems);
+				this.lastSavedSystemsFetch = now;
+				return systems;
+			}),
+			catchError(error => {
+				console.error('Erro ao buscar sistemas salvos:', error);
+				// Retornar cache antigo se houver erro
+				return cached ? of(cached) : of([]);
+			}),
+			shareReplay(1)
+		);
 	}
 
 	public getSystemById(id: string): Observable<RpgSystem | undefined> {
@@ -61,6 +110,10 @@ export class SystemService {
 						console.log('Sistema preparado para API:', preparedSystem);
 
 						return this.http.post<RpgSystem>(this.apiUrl, preparedSystem).pipe(
+							map(newSystem => {
+								this.clearCache(); // Limpar cache ao fazer upload de sistema
+								return newSystem;
+							}),
 							catchError(error => {
 								console.error('Erro ao fazer upload do sistema:', error);
 								console.error('Status:', error.status);
@@ -115,7 +168,10 @@ export class SystemService {
 
 	public markSystemAsObsolete(systemId: string): Observable<boolean> {
 		return this.http.patch<boolean>(`${this.apiUrl}/${systemId}/obsolete`, {}).pipe(
-			map(() => true),
+			map(() => {
+				this.clearCache(); // Limpar todo o cache ao marcar como obsoleto
+				return true;
+			}),
 			catchError(error => {
 				console.error('Erro ao marcar sistema como obsoleto:', error);
 				return of(false);
@@ -130,6 +186,7 @@ export class SystemService {
 		return this.http.post<boolean>(`${this.apiUrl}/${systemId}/save`, {}).pipe(
 			map((response) => {
 				console.log('Resposta do servidor:', response);
+				this.clearSavedSystemsCache(); // Limpar cache ao salvar sistema
 				return true;
 			}),
 			catchError(error => {
@@ -144,7 +201,10 @@ export class SystemService {
 
 	public unsaveSystem(systemId: string): Observable<boolean> {
 		return this.http.delete<boolean>(`${this.apiUrl}/${systemId}/save`).pipe(
-			map(() => true),
+			map(() => {
+				this.clearSavedSystemsCache(); // Limpar cache ao remover sistema
+				return true;
+			}),
 			catchError(error => {
 				console.error('Erro ao remover sistema dos salvos:', error);
 				return of(false);
@@ -175,5 +235,23 @@ export class SystemService {
 			})) || [],
 			categoryOrder: system.categoryOrder
 		};
+	}
+
+	/**
+	 * Limpa o cache para forçar nova busca dos dados
+	 */
+	public clearCache(): void {
+		this.systemsCache$.next(null);
+		this.savedSystemsCache$.next(null);
+		this.lastSystemsFetch = 0;
+		this.lastSavedSystemsFetch = 0;
+	}
+
+	/**
+	 * Invalida apenas o cache de sistemas salvos
+	 */
+	public clearSavedSystemsCache(): void {
+		this.savedSystemsCache$.next(null);
+		this.lastSavedSystemsFetch = 0;
 	}
 }

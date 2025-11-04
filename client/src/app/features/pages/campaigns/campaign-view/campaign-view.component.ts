@@ -297,19 +297,21 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 			invitedPlayerIds: formValue.invitedPlayerIds || []
 		};
 
-		this.campaignService.updateCampaign(this.campaignId, updatedCampaign).subscribe((success: boolean) => {
-			this.isLoading = false;
-			if (success) {
-				this.campaign = updatedCampaign;
-				this.editMode = false;
-				// Recarregar dados dos jogadores convidados e usuários disponíveis
-				this.loadInvitedPlayers();
-				this.loadUsers(); // Atualizar lista de usuários disponíveis
-				this.dialogService.success('Sucesso', 'Campanha atualizada com sucesso!');
-			} else {
-				this.dialogService.error('Erro', 'Erro ao atualizar campanha. Tente novamente.');
-			}
-		});
+		this.campaignService.updateCampaign(this.campaignId, updatedCampaign)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((success: boolean) => {
+				this.isLoading = false;
+				if (success) {
+					this.campaign = updatedCampaign;
+					this.editMode = false;
+					// Recarregar dados dos jogadores convidados e usuários disponíveis
+					this.loadInvitedPlayers();
+					this.loadUsers(); // Atualizar lista de usuários disponíveis
+					this.dialogService.success('Sucesso', 'Campanha atualizada com sucesso!');
+				} else {
+					this.dialogService.error('Erro', 'Erro ao atualizar campanha. Tente novamente.');
+				}
+			});
 	}
 
 	public async startSession(): Promise<void> {

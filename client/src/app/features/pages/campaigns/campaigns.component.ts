@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Campaign } from '../../../shared/models/rpg-sheet-manager.model';
@@ -9,6 +9,7 @@ import { DialogService } from '../../../shared/services/dialog.service';
 import { CurrentUserService } from '../../../shared/services/current-user.service';
 import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
 import { SearchBarConfig } from '../../../shared/models/search-bar.model';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
 	selector: 'app-campaigns',
@@ -17,7 +18,8 @@ import { SearchBarConfig } from '../../../shared/models/search-bar.model';
 	templateUrl: './campaigns.component.html',
 	styleUrl: './campaigns.component.scss'
 })
-export class CampaignsComponent implements OnInit {
+export class CampaignsComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	private router = inject(Router);
 	private campaignService = inject(CampaignService);
 	private systemService = inject(SystemService);
@@ -57,28 +59,34 @@ export class CampaignsComponent implements OnInit {
 	}
 
 	private loadSystems(): void {
-		this.systemService.getSavedSystems().subscribe(systems => {
-			this.systems = systems.reduce((acc, system) => {
-				if (system.id && system.name) {
-					acc[system.id] = system.name;
-				}
-				return acc;
-			}, {} as { [key: string]: string });
-		});
+		this.systemService.getSavedSystems()
+			.pipe(takeUntil(this.destroy$))
+			.subscribe(systems => {
+				this.systems = systems.reduce((acc, system) => {
+					if (system.id && system.name) {
+						acc[system.id] = system.name;
+					}
+					return acc;
+				}, {} as { [key: string]: string });
+			});
 	}
 
 	private loadCampaigns(): void {
 		// Carregar campanhas como mestre
-		this.campaignService.getCampaignsByMaster(this.currentUserId).subscribe((campaigns: Campaign[]) => {
-			this.myCampaigns = campaigns;
-			this.filteredMyCampaigns = [...campaigns];
-		});
+		this.campaignService.getCampaignsByMaster(this.currentUserId)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((campaigns: Campaign[]) => {
+				this.myCampaigns = campaigns;
+				this.filteredMyCampaigns = [...campaigns];
+			});
 
 		// Carregar campanhas como jogador
-		this.campaignService.getCampaignsByPlayer(this.currentUserId).subscribe((campaigns: Campaign[]) => {
-			this.playerCampaigns = campaigns;
-			this.filteredPlayerCampaigns = [...campaigns];
-		});
+		this.campaignService.getCampaignsByPlayer(this.currentUserId)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((campaigns: Campaign[]) => {
+				this.playerCampaigns = campaigns;
+				this.filteredPlayerCampaigns = [...campaigns];
+			});
 	}
 
 	public onMySearchResults(filteredCampaigns: Campaign[]): void {
@@ -103,14 +111,16 @@ export class CampaignsComponent implements OnInit {
 		if (cachedName) return cachedName;
 
 		// Se não encontrou, busca dinamicamente e atualiza o cache
-		this.userService.getUserByAuthId(masterId).subscribe({
-			next: (user) => {
-				this.users[masterId] = user?.displayName || user?.email || 'Mestre';
-			},
-			error: () => {
-				this.users[masterId] = 'Mestre Desconhecido';
-			}
-		});
+		this.userService.getUserByAuthId(masterId)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (user) => {
+					this.users[masterId] = user?.displayName || user?.email || 'Mestre';
+				},
+				error: () => {
+					this.users[masterId] = 'Mestre';
+				}
+			});
 
 		return 'Carregando...';
 	}
@@ -134,14 +144,16 @@ export class CampaignsComponent implements OnInit {
 
 		if (!confirmed) return;
 
-		this.campaignService.startSession(campaign.id).subscribe((success: boolean) => {
-			if (success) {
-				campaign.activeSession = true;
-				this.dialogService.success('Sessão Iniciada', 'A sessão foi iniciada com sucesso!');
-			} else {
-				this.dialogService.error('Erro', 'Erro ao iniciar sessão. Tente novamente.');
-			}
-		});
+		this.campaignService.startSession(campaign.id)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((success: boolean) => {
+				if (success) {
+					campaign.activeSession = true;
+					this.dialogService.success('Sessão Iniciada', 'A sessão foi iniciada com sucesso!');
+				} else {
+					this.dialogService.error('Erro', 'Erro ao iniciar sessão. Tente novamente.');
+				}
+			});
 	}
 
 	public async endSession(campaign: Campaign): Promise<void> {
@@ -155,13 +167,20 @@ export class CampaignsComponent implements OnInit {
 
 		if (!confirmed) return;
 
-		this.campaignService.endSession(campaign.id).subscribe((success: boolean) => {
-			if (success) {
-				campaign.activeSession = false;
-				this.dialogService.success('Sessão Finalizada', 'A sessão foi finalizada com sucesso!');
-			} else {
-				this.dialogService.error('Erro', 'Erro ao finalizar sessão. Tente novamente.');
-			}
-		});
+		this.campaignService.endSession(campaign.id)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((success: boolean) => {
+				if (success) {
+					campaign.activeSession = false;
+					this.dialogService.success('Sessão Finalizada', 'A sessão foi finalizada com sucesso!');
+				} else {
+					this.dialogService.error('Erro', 'Erro ao finalizar sessão. Tente novamente.');
+				}
+			});
+	}
+
+	ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 }

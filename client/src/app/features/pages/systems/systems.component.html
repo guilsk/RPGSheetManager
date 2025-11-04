@@ -48,8 +48,14 @@
 			</div>
 		</div>
 
+		<!-- Loading State -->
+		<div class="systems-page__loading" *ngIf="isLoadingSystems">
+			<div class="loading-spinner">⏳</div>
+			<p>Carregando sistemas...</p>
+		</div>
+
 		<!-- Systems Grid -->
-		<div class="systems-page__grid" *ngIf="filteredSystems.length > 0">
+		<div class="systems-page__grid" *ngIf="!isLoadingSystems && filteredSystems.length > 0">
 			<div class="system-card" *ngFor="let system of getSortedSystems()"
 				[class.system-card--saved]="isSystemSavedOrOwned(system)" [class.system-card--own]="isSystemOwner(system)">
 
@@ -102,7 +108,7 @@
 		</div>
 
 		<!-- Empty State -->
-		<div class="systems-page__empty" *ngIf="getSortedSystems().length === 0 && !isUploading">
+		<div class="systems-page__empty" *ngIf="!isLoadingSystems && getSortedSystems().length === 0 && !isUploading">
 			<div class="systems-page__empty-icon">🎲</div>
 			<h3 class="systems-page__empty-title">Nenhum Sistema Disponível</h3>
 			<p class="systems-page__empty-description">Seja o primeiro a criar um sistema de RPG! Faça upload de um arquivo JSON para começar.</p>
