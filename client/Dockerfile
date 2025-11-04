@@ -3,14 +3,14 @@ FROM node:18-alpine AS build
 
 WORKDIR /app
 
-# Copiar package.json primeiro para otimizar cache
-COPY package*.json ./
+# Como o context é a raiz, copiar apenas a pasta client
+COPY client/package*.json ./
 
 # Instalar dependências (incluindo devDependencies para build)
 RUN npm ci
 
-# Copiar código fonte
-COPY . .
+# Copiar código fonte do client
+COPY client/ .
 
 # Build da aplicação para produção
 RUN npm run build
@@ -21,8 +21,8 @@ FROM nginx:alpine
 # Copiar arquivos buildados
 COPY --from=build /app/dist/client /usr/share/nginx/html
 
-# Copiar configuração customizada do nginx
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copiar configuração customizada do nginx (caminho correto)
+COPY client/nginx.conf /etc/nginx/nginx.conf
 
 # Expor porta 80
 EXPOSE 80
