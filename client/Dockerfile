@@ -18,14 +18,11 @@ RUN npm run build
 # Stage 2: Servir com nginx
 FROM nginx:alpine
 
-# Primeiro, vamos tentar copiar toda a pasta dist para ver o que existe
-COPY --from=build /app/dist /usr/share/nginx/
+# Copiar os arquivos buildados para a pasta que o nginx espera
+# O Angular gera os arquivos em /app/dist/client (conforme angular.json)
+COPY --from=build /app/dist/client /usr/share/nginx/html
 
-# Se isso não funcionar, vamos criar uma página de teste
-RUN echo '<h1>TESTE - ARQUIVOS DISPONIVEIS:</h1>' > /usr/share/nginx/html/test.html
-RUN ls -la /usr/share/nginx/ >> /usr/share/nginx/html/test.html || echo "Erro ao listar" >> /usr/share/nginx/html/test.html
-
-# Copiar configuração customizada do nginx (caminho correto)
+# Copiar configuração customizada do nginx
 COPY client/nginx.conf /etc/nginx/nginx.conf
 
 # Expor porta 80
