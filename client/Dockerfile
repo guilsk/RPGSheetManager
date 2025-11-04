@@ -6,8 +6,8 @@ WORKDIR /app
 # Como o context é a raiz, copiar apenas a pasta client
 COPY client/package*.json ./
 
-# Limpar cache do npm e instalar dependências
-RUN npm cache clean --force && npm install
+# Limpar cache do npm e instalar dependências (força rebuild)
+RUN npm cache clean --force && npm install --no-cache
 
 # Copiar código fonte do client
 COPY client/ .
@@ -15,8 +15,8 @@ COPY client/ .
 # Build da aplicação para produção
 RUN npm run build
 
-# Debug: verificar o que foi gerado
-RUN ls -la dist/
+# Debug: verificar o que foi gerado na pasta dist
+RUN echo "=== CONTEUDO DA PASTA DIST ===" && ls -la dist/ && echo "=== ARQUIVOS DENTRO DE DIST/CLIENT ===" && ls -la dist/client/ || echo "Pasta dist/client nao existe"
 
 # Stage 2: Servir com nginx
 FROM nginx:alpine
