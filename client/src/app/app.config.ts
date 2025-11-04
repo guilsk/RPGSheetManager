@@ -21,6 +21,7 @@ export const appConfig: ApplicationConfig = {
 			useRefreshTokens: true,
 			cacheLocation: 'localstorage',
 			skipRedirectCallback: false,
+
 			httpInterceptor: {
 				allowedList: [
 					{

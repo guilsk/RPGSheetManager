@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { CurrentUserService } from '../../../shared/services/current-user.service';
+import { environment } from '../../../../environments/environment';
 import { DialogComponent } from '../../components/dialog/dialog.component';
 import { DialogService } from '../../../shared/services/dialog.service';
 import { CampaignService } from '../../../shared/services/campaign.service';
@@ -88,5 +89,13 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
 	onDialogClosed(): void {
 		this.dialogService.hideDialog();
+	}
+
+	logout(): void {
+		this.auth.logout({
+			logoutParams: {
+				returnTo: environment.auth0.logoutUri
+			}
+		});
 	}
 }

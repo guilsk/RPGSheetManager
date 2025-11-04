@@ -11,6 +11,8 @@ export const environment = {
     clientId: 'VYpgkGhW4JmH4980SiGBvWS891jqk55t',
     audience: 'https://rpg-sheetmanager/',
     // URL de callback em produção
-    redirectUri: 'https://rpgsheetmanager.onrender.com/callback'
+    redirectUri: 'https://rpgsheetmanager.onrender.com/callback',
+    // URL de logout em produção
+    logoutUri: 'https://rpgsheetmanager.onrender.com'
   }
 };
