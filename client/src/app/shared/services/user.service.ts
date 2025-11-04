@@ -18,7 +18,15 @@ export class UserService {
 	constructor() { }
 
 	public post(userInfo: User): Observable<User> {
-		return this.http.post<User>(this.apiUrl, userInfo);
+		return this.http.post<User>(this.apiUrl, userInfo).pipe(
+			map(user => {
+				// Limpar cache ao criar novo usuário
+				if (user.authId) {
+					this.clearUserFromCache(user.authId);
+				}
+				return user;
+			})
+		);
 	}
 
 	public getUserByAuthId(authId: string): Observable<User> {
@@ -49,7 +57,15 @@ export class UserService {
 	}
 
 	public updateProfile(user: User): Observable<User> {
-		return this.http.put<User>(`${this.apiUrl}/profile`, user);
+		return this.http.put<User>(`${this.apiUrl}/profile`, user).pipe(
+			map(updatedUser => {
+				// Limpar cache do usuário atualizado
+				if (updatedUser.authId) {
+					this.clearUserFromCache(updatedUser.authId);
+				}
+				return updatedUser;
+			})
+		);
 	}
 
 	public getAllUsers(): Observable<User[]> {

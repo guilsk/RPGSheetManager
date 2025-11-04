@@ -46,9 +46,11 @@ export class CharactersComponent implements OnInit, OnDestroy {
 	}
 
 	private loadCharacters(): void {
-		this.characterService.getCharacters()
+		// Usar o observable reativo que mantém o estado
+		this.characterService.characters$
 			.pipe(takeUntil(this.destroy$))
 			.subscribe((characters: Character[]) => {
+				console.log('CharactersComponent - Personagens carregados do cache:', characters.length);
 				this.characters = characters;
 				this.filteredCharacters = [...characters];
 			});
