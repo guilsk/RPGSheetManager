@@ -7,8 +7,19 @@ namespace RPGSheetManager.API {
         public static void Main(string[] args) {
             var builder = WebApplication.CreateBuilder(args);
 
-            var allowed = builder.Configuration.GetSection("AllowedCors").Get<string[]>() ?? [];
-            Console.WriteLine($" CORS Origins configuradas: {string.Join(", ", allowed)}");
+            var corsSection = builder.Configuration.GetSection("AllowedCors");
+            Console.WriteLine($"🔍 AllowedCors section exists: {corsSection.Exists()}");
+            Console.WriteLine($"🔍 AllowedCors section value: {corsSection.Value}");
+            
+            var allowed = corsSection.Get<string[]>() ?? [];
+            Console.WriteLine($"🔥 CORS Origins configuradas ({allowed.Length}): {string.Join(", ", allowed)}");
+            
+            // Debug: mostrar todas as configurações relacionadas a CORS
+            var allKeys = builder.Configuration.AsEnumerable().Where(x => x.Key.Contains("Cors", StringComparison.OrdinalIgnoreCase));
+            foreach (var key in allKeys)
+            {
+                Console.WriteLine($"🔍 Config Key: {key.Key} = {key.Value}");
+            }
             builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
                 p.WithOrigins(allowed).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 
