@@ -22,6 +22,9 @@ FROM nginx:alpine
 # O Angular gera os arquivos em /app/dist/client (conforme angular.json)
 COPY --from=build /app/dist/client /usr/share/nginx/html
 
+# DEBUG: Verificar o que foi copiado
+RUN echo "=== CONTEUDO DE /usr/share/nginx/html ===" && ls -la /usr/share/nginx/html && echo "=== FIM DEBUG ==="
+
 # Copiar configuração customizada do nginx
 COPY client/nginx.conf /etc/nginx/nginx.conf
 
