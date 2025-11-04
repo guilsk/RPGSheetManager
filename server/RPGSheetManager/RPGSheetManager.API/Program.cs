@@ -8,7 +8,7 @@ namespace RPGSheetManager.API {
             var builder = WebApplication.CreateBuilder(args);
 
             var allowed = builder.Configuration.GetSection("AllowedCors").Get<string[]>() ?? [];
-            Console.WriteLine($"CORS Origins configuradas: {string.Join(", ", allowed)}");
+            Console.WriteLine($" CORS Origins configuradas: {string.Join(", ", allowed)}");
             builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
                 p.WithOrigins(allowed).AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 
