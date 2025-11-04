@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '@auth0/auth0-angular';
 import { UserService } from '../../../shared/services/user.service';
 import { CurrentUserService } from '../../../shared/services/current-user.service';
 import { User } from '../../../shared/models/rpg-sheet-manager.model';
-import { catchError, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, switchMap, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 @Component({
 	selector: 'app-user-profile',
@@ -15,13 +15,14 @@ import { of } from 'rxjs';
 	templateUrl: './user-profile.component.html',
 	styleUrls: ['./user-profile.component.scss']
 })
-export class UserProfileComponent implements OnInit {
+export class UserProfileComponent implements OnInit, OnDestroy {
 	profileForm: FormGroup;
 	isLoading = false;
 	isSubmitting = false;
 	error: string | null = null;
 	success: string | null = null;
 	currentUser: User | null = null;
+	private destroy$ = new Subject<void>();
 
 	constructor(
 		private fb: FormBuilder,
@@ -39,6 +40,11 @@ export class UserProfileComponent implements OnInit {
 		this.loadUserProfile();
 	}
 
+	ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	private loadUserProfile(): void {
 		this.isLoading = true;
 		this.error = null;
@@ -54,7 +60,8 @@ export class UserProfileComponent implements OnInit {
 				console.error('Erro ao carregar perfil:', error);
 				this.error = 'Erro ao carregar perfil do usuário';
 				return of(null);
-			})
+			}),
+			takeUntil(this.destroy$)
 		).subscribe(user => {
 			this.isLoading = false;
 			if (user) {
@@ -80,26 +87,28 @@ export class UserProfileComponent implements OnInit {
 
 
 
-			this.userService.updateProfile(updatedUser).subscribe({
-				next: (user) => {
-					this.isSubmitting = false;
-					this.success = 'Perfil atualizado com sucesso!';
-					this.currentUser = user;
+			this.userService.updateProfile(updatedUser)
+				.pipe(takeUntil(this.destroy$))
+				.subscribe({
+					next: (user) => {
+						this.isSubmitting = false;
+						this.success = 'Perfil atualizado com sucesso!';
+						this.currentUser = user;
 
-					// Atualizar o usuário atual no serviço para refletir no layout
-					this.currentUserService.updateCurrentUser(user);
+						// Atualizar o usuário atual no serviço para refletir no layout
+						this.currentUserService.updateCurrentUser(user);
 
-					// Limpar mensagem de sucesso após 3 segundos
-					setTimeout(() => {
-						this.success = null;
-					}, 3000);
-				},
-				error: (error) => {
-					this.isSubmitting = false;
-					console.error('Erro ao atualizar perfil:', error);
-					this.error = 'Erro ao atualizar perfil. Tente novamente.';
-				}
-			});
+						// Limpar mensagem de sucesso após 3 segundos
+						setTimeout(() => {
+							this.success = null;
+						}, 3000);
+					},
+					error: (error) => {
+						this.isSubmitting = false;
+						console.error('Erro ao atualizar perfil:', error);
+						this.error = 'Erro ao atualizar perfil. Tente novamente.';
+					}
+				});
 		}
 	}
 
