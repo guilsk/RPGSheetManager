@@ -18,12 +18,11 @@ RUN npm run build
 # Stage 2: Servir com nginx
 FROM nginx:alpine
 
-# Copiar os arquivos buildados para a pasta que o nginx espera
-# O Angular gera os arquivos em /app/dist/client (conforme angular.json)
-COPY --from=build /app/dist/client /usr/share/nginx/html
+# Remover arquivos padrão do nginx
+RUN rm -rf /usr/share/nginx/html/*
 
-# DEBUG: Verificar o que foi copiado
-RUN echo "=== CONTEUDO DE /usr/share/nginx/html ===" && ls -la /usr/share/nginx/html && echo "=== FIM DEBUG ==="
+# Copiar os arquivos buildados do Angular (está em /app/dist/client/browser/)
+COPY --from=build /app/dist/client/browser /usr/share/nginx/html
 
 # Copiar configuração customizada do nginx
 COPY client/nginx.conf /etc/nginx/nginx.conf
