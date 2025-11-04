@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
@@ -14,6 +14,8 @@ import { MultiSelectSearchComponent } from '../../../components/multi-select-sea
 import { CharacterSelectorComponent } from '../../../components/character-selector/character-selector.component';
 import { CharacterViewModalComponent } from '../../../components/character-view-modal/character-view-modal.component';
 import { CharacterEditModalComponent } from '../../../components/character-edit-modal/character-edit-modal.component';
+import { Subject, forkJoin } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'app-campaign-view',
@@ -22,7 +24,7 @@ import { CharacterEditModalComponent } from '../../../components/character-edit-
 	templateUrl: './campaign-view.component.html',
 	styleUrl: './campaign-view.component.scss'
 })
-export class CampaignViewComponent implements OnInit {
+export class CampaignViewComponent implements OnInit, OnDestroy {
 	private fb = inject(FormBuilder);
 	private router = inject(Router);
 	private route = inject(ActivatedRoute);
@@ -32,6 +34,7 @@ export class CampaignViewComponent implements OnInit {
 	private dialogService = inject(DialogService);
 	private currentUserService = inject(CurrentUserService);
 	private characterService = inject(CharacterService);
+	private destroy$ = new Subject<void>();
 
 	campaign: Campaign | null = null;
 	systems: RpgSystem[] = [];
@@ -86,6 +89,11 @@ export class CampaignViewComponent implements OnInit {
 		}
 	}
 
+	public ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	private initEditForm(): void {
 		this.editForm = this.fb.group({
 			title: ['', [Validators.required, Validators.minLength(3)]],
@@ -109,7 +117,9 @@ export class CampaignViewComponent implements OnInit {
 	private loadUsers(): void {
 		this.loadingUsers = true;
 
-		this.userService.getAllUsers().subscribe({
+		this.userService.getAllUsers()
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
 			next: (users: User[]) => {
 				// Filtrar usuário atual, jogadores ativos e jogadores convidados
 				this.users = users.filter(user => {
@@ -138,15 +148,19 @@ export class CampaignViewComponent implements OnInit {
 	}
 
 	private loadSystems(): void {
-		this.systemService.getSavedSystems().subscribe(systems => {
-			this.systems = systems;
-		});
+		this.systemService.getSavedSystems()
+			.pipe(takeUntil(this.destroy$))
+			.subscribe(systems => {
+				this.systems = systems;
+			});
 	}
 
 	private loadCampaign(): void {
 		if (!this.campaignId) return;
 
-		this.campaignService.getCampaignById(this.campaignId).subscribe(campaign => {
+		this.campaignService.getCampaignById(this.campaignId)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe(campaign => {
 			if (campaign) {
 				this.campaign = campaign;
 				this.isOwner = campaign.masterId === this.currentUserId;
@@ -214,18 +228,17 @@ export class CampaignViewComponent implements OnInit {
 			return;
 		}
 
-		// Carregar dados dos jogadores ativos
+		// Carregar dados dos jogadores ativos usando forkJoin para evitar múltiplas subscriptions
 		this.activePlayers = [];
-		for (const playerId of this.campaign.playerIds) {
-			this.userService.getUserByAuthId(playerId).subscribe(user => {
-				if (user) {
-					this.activePlayers.push(user);
-				}
-			});
-		}
+		const playerRequests = this.campaign.playerIds.map(playerId =>
+			this.userService.getUserByAuthId(playerId)
+		);
 
-		// TODO: Carregar personagens dos jogadores quando implementarmos
-		// this.loadPlayerCharacters();
+		forkJoin(playerRequests)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe(users => {
+				this.activePlayers = users.filter(user => user != null);
+			});
 	}
 
 	private loadInvitedPlayers(): void {
@@ -234,15 +247,17 @@ export class CampaignViewComponent implements OnInit {
 			return;
 		}
 
-		// Carregar dados dos jogadores convidados
+		// Carregar dados dos jogadores convidados usando forkJoin para evitar múltiplas subscriptions
 		this.invitedPlayers = [];
-		for (const playerId of this.campaign.invitedPlayerIds) {
-			this.userService.getUserByAuthId(playerId).subscribe(user => {
-				if (user) {
-					this.invitedPlayers.push(user);
-				}
+		const inviteRequests = this.campaign.invitedPlayerIds.map(playerId =>
+			this.userService.getUserByAuthId(playerId)
+		);
+
+		forkJoin(inviteRequests)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe(users => {
+				this.invitedPlayers = users.filter(user => user != null);
 			});
-		}
 	}
 
 	public trackByPlayer(index: number, player: User): string {
