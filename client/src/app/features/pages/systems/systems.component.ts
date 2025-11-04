@@ -30,7 +30,7 @@ export class SystemsComponent implements OnInit, OnDestroy {
 	currentUser: User | null = null;
 	currentUserId: string | null = null;
 	ownerNames: { [key: string]: string } = {}; // Cache para nomes dos usuários
-	
+
 	// Loading states para melhor UX
 	isLoadingSystems = true;
 	isLoadingAction = false;

@@ -11,7 +11,7 @@ import { environment } from '../../../environments/environment';
 })
 export class SystemService {
 	private apiUrl = `${environment.apiUrl}/system`;
-	
+
 	// Cache para melhorar performance
 	private systemsCache$ = new BehaviorSubject<RpgSystem[] | null>(null);
 	private savedSystemsCache$ = new BehaviorSubject<RpgSystem[] | null>(null);
@@ -28,12 +28,12 @@ export class SystemService {
 	public getSystems(): Observable<RpgSystem[]> {
 		const now = Date.now();
 		const cached = this.systemsCache$.value;
-		
+
 		// Retornar cache se válido
 		if (cached && (now - this.lastSystemsFetch) < this.cacheExpiry) {
 			return of(cached);
 		}
-		
+
 		// Buscar novos dados
 		return this.http.get<RpgSystem[]>(this.apiUrl).pipe(
 			map(systems => {
@@ -57,12 +57,12 @@ export class SystemService {
 	public getSavedSystems(): Observable<RpgSystem[]> {
 		const now = Date.now();
 		const cached = this.savedSystemsCache$.value;
-		
+
 		// Retornar cache se válido
 		if (cached && (now - this.lastSavedSystemsFetch) < this.cacheExpiry) {
 			return of(cached);
 		}
-		
+
 		// Buscar novos dados
 		return this.http.get<RpgSystem[]>(`${this.apiUrl}/saved-systems`).pipe(
 			map(systems => {

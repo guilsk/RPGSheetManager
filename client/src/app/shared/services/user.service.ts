@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment';
 export class UserService {
 	private apiUrl = `${environment.apiUrl}/user`;
 	private http = inject(HttpClient);
-	
+
 	// Cache para usuários para evitar múltiplas requisições
 	private userCache = new Map<string, { user: User, timestamp: number }>();
 	private cacheExpiry = 10 * 60 * 1000; // 10 minutos
@@ -24,12 +24,12 @@ export class UserService {
 	public getUserByAuthId(authId: string): Observable<User> {
 		const now = Date.now();
 		const cached = this.userCache.get(authId);
-		
+
 		// Retornar cache se válido
 		if (cached && (now - cached.timestamp) < this.cacheExpiry) {
 			return of(cached.user);
 		}
-		
+
 		// Buscar novo usuário
 		return this.http.get<User>(`${this.apiUrl}/${authId}`).pipe(
 			map(user => {
