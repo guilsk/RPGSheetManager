@@ -11,11 +11,14 @@ WORKDIR /src
 # Copiar toda a solution e projetos
 COPY . .
 
-# Restaurar pacotes usando o arquivo de solution
-RUN dotnet restore "RPGSheetManager.sln"
+# Listar arquivos para debug (temporário)
+RUN ls -la
+
+# Restaurar pacotes direto no projeto principal
+RUN dotnet restore "RPGSheetManager.API/RPGSheetManager.API.csproj"
 
 # Build da aplicação
-RUN dotnet build "RPGSheetManager.sln" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "RPGSheetManager.API/RPGSheetManager.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
