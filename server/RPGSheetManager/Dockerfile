@@ -9,6 +9,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Copiar arquivos de projeto primeiro (para otimizar cache do Docker)
+# Como o context é ./server/RPGSheetManager, os projetos estão na raiz
 COPY ["RPGSheetManager.API/RPGSheetManager.API.csproj", "RPGSheetManager.API/"]
 COPY ["RPGSheetManager.Application/RPGSheetManager.Application.csproj", "RPGSheetManager.Application/"]
 COPY ["RPGSheetManager.Domain/RPGSheetManager.Domain.csproj", "RPGSheetManager.Domain/"]
