@@ -4,7 +4,7 @@
 export const environment = {
   production: true,
   // URL da API em produção no Render
-  apiUrl: 'https://rpg-sm-api.onrender.com/api',
+  apiUrl: 'https://rpgsheetmanager-api.onrender.com/api',
 
   auth0: {
     domain: 'dev-j4yhsqhd3jiqhal4.us.auth0.com',
