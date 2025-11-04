@@ -15,10 +15,13 @@ COPY client/ .
 # Build da aplicação para produção
 RUN npm run build
 
+# Debug: verificar o que foi gerado
+RUN ls -la dist/
+
 # Stage 2: Servir com nginx
 FROM nginx:alpine
 
-# Copiar arquivos buildados
+# Copiar arquivos buildados (verificar se o build gerou arquivos)
 COPY --from=build /app/dist/client /usr/share/nginx/html
 
 # Copiar configuração customizada do nginx (caminho correto)
