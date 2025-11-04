@@ -8,18 +8,18 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-# Copiar toda a solution e projetos
-COPY . .
+# Copiar apenas a pasta server para o contexto
+COPY server/ ./
 
-# Os arquivos estão na raiz, então o caminho correto é:
-RUN dotnet restore "server/RPGSheetManager/RPGSheetManager.API/RPGSheetManager.API.csproj"
+# Agora os caminhos são relativos à pasta server
+RUN dotnet restore "RPGSheetManager/RPGSheetManager.API/RPGSheetManager.API.csproj"
 
 # Build da aplicação
-RUN dotnet build "server/RPGSheetManager/RPGSheetManager.API/RPGSheetManager.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "RPGSheetManager/RPGSheetManager.API/RPGSheetManager.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "server/RPGSheetManager/RPGSheetManager.API/RPGSheetManager.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "RPGSheetManager/RPGSheetManager.API/RPGSheetManager.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
