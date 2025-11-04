@@ -6,8 +6,8 @@ WORKDIR /app
 # Como o context é a raiz, copiar apenas a pasta client
 COPY client/package*.json ./
 
-# Instalar dependências (incluindo devDependencies para build)
-RUN npm ci
+# Limpar cache do npm e instalar dependências
+RUN npm cache clean --force && npm install
 
 # Copiar código fonte do client
 COPY client/ .
