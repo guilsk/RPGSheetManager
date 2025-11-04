@@ -1,0 +1,46 @@
+# Render configuration para RPG Sheet Manager
+services:
+  # Frontend Angular
+  - type: web
+    name: rpg-sheet-manager
+    env: docker
+    dockerfilePath: ./client/Dockerfile
+    dockerContext: ./client
+    plan: free
+    region: oregon
+    branch: develop
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+  # Backend .NET API
+  - type: web
+    name: rpg-sm-api
+    env: docker
+    dockerfilePath: ./server/RPGSheetManager/Dockerfile
+    dockerContext: ./server/RPGSheetManager
+    plan: free
+    region: oregon
+    branch: develop
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:10000
+      - key: MongoDb__ConnectionString
+        sync: false # Será definido manualmente (MongoDB Atlas)
+      - key: MongoDb__DatabaseName
+        value: RPGSheetManager
+      - key: Auth0__Domain
+        value: dev-j4yhsqhd3jiqhal4.us.auth0.com
+      - key: Auth0__ClientId
+        value: VYpgkGhW4JmH4980SiGBvWS891jqk55t
+      - key: Auth0__Audience
+        value: https://rpg-sheetmanager/
+      # CORS Configuration
+      - key: AllowedCors__0
+        value: https://rpg-sheet-manager.onrender.com
+      - key: AllowedCors__1
+        value: https://rpgsheetmanager.com
+      - key: AllowedCors__2
+        value: http://localhost:4200

@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+.angular/cache
+dist
+.vscode
+coverage
+.nyc_output
+.env
+.env.local
+.env.production
+.env.development
+*.log
