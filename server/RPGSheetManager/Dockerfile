@@ -11,18 +11,15 @@ WORKDIR /src
 # Copiar toda a solution e projetos
 COPY . .
 
-# Listar arquivos para debug (temporário)
-RUN ls -la
-
-# Restaurar pacotes direto no projeto principal
-RUN dotnet restore "RPGSheetManager.API/RPGSheetManager.API.csproj"
+# Os arquivos estão na raiz, então o caminho correto é:
+RUN dotnet restore "server/RPGSheetManager/RPGSheetManager.API/RPGSheetManager.API.csproj"
 
 # Build da aplicação
-RUN dotnet build "RPGSheetManager.API/RPGSheetManager.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "server/RPGSheetManager/RPGSheetManager.API/RPGSheetManager.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "RPGSheetManager.API/RPGSheetManager.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "server/RPGSheetManager/RPGSheetManager.API/RPGSheetManager.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
