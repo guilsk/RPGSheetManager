@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -9,6 +9,8 @@ import {
 import { DynamicFieldComponent } from '../../../components/dynamic-field/dynamic-field.component';
 import { SystemService } from '../../../../shared/services/system.service';
 import { UserService } from '../../../../shared/services/user.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'app-system-view',
@@ -17,11 +19,12 @@ import { UserService } from '../../../../shared/services/user.service';
 	templateUrl: './system-view.component.html',
 	styleUrl: './system-view.component.scss'
 })
-export class SystemViewComponent implements OnInit {
+export class SystemViewComponent implements OnInit, OnDestroy {
 	private route = inject(ActivatedRoute);
 	private router = inject(Router);
 	private systemService = inject(SystemService);
 	private userService = inject(UserService);
+	private destroy$ = new Subject<void>();
 
 	public system?: RpgSystem;
 	public systemData: CharacterData[] = [];
@@ -33,6 +36,11 @@ export class SystemViewComponent implements OnInit {
 
 	public ngOnInit() {
 		this.loadData();
+	}
+
+	public ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 
 	private loadData() {
@@ -48,49 +56,53 @@ export class SystemViewComponent implements OnInit {
 
 		this.loading = true;
 
-		this.systemService.getSystemById(this.systemId).subscribe({
-			next: (system: RpgSystem | undefined) => {
-				this.loading = false;
-				if (system) {
-					this.system = system;
+		this.systemService.getSystemById(this.systemId)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (system: RpgSystem | undefined) => {
+					this.loading = false;
+					if (system) {
+						this.system = system;
 
-					// Carregar o nome do dono do sistema
-					if (system.ownerId && system.ownerId !== 'system-admin') {
-						this.loadOwnerName(system.ownerId);
+						// Carregar o nome do dono do sistema
+						if (system.ownerId && system.ownerId !== 'system-admin') {
+							this.loadOwnerName(system.ownerId);
+						}
+
+						if (system.template) {
+							// Criar dados do sistema com valores padrão para visualização
+							this.systemData = system.template.map(field => ({
+								...field,
+								value: field.value || this.getDefaultValueForField(field),
+								editable: false, // Sempre false para visualização
+								visible: field.visible !== false
+							}));
+
+							this.organizeDataByCategory();
+						}
+					} else {
+						this.router.navigate(['/systems']);
 					}
-
-					if (system.template) {
-						// Criar dados do sistema com valores padrão para visualização
-						this.systemData = system.template.map(field => ({
-							...field,
-							value: field.value || this.getDefaultValueForField(field),
-							editable: false, // Sempre false para visualização
-							visible: field.visible !== false
-						}));
-
-						this.organizeDataByCategory();
-					}
-				} else {
+				},
+				error: (error) => {
+					console.error('Erro ao carregar sistema:', error);
+					this.loading = false;
 					this.router.navigate(['/systems']);
 				}
-			},
-			error: (error) => {
-				console.error('Erro ao carregar sistema:', error);
-				this.loading = false;
-				this.router.navigate(['/systems']);
-			}
-		});
+			});
 	}
 
 	private loadOwnerName(ownerId: string) {
-		this.userService.getUserByAuthId(ownerId).subscribe({
-			next: (user) => {
-				this.ownerName = user.displayName || 'Usuário desconhecido';
-			},
-			error: () => {
-				this.ownerName = 'Usuário desconhecido';
-			}
-		});
+		this.userService.getUserByAuthId(ownerId)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (user) => {
+					this.ownerName = user.displayName || 'Usuário desconhecido';
+				},
+				error: () => {
+					this.ownerName = 'Usuário desconhecido';
+				}
+			});
 	}
 
 	private getDefaultValueForField(field: CharacterData): string {

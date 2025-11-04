@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Character, CharacterData } from '../../../shared/models/rpg-sheet-manager.model';
@@ -7,6 +7,8 @@ import { SystemService } from '../../../shared/services/system.service';
 import { DialogService } from '../../../shared/services/dialog.service';
 import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
 import { SearchBarConfig } from '../../../shared/models/search-bar.model';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'app-characters',
@@ -15,10 +17,11 @@ import { SearchBarConfig } from '../../../shared/models/search-bar.model';
 	templateUrl: './characters.component.html',
 	styleUrl: './characters.component.scss'
 })
-export class CharactersComponent implements OnInit {
+export class CharactersComponent implements OnInit, OnDestroy {
 	private characterService = inject(CharacterService);
 	private systemService = inject(SystemService);
 	private dialogService = inject(DialogService);
+	private destroy$ = new Subject<void>();
 
 	characters: Character[] = [];
 	filteredCharacters: Character[] = [];
@@ -37,11 +40,18 @@ export class CharactersComponent implements OnInit {
 		this.loadSystems();
 	}
 
+	public ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
+	}
+
 	private loadCharacters(): void {
-		this.characterService.getCharacters().subscribe((characters: Character[]) => {
-			this.characters = characters;
-			this.filteredCharacters = [...characters];
-		});
+		this.characterService.getCharacters()
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((characters: Character[]) => {
+				this.characters = characters;
+				this.filteredCharacters = [...characters];
+			});
 	}
 
 	public onSearchResults(filteredCharacters: Character[]): void {
@@ -49,13 +59,15 @@ export class CharactersComponent implements OnInit {
 	}
 
 	private loadSystems(): void {
-		this.systemService.getSystems().subscribe((systems: any[]) => {
-			systems.forEach((system: any) => {
-				if (system.id && system.name) {
-					this.systems[system.id] = system.name;
-				}
+		this.systemService.getSystems()
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((systems: any[]) => {
+				systems.forEach((system: any) => {
+					if (system.id && system.name) {
+						this.systems[system.id] = system.name;
+					}
+				});
 			});
-		});
 	}
 
 	public getCharacterLevel(character: Character): string {
@@ -92,21 +104,23 @@ export class CharactersComponent implements OnInit {
 
 		if (!confirmed) return;
 
-		this.characterService.deleteCharacter(character.id).subscribe({
-			next: (success) => {
-				if (success) {
-					// Remover da lista principal
-					this.characters = this.characters.filter(c => c.id !== character.id);
-					// Remover também da lista filtrada para atualização imediata na tela
-					this.filteredCharacters = this.filteredCharacters.filter(c => c.id !== character.id);
-				} else {
+		this.characterService.deleteCharacter(character.id)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (success) => {
+					if (success) {
+						// Remover da lista principal
+						this.characters = this.characters.filter(c => c.id !== character.id);
+						// Remover também da lista filtrada para atualização imediata na tela
+						this.filteredCharacters = this.filteredCharacters.filter(c => c.id !== character.id);
+					} else {
+						this.dialogService.error('Erro', 'Erro ao excluir personagem. Tente novamente.');
+					}
+				},
+				error: (error) => {
+					console.error('Erro ao excluir personagem:', error);
 					this.dialogService.error('Erro', 'Erro ao excluir personagem. Tente novamente.');
 				}
-			},
-			error: (error) => {
-				console.error('Erro ao excluir personagem:', error);
-				this.dialogService.error('Erro', 'Erro ao excluir personagem. Tente novamente.');
-			}
-		});
+			});
 	}
 }
