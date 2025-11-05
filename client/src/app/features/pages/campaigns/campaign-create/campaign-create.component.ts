@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { Campaign, RpgSystem, User } from '../../../../shared/models/rpg-sheet-manager.model';
 import { SearchBarConfig } from '../../../../shared/models/search-bar.model';
 import { CampaignService } from '../../../../shared/services/campaign.service';
@@ -18,7 +19,7 @@ import { MultiSelectSearchComponent } from '../../../components/multi-select-sea
 	templateUrl: './campaign-create.component.html',
 	styleUrl: './campaign-create.component.scss'
 })
-export class CampaignCreateComponent implements OnInit {
+export class CampaignCreateComponent implements OnInit, OnDestroy {
 	private fb = inject(FormBuilder);
 	private router = inject(Router);
 	private route = inject(ActivatedRoute);
@@ -27,6 +28,8 @@ export class CampaignCreateComponent implements OnInit {
 	private userService = inject(UserService);
 	private dialogService = inject(DialogService);
 	private currentUserService = inject(CurrentUserService);
+
+	private destroy$ = new Subject<void>();
 
 	public campaignForm!: FormGroup;
 	public systems: RpgSystem[] = [];
@@ -56,23 +59,25 @@ export class CampaignCreateComponent implements OnInit {
 		this.loadingSystems = true;
 		this.campaignForm.get('systemId')?.disable();
 
-		this.systemService.getSavedSystems().subscribe({
-			next: (systems: RpgSystem[]) => {
-				this.systems = systems;
-				this.loadingSystems = false;
-				this.campaignForm.get('systemId')?.enable();
+		this.systemService.getSavedSystems()
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (systems: RpgSystem[]) => {
+					this.systems = systems;
+					this.loadingSystems = false;
+					this.campaignForm.get('systemId')?.enable();
 
-				// Se só há um sistema, seleciona automaticamente
-				if (systems.length === 1) {
-					this.campaignForm.get('systemId')?.setValue(systems[0].id);
+					// Se só há um sistema, seleciona automaticamente
+					if (systems.length === 1) {
+						this.campaignForm.get('systemId')?.setValue(systems[0].id);
+					}
+				},
+				error: (error) => {
+					console.error('Erro ao carregar sistemas:', error);
+					this.loadingSystems = false;
+					this.campaignForm.get('systemId')?.enable();
 				}
-			},
-			error: (error) => {
-				console.error('Erro ao carregar sistemas:', error);
-				this.loadingSystems = false;
-				this.campaignForm.get('systemId')?.enable();
-			}
-		});
+			});
 	}
 
 	private setupUserSearchConfig(): void {
@@ -89,22 +94,24 @@ export class CampaignCreateComponent implements OnInit {
 	private loadUsers(): void {
 		this.loadingUsers = true;
 
-		this.userService.getAllUsers().subscribe({
-			next: (users: User[]) => {
-				// Filtrar o usuário atual para que não apareça na busca
-				const currentUser = this.currentUserService.getCurrentUser();
-				if (currentUser?.authId) {
-					this.users = users.filter(user => user.authId !== currentUser.authId);
-				} else {
-					this.users = users;
+		this.userService.getAllUsers()
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (users: User[]) => {
+					// Filtrar o usuário atual para que não apareça na busca
+					const currentUser = this.currentUserService.getCurrentUser();
+					if (currentUser?.authId) {
+						this.users = users.filter(user => user.authId !== currentUser.authId);
+					} else {
+						this.users = users;
+					}
+					this.loadingUsers = false;
+				},
+				error: (error) => {
+					console.error('Erro ao carregar usuários:', error);
+					this.loadingUsers = false;
 				}
-				this.loadingUsers = false;
-			},
-			error: (error) => {
-				console.error('Erro ao carregar usuários:', error);
-				this.loadingUsers = false;
-			}
-		});
+			});
 	}
 
 	public saveCampaign(): void {
@@ -131,15 +138,17 @@ export class CampaignCreateComponent implements OnInit {
 			activeSession: false
 		};
 
-		this.campaignService.createCampaign(campaignData).subscribe(campaign => {
-			this.isLoading = false;
-			if (campaign) {
-				this.dialogService.success('Sucesso', 'Campanha criada com sucesso!');
-				this.router.navigate(['/campaigns']);
-			} else {
-				this.dialogService.error('Erro', 'Erro ao criar campanha. Tente novamente.');
-			}
-		});
+		this.campaignService.createCampaign(campaignData)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe(campaign => {
+				this.isLoading = false;
+				if (campaign) {
+					this.dialogService.success('Sucesso', 'Campanha criada com sucesso!');
+					this.router.navigate(['/campaigns']);
+				} else {
+					this.dialogService.error('Erro', 'Erro ao criar campanha. Tente novamente.');
+				}
+			});
 	}
 
 	public cancel(): void {
@@ -148,5 +157,10 @@ export class CampaignCreateComponent implements OnInit {
 
 	public goBack(): void {
 		this.router.navigate(['/campaigns']);
+	}
+
+	public ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 }

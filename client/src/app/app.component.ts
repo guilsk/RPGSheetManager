@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@auth0/auth0-angular';
 import { UserService } from './shared/services/user.service';
 import { CurrentUserService } from './shared/services/current-user.service';
 import { LayoutComponent } from './features/pages/layout/layout.component';
 import { User } from './shared/models/rpg-sheet-manager.model';
-import { catchError, switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, switchMap, takeUntil } from 'rxjs/operators';
+import { of, Subject } from 'rxjs';
 
 @Component({
 	selector: 'app-root',
@@ -15,7 +15,9 @@ import { of } from 'rxjs';
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
+
 	constructor(
 		public auth: AuthService,
 		public userService: UserService,
@@ -24,11 +26,13 @@ export class AppComponent implements OnInit {
 
 	public async ngOnInit(): Promise<void> {
 		// Tratar erros de autenticação
-		this.auth.error$.subscribe(error => {
-			if (error) {
-				console.error('Erro de autenticação Auth0:', error);
-			}
-		});
+		this.auth.error$
+			.pipe(takeUntil(this.destroy$))
+			.subscribe(error => {
+				if (error) {
+					console.error('Erro de autenticação Auth0:', error);
+				}
+			});
 
 		// Processar usuário autenticado
 		this.auth.user$.pipe(
@@ -77,11 +81,17 @@ export class AppComponent implements OnInit {
 				console.error('Erro ao processar usuário:', error);
 				return of(null);
 			})
-		).subscribe(user => {
+		).pipe(takeUntil(this.destroy$))
+		.subscribe(user => {
 			// Notificar o CurrentUserService sempre que o usuário for processado
 			if (user) {
 				this.currentUserService.updateCurrentUser(user);
 			}
 		});
+	}
+
+	ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 }

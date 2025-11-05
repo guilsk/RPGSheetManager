@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
 	selector: 'app-auth-callback',
@@ -37,7 +39,9 @@ import { Router } from '@angular/router';
 		}
 	`]
 })
-export class AuthCallbackComponent implements OnInit {
+export class AuthCallbackComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
+
 	constructor(
 		private auth: AuthService,
 		private router: Router
@@ -46,19 +50,28 @@ export class AuthCallbackComponent implements OnInit {
 	ngOnInit() {
 		// O Auth0 Angular SDK automaticamente processa o callback
 		// Vamos aguardar a autenticação e redirecionar
-		this.auth.isAuthenticated$.subscribe(isAuthenticated => {
-			if (isAuthenticated) {
-				// Redireciona para a página inicial após autenticação bem-sucedida
-				this.router.navigate(['/characters']);
-			}
-		});
+		this.auth.isAuthenticated$
+			.pipe(takeUntil(this.destroy$))
+			.subscribe(isAuthenticated => {
+				if (isAuthenticated) {
+					// Redireciona para a página inicial após autenticação bem-sucedida
+					this.router.navigate(['/characters']);
+				}
+			});
 
-		this.auth.error$.subscribe(error => {
-			if (error) {
-				console.error('Erro de autenticação:', error);
-				// Redireciona para login em caso de erro
-				this.router.navigate(['/']);
-			}
-		});
+		this.auth.error$
+			.pipe(takeUntil(this.destroy$))
+			.subscribe(error => {
+				if (error) {
+					console.error('Erro de autenticação:', error);
+					// Redireciona para login em caso de erro
+					this.router.navigate(['/']);
+				}
+			});
+	}
+
+	ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 }

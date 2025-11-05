@@ -212,12 +212,14 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 	}
 
 	private loadMasterName(masterId: string): void {
-		this.userService.getUserByAuthId(masterId).subscribe({
-			next: (user) => {
-				this.masterName = user?.displayName || user?.email || 'Mestre';
-			},
-			error: () => {
-				this.masterName = 'Mestre Desconhecido';
+		this.userService.getUserByAuthId(masterId)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (user) => {
+					this.masterName = user?.displayName || user?.email || 'Mestre';
+				},
+				error: () => {
+					this.masterName = 'Mestre Desconhecido';
 			}
 		});
 	}
@@ -325,14 +327,16 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 
 		if (!confirmed) return;
 
-		this.campaignService.startSession(this.campaign.id).subscribe((success: boolean) => {
-			if (success && this.campaign) {
-				this.campaign.activeSession = true;
-				this.dialogService.success('Aventura Iniciada', 'A sessão foi iniciada com sucesso! Os jogadores já podem participar.');
-			} else {
-				this.dialogService.error('Erro', 'Erro ao iniciar sessão. Tente novamente.');
-			}
-		});
+		this.campaignService.startSession(this.campaign.id)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((success: boolean) => {
+				if (success && this.campaign) {
+					this.campaign.activeSession = true;
+					this.dialogService.success('Aventura Iniciada', 'A sessão foi iniciada com sucesso! Os jogadores já podem participar.');
+				} else {
+					this.dialogService.error('Erro', 'Erro ao iniciar sessão. Tente novamente.');
+				}
+			});
 	}
 
 	public async endSession(): Promise<void> {
@@ -346,14 +350,16 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 
 		if (!confirmed) return;
 
-		this.campaignService.endSession(this.campaign.id).subscribe((success: boolean) => {
-			if (success && this.campaign) {
-				this.campaign.activeSession = false;
-				this.dialogService.success('Aventura Encerrada', 'A sessão foi encerrada com sucesso!');
-			} else {
-				this.dialogService.error('Erro', 'Erro ao encerrar sessão. Tente novamente.');
-			}
-		});
+		this.campaignService.endSession(this.campaign.id)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((success: boolean) => {
+				if (success && this.campaign) {
+					this.campaign.activeSession = false;
+					this.dialogService.success('Aventura Encerrada', 'A sessão foi encerrada com sucesso!');
+				} else {
+					this.dialogService.error('Erro', 'Erro ao encerrar sessão. Tente novamente.');
+				}
+			});
 	}
 
 	public async deleteCampaign(): Promise<void> {
@@ -367,14 +373,16 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 
 		if (!confirmed) return;
 
-		this.campaignService.deleteCampaign(this.campaign.id).subscribe((success: boolean) => {
-			if (success) {
-				this.dialogService.success('Campanha Encerrada', 'A campanha foi encerrada com sucesso.');
-				this.router.navigate(['/campaigns']);
-			} else {
-				this.dialogService.error('Erro', 'Erro ao encerrar campanha. Tente novamente.');
-			}
-		});
+		this.campaignService.deleteCampaign(this.campaign.id)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((success: boolean) => {
+				if (success) {
+					this.dialogService.success('Campanha Encerrada', 'A campanha foi encerrada com sucesso.');
+					this.router.navigate(['/campaigns']);
+				} else {
+					this.dialogService.error('Erro', 'Erro ao encerrar campanha. Tente novamente.');
+				}
+			});
 	}
 
 	public async removePlayer(player: User): Promise<void> {
@@ -396,13 +404,15 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 			playerIds: updatedPlayerIds
 		};
 
-		this.campaignService.updateCampaign(this.campaign.id, updatedCampaign).subscribe((success: boolean) => {
-			if (success) {
-				// Atualizar o objeto campaign local
-				this.campaign = updatedCampaign;
+		this.campaignService.updateCampaign(this.campaign.id, updatedCampaign)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((success: boolean) => {
+				if (success) {
+					// Atualizar o objeto campaign local
+					this.campaign = updatedCampaign;
 
-				// Remover da lista de jogadores ativos
-				this.activePlayers = this.activePlayers.filter(p => p.authId !== player.authId);
+					// Remover da lista de jogadores ativos
+					this.activePlayers = this.activePlayers.filter(p => p.authId !== player.authId);
 
 				// Recarregar usuários disponíveis para que o jogador removido apareça novamente na busca
 				this.loadUsers();
@@ -433,13 +443,15 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 			invitedPlayerIds: updatedInvitedPlayerIds
 		};
 
-		this.campaignService.updateCampaign(this.campaign.id, updatedCampaign).subscribe((success: boolean) => {
-			if (success) {
-				// Atualizar o objeto campaign local
-				this.campaign = updatedCampaign;
+		this.campaignService.updateCampaign(this.campaign.id, updatedCampaign)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((success: boolean) => {
+				if (success) {
+					// Atualizar o objeto campaign local
+					this.campaign = updatedCampaign;
 
-				// Remover da lista de jogadores convidados
-				this.invitedPlayers = this.invitedPlayers.filter(p => p.authId !== player.authId);
+					// Remover da lista de jogadores convidados
+					this.invitedPlayers = this.invitedPlayers.filter(p => p.authId !== player.authId);
 
 				// Atualizar o form control para refletir a mudança
 				this.editForm.patchValue({
@@ -463,9 +475,11 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 		// Para cada personagem da campanha, buscar os dados completos
 		this.campaign.characters.forEach(campaignChar => {
 			if (campaignChar.characterId && campaignChar.playerId) {
-				this.characterService.getCharacterById(campaignChar.characterId).subscribe({
-					next: (character: Character | undefined) => {
-						if (character) {
+				this.characterService.getCharacterById(campaignChar.characterId)
+					.pipe(takeUntil(this.destroy$))
+					.subscribe({
+						next: (character: Character | undefined) => {
+							if (character) {
 							this.campaignCharacters[campaignChar.playerId] = character;
 						}
 					},
@@ -505,8 +519,10 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 			return;
 		}
 
-		this.campaignService.associateCharacter(this.campaign.id, character.id!, this.selectedPlayerForCharacter).subscribe({
-			next: (response) => {
+		this.campaignService.associateCharacter(this.campaign.id, character.id!, this.selectedPlayerForCharacter)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (response) => {
 				this.campaignCharacters[this.selectedPlayerForCharacter] = character;
 				this.dialogService.success('Sucesso', `Personagem ${character.name} foi associado à campanha!`);
 				this.closeCharacterSelector();
@@ -523,15 +539,17 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 		if (!this.campaign?.id || !character.id) return;
 
 		// Buscar dados da campanha para este personagem
-		this.campaignService.getCampaignCharacterData(this.campaign.id, character.id).subscribe({
-			next: (campaignData) => {
-				this.selectedCharacterToView = character;
-				this.selectedCharacterCampaignData = campaignData?.dynamicData || [];
-				this.showCharacterViewModal = true;
-			},
-			error: (error) => {
-				console.error('Error loading campaign character data:', error);
-				// Mostrar modal mesmo sem dados de campanha
+		this.campaignService.getCampaignCharacterData(this.campaign.id, character.id)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (campaignData) => {
+					this.selectedCharacterToView = character;
+					this.selectedCharacterCampaignData = campaignData?.dynamicData || [];
+					this.showCharacterViewModal = true;
+				},
+				error: (error) => {
+					console.error('Error loading campaign character data:', error);
+					// Mostrar modal mesmo sem dados de campanha
 				this.selectedCharacterToView = character;
 				this.selectedCharacterCampaignData = [];
 				this.showCharacterViewModal = true;
@@ -544,17 +562,19 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 		if (!this.campaign?.id || !character.id) return;
 
 		// Buscar dados da campanha para este personagem
-		this.campaignService.getCampaignCharacterData(this.campaign.id, character.id).subscribe({
-			next: (campaignData) => {
-				// Buscar o dono do personagem no campaign.characters
-				const campaignChar = this.campaign?.characters?.find(cc => cc.characterId === character.id);
+		this.campaignService.getCampaignCharacterData(this.campaign.id, character.id)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: (campaignData) => {
+					// Buscar o dono do personagem no campaign.characters
+					const campaignChar = this.campaign?.characters?.find(cc => cc.characterId === character.id);
 
-				this.selectedCharacterToEdit = character;
-				this.selectedCharacterEditCampaignData = campaignData?.dynamicData || [];
-				this.selectedCharacterOwnerId = campaignChar?.playerId || '';
-				this.showCharacterEditModal = true;
-			},
-			error: (error) => {
+					this.selectedCharacterToEdit = character;
+					this.selectedCharacterEditCampaignData = campaignData?.dynamicData || [];
+					this.selectedCharacterOwnerId = campaignChar?.playerId || '';
+					this.showCharacterEditModal = true;
+				},
+				error: (error) => {
 				console.error('Error loading campaign character data:', error);
 				// Mostrar modal mesmo sem dados de campanha
 				const campaignChar = this.campaign?.characters?.find(cc => cc.characterId === character.id);
@@ -570,16 +590,18 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 	public onCharacterDataSaved(dynamicData: DynamicField[]): void {
 		// Recarregar dados do personagem após salvar
 		if (this.selectedCharacterToEdit?.id && this.campaign?.id) {
-			this.campaignService.getCampaignCharacterData(this.campaign.id, this.selectedCharacterToEdit.id).subscribe({
-				next: (campaignData) => {
-					// Atualizar os dados de campanha localmente se necessário
-					this.selectedCharacterEditCampaignData = campaignData?.dynamicData || [];
+			this.campaignService.getCampaignCharacterData(this.campaign.id, this.selectedCharacterToEdit.id)
+				.pipe(takeUntil(this.destroy$))
+				.subscribe({
+					next: (campaignData) => {
+						// Atualizar os dados de campanha localmente se necessário
+						this.selectedCharacterEditCampaignData = campaignData?.dynamicData || [];
 
-					// Recarregar a campanha completa para refletir mudanças
-					this.loadCampaign();
-				},
-				error: (error) => {
-					console.error('Error reloading campaign character data:', error);
+						// Recarregar a campanha completa para refletir mudanças
+						this.loadCampaign();
+					},
+					error: (error) => {
+						console.error('Error reloading campaign character data:', error);
 				}
 			});
 		}
@@ -595,14 +617,16 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 		);
 
 		if (confirmed) {
-			this.campaignService.disassociateCharacter(this.campaign.id, character.id!, playerId).subscribe({
-				next: () => {
-					delete this.campaignCharacters[playerId];
-					this.dialogService.success('Sucesso', `Personagem ${character.name} foi removido da campanha.`);
-				},
-				error: (error) => {
-					console.error('Erro ao remover personagem:', error);
-					this.dialogService.error('Erro', 'Não foi possível remover o personagem da campanha.');
+			this.campaignService.disassociateCharacter(this.campaign.id, character.id!, playerId)
+				.pipe(takeUntil(this.destroy$))
+				.subscribe({
+					next: () => {
+						delete this.campaignCharacters[playerId];
+						this.dialogService.success('Sucesso', `Personagem ${character.name} foi removido da campanha.`);
+					},
+					error: (error) => {
+						console.error('Erro ao remover personagem:', error);
+						this.dialogService.error('Erro', 'Não foi possível remover o personagem da campanha.');
 				}
 			});
 		}
@@ -655,10 +679,12 @@ export class CampaignViewComponent implements OnInit, OnDestroy {
 		);
 
 		if (confirmed) {
-			this.campaignService.removePlayerFromCampaign(this.campaign.id, this.currentUserId).subscribe({
-				next: () => {
-					this.dialogService.success('Sucesso', `Você saiu da campanha "${this.campaign?.title}".`);
-					this.router.navigate(['/campaigns']);
+			this.campaignService.removePlayerFromCampaign(this.campaign.id, this.currentUserId)
+				.pipe(takeUntil(this.destroy$))
+				.subscribe({
+					next: () => {
+						this.dialogService.success('Sucesso', `Você saiu da campanha "${this.campaign?.title}".`);
+						this.router.navigate(['/campaigns']);
 				},
 				error: (error) => {
 					console.error('Erro ao sair da campanha:', error);

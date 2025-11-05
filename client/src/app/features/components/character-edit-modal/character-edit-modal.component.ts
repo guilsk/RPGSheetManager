@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subject, takeUntil } from 'rxjs';
 import { Character, CharacterData, DynamicField } from '../../../shared/models/rpg-sheet-manager.model';
 import { DynamicFieldComponent } from '../dynamic-field/dynamic-field.component';
 import { DialogService } from '../../../shared/services/dialog.service';
@@ -12,13 +13,15 @@ import { CampaignService } from '../../../shared/services/campaign.service';
 	templateUrl: './character-edit-modal.component.html',
 	styleUrl: './character-edit-modal.component.scss'
 })
-export class CharacterEditModalComponent implements OnInit, OnChanges {
+export class CharacterEditModalComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() isVisible = false;
 	@Input() character: Character | null = null;
 	@Input() campaignId: string = '';
 	@Input() campaignData: DynamicField[] = []; // Dados de sessão da campanha
 	@Input() campaignActive: boolean = false;
 	@Input() currentUserId: string = '';
+
+	private destroy$ = new Subject<void>();
 	@Input() ownerId: string = '';
 	@Output() closed = new EventEmitter<void>();
 	@Output() saved = new EventEmitter<DynamicField[]>();
@@ -147,7 +150,8 @@ export class CharacterEditModalComponent implements OnInit, OnChanges {
 			this.character.id,
 			this.currentUserId,
 			dynamicData
-		).subscribe({
+		).pipe(takeUntil(this.destroy$))
+		.subscribe({
 			next: (success) => {
 				this.isSaving = false;
 				if (success) {
@@ -187,5 +191,10 @@ export class CharacterEditModalComponent implements OnInit, OnChanges {
 			...field,
 			value: this.fieldValues[field.name] || field.value
 		};
+	}
+
+	public ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 }

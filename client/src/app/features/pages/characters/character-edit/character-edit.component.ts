@@ -1,7 +1,9 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
 	Character,
 	CharacterData,
@@ -20,7 +22,8 @@ import { DiceRollResult } from '../../../../shared/services/dice.service';
 	templateUrl: './character-edit.component.html',
 	styleUrl: './character-edit.component.scss'
 })
-export class CharacterEditComponent implements OnInit {
+export class CharacterEditComponent implements OnInit, OnDestroy {
+	private destroy$ = new Subject<void>();
 	private fb = inject(FormBuilder);
 	private route = inject(ActivatedRoute);
 	private router = inject(Router);
@@ -71,7 +74,9 @@ export class CharacterEditComponent implements OnInit {
 		this.loadingSystems = true;
 		this.characterForm.get('systemId')?.disable();
 
-		this.systemService.getSavedSystems().subscribe({
+		this.systemService.getSavedSystems()
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
 			next: (systems: RpgSystem[]) => {
 				this.systems = systems;
 				this.loadingSystems = false;
@@ -101,7 +106,9 @@ export class CharacterEditComponent implements OnInit {
 	private loadCharacter() {
 		if (!this.characterId) return;
 
-		this.characterService.getCharacterById(this.characterId).subscribe((character: Character | undefined) => {
+		this.characterService.getCharacterById(this.characterId)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe((character: Character | undefined) => {
 			if (character) {
 				this.character = character;
 				this.characterForm.patchValue({
@@ -113,7 +120,9 @@ export class CharacterEditComponent implements OnInit {
 
 				// Carregar o sistema para ter acesso ao categoryOrder
 				if (character.systemId) {
-					this.systemService.getSystemById(character.systemId).subscribe({
+					this.systemService.getSystemById(character.systemId)
+						.pipe(takeUntil(this.destroy$))
+						.subscribe({
 						next: (system: RpgSystem | undefined) => {
 							this.currentSystem = system;
 							this.organizeDataByCategory();
@@ -140,7 +149,9 @@ export class CharacterEditComponent implements OnInit {
 
 		this.loadingTemplate = true;
 
-		this.systemService.getSystemById(systemId).subscribe({
+		this.systemService.getSystemById(systemId)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
 			next: (selectedSystem: RpgSystem | undefined) => {
 				this.loadingTemplate = false;
 				this.currentSystem = selectedSystem;
@@ -337,7 +348,9 @@ export class CharacterEditComponent implements OnInit {
 	}
 
 	private createCharacter(character: Character) {
-		this.characterService.createCharacter(character).subscribe({
+		this.characterService.createCharacter(character)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
 			next: () => {
 				this.router.navigate(['/characters']);
 			},
@@ -348,13 +361,20 @@ export class CharacterEditComponent implements OnInit {
 	}
 
 	private updateCharacter(character: Character) {
-		this.characterService.updateCharacter(character).subscribe({
-			next: () => {
-				this.router.navigate(['/characters']);
-			},
-			error: (error) => {
-				console.error('Erro ao atualizar personagem:', error);
-			}
-		});
+		this.characterService.updateCharacter(character)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe({
+				next: () => {
+					this.router.navigate(['/characters']);
+				},
+				error: (error) => {
+					console.error('Erro ao atualizar personagem:', error);
+				}
+			});
+	}
+
+	ngOnDestroy(): void {
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 }
