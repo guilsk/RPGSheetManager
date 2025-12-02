@@ -9,7 +9,8 @@ import { DialogService } from '../../../shared/services/dialog.service';
 import { CurrentUserService } from '../../../shared/services/current-user.service';
 import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
 import { SearchBarConfig } from '../../../shared/models/search-bar.model';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
 	selector: 'app-campaigns',
@@ -78,6 +79,8 @@ export class CampaignsComponent implements OnInit, OnDestroy {
 			.subscribe((campaigns: Campaign[]) => {
 				this.myCampaigns = campaigns;
 				this.filteredMyCampaigns = [...campaigns];
+				// pre-carrega nomes (evita chamadas no getter)
+				this.preloadUserNames([...this.myCampaigns, ...this.playerCampaigns]);
 			});
 
 		// Carregar campanhas como jogador
@@ -86,6 +89,44 @@ export class CampaignsComponent implements OnInit, OnDestroy {
 			.subscribe((campaigns: Campaign[]) => {
 				this.playerCampaigns = campaigns;
 				this.filteredPlayerCampaigns = [...campaigns];
+				// pre-carrega nomes (evita chamadas no getter)
+				this.preloadUserNames([...this.myCampaigns, ...this.playerCampaigns]);
+			});
+	}
+
+	/** Preload minimal set of master display names to avoid HTTP calls inside template getters */
+	private preloadUserNames(campaigns: Campaign[]): void {
+		if (!campaigns || !campaigns.length) return;
+
+		const ids = Array.from(new Set(
+			campaigns
+				.map(c => c.masterId)
+				.filter(Boolean) as string[]
+		));
+
+		const idsToFetch = ids.filter(id =>
+			!this.users[id] && id !== this.currentUserId && id !== 'system-admin'
+		);
+
+		if (!idsToFetch.length) return;
+
+		const requests = idsToFetch.map(id =>
+			this.userService.getUserByAuthId(id)
+				.pipe(catchError(() => of(null)))
+		);
+
+		forkJoin(requests)
+			.pipe(takeUntil(this.destroy$))
+			.subscribe(users => {
+				users.forEach((user, i) => {
+					const id = idsToFetch[i];
+					this.users[id] = user?.displayName || user?.email || 'Mestre';
+				});
+			}, () => {
+				// se falhar, colocar placeholder para evitar chamadas repetidas
+				idsToFetch.forEach(id => {
+					if (!this.users[id]) this.users[id] = 'Mestre';
+				});
 			});
 	}
 
@@ -101,28 +142,12 @@ export class CampaignsComponent implements OnInit, OnDestroy {
 		return systemId ? this.systems[systemId] || 'Sistema Desconhecido' : 'Sem Sistema';
 	}
 
+	/** Síncrono: apenas lookup em cache (pré-carregado por preloadUserNames) */
 	public getMasterName(masterId?: string): string {
 		if (!masterId) return 'Sem Mestre';
 		if (masterId === this.currentUserId) return 'Você';
 		if (masterId === 'system-admin') return 'Sistema';
-
-		// Tenta buscar no cache primeiro
-		const cachedName = this.users[masterId];
-		if (cachedName) return cachedName;
-
-		// Se não encontrou, busca dinamicamente e atualiza o cache
-		this.userService.getUserByAuthId(masterId)
-			.pipe(takeUntil(this.destroy$))
-			.subscribe({
-				next: (user) => {
-					this.users[masterId] = user?.displayName || user?.email || 'Mestre';
-				},
-				error: () => {
-					this.users[masterId] = 'Mestre';
-				}
-			});
-
-		return 'Carregando...';
+		return this.users[masterId] || 'Carregando...';
 	}
 
 	public createCampaign(): void {
